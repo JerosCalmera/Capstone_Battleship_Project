@@ -28,5 +28,3 @@ Possible extensions:
 - Option/s for larger board/s
 - A chat function 
 - Anything else that comes up during development as a interesting idea
-
-
