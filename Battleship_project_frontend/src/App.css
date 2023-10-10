@@ -1,5 +1,5 @@
 h2 {
-  padding-left: 225px;
+  padding-left: 290px;
 }
 
 body {
@@ -7,8 +7,8 @@ body {
 }
 
 .cell {
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   border: 1px solid black;
   background-color: lightgray;
   color: lightgray;
@@ -17,8 +17,8 @@ body {
 }
 
 .cellShip {
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   border: 1px solid black;
   background-color: red;
   color: red;
@@ -27,8 +27,8 @@ body {
 }
 
 .cellDamaged {
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   border: 1px solid black;
   background-color: grey;
   color: grey;
@@ -44,17 +44,17 @@ body {
 
 .endCell {
   height: 20px;
-  width: 40px;
+  width: 50px;
   background-color: aliceblue;
   color: black;
   border: aliceblue;
+  margin-top: 5px;
   margin-right: -1px;
-  padding-top: 11px;
 }
 
 .endCellCorner {
   height: 20px;
-  width: 40px;
+  width: 50px;
   background-color: aliceblue;
   color: aliceblue;
   border: aliceblue;
@@ -63,16 +63,22 @@ body {
 
 .gameBoardRender {
   height: 500px;
-  width: 480px;
+  width: 700px;
 }
 
 .gameBoardRender2 {
   height: 500px;
-  width: 480px;
+  width: 700px;
 }
 
 .gameBoardOuter {
   display: flex;
-  position: fixed;
+  background-color: aliceblue;
+}
+
+.gameBoardOuterGreater {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: aliceblue;
 }

@@ -31,12 +31,6 @@ public class MessageController {
         System.out.println("Chat Connected");
         return new Chat("Connected to chat server");
     }
-//    @MessageMapping("/gameData")
-//    @SendTo("/topic/GameData")
-//    public GameData game(Connection message) throws Exception{
-//        System.out.println("Game data server connected");
-//        return new GameData("");
-//    }
     @MessageMapping("/gameData")
     public void handleGameData(GameData gameData){
         String target = gameData.getContent();
