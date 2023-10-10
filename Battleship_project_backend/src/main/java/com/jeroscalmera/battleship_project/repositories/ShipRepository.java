@@ -15,4 +15,6 @@ public interface ShipRepository extends JpaRepository<Ship, Long> {
     @Query("SELECT s.id FROM Ship s WHERE s.coOrds LIKE %:target%")
     Long findShipIdsByCoOrdsContainingPair(@Param("target") String target);
 
+    @Query("SELECT s.coOrds FROM Ship s")
+    List<String> findAllCoOrds();
 }

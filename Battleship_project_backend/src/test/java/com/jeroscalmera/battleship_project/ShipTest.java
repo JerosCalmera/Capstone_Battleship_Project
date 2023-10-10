@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest
 public class ShipTest {
     @Autowired
-    GameLogic gameLogic;
+    GameLogic GameLogic;
     @Autowired
     PlayerRepository playerRepository;
     @Autowired
@@ -41,13 +41,29 @@ public class ShipTest {
         Player player1 = new Player("Jack", 1);
         playerRepository.save(player1);
         Ship carrier = new Ship(player1, "carrier", 12, "");
-        carrier.setDamage("A1");
-        carrier.setDamage("A5");
-        carrier.setDamage("F1");
-        carrier.setDamage("S1");
-        carrier.setDamage("H6");
-        carrier.setDamage("JI");
+        carrier.setDamage("B2");
+        carrier.setDamage("C2");
+        carrier.setDamage("D2");
+        carrier.setDamage("E2");
+        carrier.setDamage("F2");
+        carrier.setDamage("G2");
         shipRepository.save(carrier);
-        gameLogic.shootAtShip("F1");
+        Ship battleship = new Ship(player1, "battleship", 10, "");
+        battleship.setDamage("J3");
+        battleship.setDamage("J4");
+        battleship.setDamage("J5");
+        battleship.setDamage("J6");
+        battleship.setDamage("J7");
+        shipRepository.save(battleship);
+        Ship cruiser = new Ship(player1, "cruiser", 6, "");
+        cruiser.setDamage("F7");
+        cruiser.setDamage("F8");
+        cruiser.setDamage("F9");
+        shipRepository.save(cruiser);
+        Ship destroyer = new Ship(player1, "destroyer", 4, "");
+        destroyer.setDamage("A8");
+        destroyer.setDamage("B8");
+        shipRepository.save(destroyer);
+        GameLogic.shootAtShip("F1");
     }
 }
