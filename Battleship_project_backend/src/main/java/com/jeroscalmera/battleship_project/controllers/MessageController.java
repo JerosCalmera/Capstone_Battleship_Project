@@ -1,12 +1,12 @@
 package com.jeroscalmera.battleship_project.controllers;
 
 import com.jeroscalmera.battleship_project.GameLogic;
+import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.GameData;
 import com.jeroscalmera.battleship_project.websocket.Greeting;
 import com.jeroscalmera.battleship_project.websocket.Connection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 
@@ -37,5 +37,9 @@ public class MessageController {
         System.out.println(target);
         GameLogic.shootAtShip(target);
         GameLogic.submitStats();
+    }
+    @MessageMapping("/room")
+    public void handlePassword(Room roomNumber) {
+        GameLogic.handlePassword(roomNumber);
     }
 }

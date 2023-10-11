@@ -1,11 +1,12 @@
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
-import { useEffect, useState } from "react";
+import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
 
 function GameBoard() {
+    const BASE_URL = "http://192.168.248.133"
 
-    const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`http://localhost:8081/game`)));
+    const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [severStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
@@ -13,11 +14,14 @@ function GameBoard() {
     const [enemyShipInfo, setEnemyShipInfo] = useState<string[]>([])
     const [enemyShipDamage, setEnemyShipDamage] = useState<string[]>([])
     const [shipDamage, setShipDamage] = useState<string[]>([])
-
+    const [roomReady, setRoomReady] = useState<boolean>(false)
+    const [players, setPlayers] = useState<number>(0)
+    const [password, setPassword] = useState<string>("")
+    const [passwordEntry, setPasswordEntry] = useState<boolean>(false)
 
     useEffect(() => {
         const port = 8081;
-        const socket = new SockJS(`http://localhost:${port}/game`);
+        const socket = new SockJS(`${BASE_URL}:${port}/game`);
         const client = Stomp.over(socket);
 
         client.connect({}, () => {
@@ -49,13 +53,31 @@ function GameBoard() {
             };
             setStompClient(client)
         });
-    }, [attemptReconnect]);
+    }, [attemptReconnect])
+
+
+    const auth = () => {
+        stompClient.send("/app/room", {}, JSON.stringify(password));
+    }
 
     return (
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
-            <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+            {serverMessageLog === "Room saved!" ? <div>
+                <h1>Room number: {password}</h1>
+                <h1>Waiting on other player.....</h1></div> :
+                serverMessageLog === "Rooms synced" ?
+                    <div>
+                        <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                    </div>
+                    :
+                    <div>
+                        <h1>Please enter the room number....</h1>
+                        <input onChange={(e) => setPassword(e.target.value)}></input>
+                        <button onClick={auth}>Save</button>
+                    </div>
+            }
         </>
     )
 }

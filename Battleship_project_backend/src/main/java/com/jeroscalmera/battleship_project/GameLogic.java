@@ -1,11 +1,14 @@
 package com.jeroscalmera.battleship_project;
 
+import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
+import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.GameData;
 import com.jeroscalmera.battleship_project.websocket.Greeting;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +18,13 @@ import java.util.Optional;
 public class GameLogic {
     private PlayerRepository playerRepository;
     private ShipRepository shipRepository;
+    private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
 
-    public GameLogic(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
+    public GameLogic(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
+        this.roomRepository = roomRepository;
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
@@ -33,6 +38,17 @@ public class GameLogic {
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
+    public void handlePassword(Room roomNumber) {
+        if (roomRepository.findAll().isEmpty()) {
+            roomRepository.save(roomNumber);
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Room saved!"));
+        } else if (!roomRepository.findRoom().contains(roomNumber.getRoom())) {
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Wrong room number!"));
+        } else {
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Rooms synced"));
+        }
+    }
+
     public void shootAtShip(String target) {
         if (shipRepository.findShipIdsByCoOrdsContainingPair(target) != null) {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Hit!"));

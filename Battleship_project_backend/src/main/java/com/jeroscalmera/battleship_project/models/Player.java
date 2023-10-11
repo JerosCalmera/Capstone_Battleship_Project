@@ -1,14 +1,12 @@
 package com.jeroscalmera.battleship_project.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import org.hibernate.annotations.Cascade;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Entity
 @Table(name = "players")

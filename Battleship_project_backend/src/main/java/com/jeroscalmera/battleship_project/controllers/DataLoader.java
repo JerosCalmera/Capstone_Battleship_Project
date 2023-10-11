@@ -3,6 +3,7 @@ package com.jeroscalmera.battleship_project.controllers;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
+import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -17,12 +18,15 @@ public class DataLoader implements ApplicationRunner {
     PlayerRepository playerRepository;
     @Autowired
     ShipRepository shipRepository;
+    @Autowired
+    RoomRepository roomRepository;
     public DataLoader(){
 
     }
     public void run(ApplicationArguments args){
         shipRepository.deleteAll();
         playerRepository.deleteAll();
+        roomRepository.deleteAll();
         Player player1 = new Player("Jack", 1);
         playerRepository.save(player1);
         Ship carrier = new Ship(player1, "carrier", 12, "");
