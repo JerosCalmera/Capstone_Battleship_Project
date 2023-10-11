@@ -4,7 +4,7 @@ import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
 
 function GameBoard() {
-    const BASE_URL = "http://localhost"
+    const BASE_URL = "http://192.168.248.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [severStatus, setServerStatus] = useState(false)
@@ -16,8 +16,8 @@ function GameBoard() {
     const [shipDamage, setShipDamage] = useState<string[]>([])
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [players, setPlayers] = useState<number>(0)
-    const [password, setPassword] = useState<string>("")
-    const [passwordEntry, setPasswordEntry] = useState<string>("")
+    const [password, setPassword] = useState<string>("Pears")
+    const [passwordEntry, setPasswordEntry] = useState<string>("Apples")
 
     useEffect(() => {
         const port = 8081;
@@ -27,7 +27,8 @@ function GameBoard() {
         client.connect({}, () => {
             console.log("Connected to server");
             client.subscribe("/topic/connect", (message: any) => {
-                serverSetMessageLog(message.body.slice(12, -2))
+                if (message.body.slice(12, -2) === "Wrong room number!") { console.log("Wrong room number!") }
+                else { serverSetMessageLog(message.body.slice(12, -2)) }
             });
 
             client.subscribe("/topic/gameData", (message: any) => {
