@@ -4,7 +4,7 @@ import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.248.133"
+    const BASE_URL = "http://localhost"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [severStatus, setServerStatus] = useState(false)
@@ -17,7 +17,7 @@ function GameBoard() {
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [players, setPlayers] = useState<number>(0)
     const [password, setPassword] = useState<string>("")
-    const [passwordEntry, setPasswordEntry] = useState<boolean>(false)
+    const [passwordEntry, setPasswordEntry] = useState<string>("")
 
     useEffect(() => {
         const port = 8081;
@@ -58,15 +58,16 @@ function GameBoard() {
 
     const auth = () => {
         stompClient.send("/app/room", {}, JSON.stringify(password));
+        setPasswordEntry(password)
     }
 
     return (
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
-            {serverMessageLog === "Room saved!" ? <div>
-                <h1>Room number: {password}</h1>
-                <h1>Waiting on other player.....</h1></div> :
+            {serverMessageLog === "Room saved!" && passwordEntry.length > 0 ? <div>
+                < h1 > Room number: {passwordEntry}</h1 >
+                <h1>Waiting on other player.....</h1></div > :
                 serverMessageLog === "Rooms synced" ?
                     <div>
                         <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
