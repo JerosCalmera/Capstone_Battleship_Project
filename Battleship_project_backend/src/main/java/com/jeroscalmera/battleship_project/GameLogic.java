@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 @Service
 public class GameLogic {
@@ -64,4 +65,7 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Miss!"));
         }
     }
+    public void messageSender(String string) {
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(string));
+        }
 }
