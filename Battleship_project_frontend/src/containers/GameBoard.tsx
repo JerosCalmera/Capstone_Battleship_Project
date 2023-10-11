@@ -70,10 +70,11 @@ function GameBoard() {
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
+            {serverMessageLog === "Room saved!" && savedName === "" ? serverSetMessageLog("") : null}
             {savedName === "" ?
                 <div>
                     <h1>Please enter your name....</h1>
-                    <input onChange={(e) => setPlayerName(e.target.value)}></input>
+                    <input required onChange={(e) => setPlayerName(e.target.value)}></input>
                     <button onClick={nameSave}>Save</button>
                 </div>
                 :
@@ -87,7 +88,7 @@ function GameBoard() {
                         :
                         <div>
                             <h1>Please enter the room number....</h1>
-                            <input onChange={(e) => setPassword(e.target.value)}></input>
+                            <input required onChange={(e) => setPassword(e.target.value)}></input>
                             <button onClick={auth}>Save</button>
                         </div>
             }
