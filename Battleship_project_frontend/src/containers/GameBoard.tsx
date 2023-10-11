@@ -21,7 +21,7 @@ function GameBoard() {
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string>("")
     const [hidden, setHidden] = useState<string>("")
- 
+
     useEffect(() => {
         const port = 8081;
         const socket = new SockJS(`${BASE_URL}:${port}/game`);
@@ -79,7 +79,7 @@ function GameBoard() {
                     < h1 >Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div >
                 : null}
-            {savedName != "name" ?
+            {savedName != "name" && serverMessageLog != "Rooms synced" ?
                 <div>
                     <h1>Please enter the room number....</h1>
                     <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
