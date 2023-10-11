@@ -61,6 +61,7 @@ function GameBoard() {
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
+        setRoomReady(true)
     }
 
     const nameSave = () => {
@@ -73,20 +74,19 @@ function GameBoard() {
                 <div>
                     <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                 </div>);
-        else if (serverMessageLog === "Room saved!" && savedName != "name")
+        else if (serverMessageLog === "Room saved!" && roomReady === true)
             return (
                 <div>
-                    < h1 > Room number: {passwordEntry}</h1 >
+                    < h1 >Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div >
             );
-        else if (savedName != "name" && serverMessageLog != "Rooms synced") {
+        else if (savedName != "name" && serverMessageLog != "Rooms synced")
             return (
                 <div>
                     <h1>Please enter the room number....</h1>
                     <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button onClick={auth}>Send</button>
                 </div>);
-        }
         else if (savedName === "name")
             return (
                 <div>
