@@ -21,7 +21,7 @@ function GameBoard() {
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string>("")
     const [hidden, setHidden] = useState<string>("")
-
+ 
     useEffect(() => {
         const port = 8081;
         const socket = new SockJS(`${BASE_URL}:${port}/game`);
@@ -66,7 +66,6 @@ function GameBoard() {
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
-        stompClient.send("/app/hidden", {}, JSON.stringify(savedName));
     }
 
     return (
@@ -74,12 +73,13 @@ function GameBoard() {
             {serverStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
             Chat: <h4>{chat}</h4>
-            {serverMessageLog === "Room saved!" && savedName === hidden ?
+            {serverMessageLog === "Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Another player has started a room") : null}
+            {serverMessageLog === "Room saved!" ?
                 <div>
                     < h1 >Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div >
                 : null}
-            {savedName != "name" && savedName != hidden ?
+            {savedName != "name" ?
                 <div>
                     <h1>Please enter the room number....</h1>
                     <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
