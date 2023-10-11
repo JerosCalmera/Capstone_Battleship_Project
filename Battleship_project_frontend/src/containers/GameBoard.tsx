@@ -7,7 +7,7 @@ function GameBoard() {
     const BASE_URL = "http://192.168.1.231"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
-    const [severStatus, setServerStatus] = useState(false)
+    const [serverStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
     const [shipInfo, setShipInfo] = useState<string[]>([])
@@ -20,6 +20,7 @@ function GameBoard() {
     const [savedName, setSaveName] = useState<string>("name")
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string>("")
+    const [hidden, setHidden] = useState<string>("")
 
     useEffect(() => {
         const port = 8081;
@@ -46,6 +47,10 @@ function GameBoard() {
                 setChat(message.body.slice(12, -2))
             });
 
+            client.subscribe("/topic/hidden", (message: any) => {
+                setHidden(message.body.slice(12, -2))
+            });
+
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
             setServerStatus(true);
 
@@ -61,47 +66,35 @@ function GameBoard() {
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
-        setRoomReady(true)
-    }
-
-    const nameSave = () => {
-        setSaveName(playerName)
-    }
-
-    const loginProcess = () => {
-        if (serverMessageLog === "Rooms synced")
-            return (
-                <div>
-                    <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
-                </div>);
-        else if (serverMessageLog === "Room saved!" && roomReady === true)
-            return (
-                <div>
-                    < h1 >Room number: {passwordEntry}</h1 >
-                    <h1>Waiting on other player.....</h1></div >
-            );
-        else if (savedName != "name" && serverMessageLog != "Rooms synced")
-            return (
-                <div>
-                    <h1>Please enter the room number....</h1>
-                    <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button onClick={auth}>Send</button>
-                </div>);
-        else if (savedName === "name")
-            return (
-                <div>
-                    <h1>Please enter your name....</h1>
-                    <input name="name" onChange={(e) => setPlayerName(e.target.value)}></input>
-                    <button onClick={nameSave}>Save</button>
-                </div>)
+        stompClient.send("/app/hidden", {}, JSON.stringify(savedName));
     }
 
     return (
         <>
-            {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
+            {serverStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
             Chat: <h4>{chat}</h4>
-            {loginProcess()}
+            {serverMessageLog === "Room saved!" && savedName === hidden ?
+                <div>
+                    < h1 >Room number: {passwordEntry}</h1 >
+                    <h1>Waiting on other player.....</h1></div >
+                : null}
+            {savedName != "name" && savedName != hidden ?
+                <div>
+                    <h1>Please enter the room number....</h1>
+                    <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <button onClick={auth}>Send</button>
+                </div> : null}
+            {savedName === "name" ?
+                <div>
+                    <h1>Please enter your name....</h1>
+                    <input name="name" onChange={(e) => setPlayerName(e.target.value)}></input>
+                    <button onClick={() => setSaveName(playerName)}>Save</button>
+                </div> : null}
+            {serverMessageLog === "Rooms synced" ?
+                <div>
+                    <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                </div> : null}
         </>
     )
 }
