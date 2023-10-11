@@ -44,7 +44,7 @@ public class GameLogic {
             roomRepository.save(roomNumber);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Room saved!"));
         } else if (!roomRepository.findRoom().contains(roomNumber.getRoom())) {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Wrong room number!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Wrong room number!"));
         } else {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Rooms synced"));
         }

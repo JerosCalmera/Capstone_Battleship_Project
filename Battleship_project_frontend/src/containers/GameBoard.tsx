@@ -59,8 +59,8 @@ function GameBoard() {
 
 
     const auth = () => {
-        stompClient.send("/app/room", {}, JSON.stringify(password));
         setPasswordEntry(password)
+        stompClient.send("/app/room", {}, JSON.stringify(password));
     }
 
     const nameSave = () => {
@@ -68,22 +68,32 @@ function GameBoard() {
     }
 
     const loginProcess = () => {
-        if (savedName === "name") {
+        if (serverMessageLog === "Rooms synced")
             return (
                 <div>
-                    <h1>Please enter your name....</h1>
-                    <input required onChange={(e) => setPlayerName(e.target.value)}></input>
-                    <button onClick={nameSave}>Save</button>
+                    <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                 </div>);
-        }
+        else if (serverMessageLog === "Room saved!" && savedName != "name")
+            return (
+                <div>
+                    < h1 > Room number: {passwordEntry}</h1 >
+                    <h1>Waiting on other player.....</h1></div >
+            );
         else if (savedName != "name" && serverMessageLog != "Rooms synced") {
             return (
                 <div>
                     <h1>Please enter the room number....</h1>
-                    <input required onChange={(e) => setPassword(e.target.value)}></input>
-                    <button onClick={auth}>Save</button>
+                    <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <button onClick={auth}>Send</button>
                 </div>);
         }
+        else if (savedName === "name")
+            return (
+                <div>
+                    <h1>Please enter your name....</h1>
+                    <input name="name" onChange={(e) => setPlayerName(e.target.value)}></input>
+                    <button onClick={nameSave}>Save</button>
+                </div>)
     }
 
     return (
@@ -92,16 +102,6 @@ function GameBoard() {
             <h4>{serverMessageLog}</h4>
             Chat: <h4>{chat}</h4>
             {loginProcess()}
-            {serverMessageLog === "Room saved!" && savedName != "name" ?
-                <div>
-                    < h1 > Room number: {passwordEntry}</h1 >
-                    <h1>Waiting on other player.....</h1></div >
-                : null}
-            {serverMessageLog === "Rooms synced" ?
-                <div>
-                    <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
-                </div>
-                : null}
         </>
     )
 }
