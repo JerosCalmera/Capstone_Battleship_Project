@@ -5,6 +5,7 @@ import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
+import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.GameData;
 import com.jeroscalmera.battleship_project.websocket.Greeting;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
@@ -51,7 +52,7 @@ public class GameLogic {
 
     public void shootAtShip(String target) {
         if (shipRepository.findShipIdsByCoOrdsContainingPair(target) != null) {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Hit!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Hit!"));
             Long shipID = shipRepository.findShipIdsByCoOrdsContainingPair(target);
             Optional<Ship> shipToUpdate = shipRepository.findById(shipID);
             Ship ship = shipToUpdate.get();
@@ -60,7 +61,7 @@ public class GameLogic {
             ship.setCoOrds(newShipHealth);
             shipRepository.save(ship);
         } else {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Miss!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Miss!"));
         }
     }
 }

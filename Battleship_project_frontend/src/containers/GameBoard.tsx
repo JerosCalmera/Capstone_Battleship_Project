@@ -4,7 +4,7 @@ import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.248.133."
+    const BASE_URL = "http://192.168.1.231"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [severStatus, setServerStatus] = useState(false)
@@ -14,11 +14,12 @@ function GameBoard() {
     const [enemyShipInfo, setEnemyShipInfo] = useState<string[]>([])
     const [enemyShipDamage, setEnemyShipDamage] = useState<string[]>([])
     const [shipDamage, setShipDamage] = useState<string[]>([])
-    const [password, setPassword] = useState<string>("Pears")
-    const [passwordEntry, setPasswordEntry] = useState<string>("Apples")
+    const [password, setPassword] = useState<string>("")
+    const [passwordEntry, setPasswordEntry] = useState<string>("")
     const [playerName, setPlayerName] = useState<string>("")
-    const [savedName, setSaveName] = useState<string>("")
+    const [savedName, setSaveName] = useState<string>("name")
     const [roomReady, setRoomReady] = useState<boolean>(false)
+    const [chat, setChat] = useState<string>("")
 
     useEffect(() => {
         const port = 8081;
@@ -42,7 +43,7 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/chat", (message: any) => {
-
+                setChat(message.body.slice(12, -2))
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -67,8 +68,7 @@ function GameBoard() {
     }
 
     const loginProcess = () => {
-
-        if (savedName === "" && serverMessageLog != "Rooms synced") {
+        if (savedName === "name") {
             return (
                 <div>
                     <h1>Please enter your name....</h1>
@@ -76,7 +76,7 @@ function GameBoard() {
                     <button onClick={nameSave}>Save</button>
                 </div>);
         }
-        else if (savedName.length > 0 && serverMessageLog != "Rooms synced") {
+        else if (savedName != "name" && serverMessageLog != "Rooms synced") {
             return (
                 <div>
                     <h1>Please enter the room number....</h1>
@@ -90,9 +90,9 @@ function GameBoard() {
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
+            Chat: <h4>{chat}</h4>
             {loginProcess()}
-            {serverMessageLog === "Room Saved!" && savedName === "" ? serverSetMessageLog("Another play has set up a room.") : null}
-            {serverMessageLog === "Room saved!" ?
+            {serverMessageLog === "Room saved!" && savedName != "name" ?
                 <div>
                     < h1 > Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div >
