@@ -18,6 +18,7 @@ function GameBoard() {
     const [passwordEntry, setPasswordEntry] = useState<string>("Apples")
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("")
+    const [roomReady, setRoomReady] = useState<boolean>(false)
 
     useEffect(() => {
         const port = 8081;
@@ -70,7 +71,6 @@ function GameBoard() {
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
-            {serverMessageLog === "Room saved!" && savedName === "" ? serverSetMessageLog("") : null}
             {savedName === "" ?
                 <div>
                     <h1>Please enter your name....</h1>
@@ -78,19 +78,22 @@ function GameBoard() {
                     <button onClick={nameSave}>Save</button>
                 </div>
                 :
-                serverMessageLog === "Room saved!" && playerName === savedName ? <div>
+                serverMessageLog === "Room saved!" && playerName === savedName ?
+                    setRoomReady(true) : null}
+            {roomReady === true ?
+                <div>
                     < h1 > Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div > :
-                    serverMessageLog === "Rooms synced" ?
-                        <div>
-                            <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
-                        </div>
-                        :
-                        <div>
-                            <h1>Please enter the room number....</h1>
-                            <input required onChange={(e) => setPassword(e.target.value)}></input>
-                            <button onClick={auth}>Save</button>
-                        </div>
+                serverMessageLog === "Rooms synced" ?
+                    <div>
+                        <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                    </div>
+                    :
+                    <div>
+                        <h1>Please enter the room number....</h1>
+                        <input required onChange={(e) => setPassword(e.target.value)}></input>
+                        <button onClick={auth}>Save</button>
+                    </div>
             }
         </>
     )
