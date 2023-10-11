@@ -57,6 +57,7 @@ function GameBoard() {
 
 
     const auth = () => {
+
         stompClient.send("/app/room", {}, JSON.stringify(password));
         setPasswordEntry(password)
     }
@@ -65,7 +66,7 @@ function GameBoard() {
         <>
             {severStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
-            {passwordEntry.length > 0 ? <div>
+            {serverMessageLog === "Room saved!" && passwordEntry === password ? <div>
                 < h1 > Room number: {passwordEntry}</h1 >
                 <h1>Waiting on other player.....</h1></div > :
                 serverMessageLog === "Rooms synced" ?
