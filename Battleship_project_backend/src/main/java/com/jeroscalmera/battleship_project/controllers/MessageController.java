@@ -2,6 +2,7 @@ package com.jeroscalmera.battleship_project.controllers;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.jeroscalmera.battleship_project.GameLogic;
+import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +47,9 @@ public class MessageController {
         GameLogic.handlePassword(room);
     }
 
-    @MessageMapping("/hidden")
-    @SendTo("/topic/hidden")
-    public Hidden hidden(Hidden message) throws Exception {
-        System.out.println(message);
-        String hidden = message.getContent();
-        System.out.println(hidden);
-        return new Hidden(hidden);
+    @MessageMapping("/name")
+    @SendTo("/topic/name")
+    public void handleName (Player playerName) throws Exception {
+        GameLogic.handleNewPlayer(playerName);
     }
 }

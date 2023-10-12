@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.18.133"
+    const BASE_URL = "http://192.168.100.95"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -50,6 +50,10 @@ function GameBoard() {
 
             });
 
+            client.subscribe("/topic/name", (message: any) => {
+                setShipDamage(message.body.slice(12, -2))
+            });
+
             client.subscribe("/topic/chat", (message: any) => {
                 const newMessage: string = message.body.slice(12, -2)
                 setChat((prevChat) => {
@@ -79,7 +83,11 @@ function GameBoard() {
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
-        stompClient.send("/app/hidden", {}, JSON.stringify(password));
+    }
+
+    const saveName = () => {
+        setSaveName(playerName)
+        stompClient.send("/app/name", {}, JSON.stringify(playerName));
     }
 
     const chatSend = () => {
@@ -91,6 +99,7 @@ function GameBoard() {
         <>
             {serverStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
+            {serverMessageLog === "Server: Player already exists!" ? savedName != "name" ? setSaveName("name") : serverSetMessageLog("Server: Sorry that player already exists!") : null}
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" ?
                 <div>
@@ -109,8 +118,8 @@ function GameBoard() {
             {savedName === "name" ?
                 <div>
                     <h1>Please enter your name....</h1>
-                    <input name="name" onChange={(e) => setPlayerName(e.target.value)}></input>
-                    <button onClick={() => setSaveName(playerName)}>Save</button>
+                    <input name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
+                    <button onClick={saveName}>Save</button>
                 </div> : null}
             {savedName != "name" ?
                 <div className="chatBox">

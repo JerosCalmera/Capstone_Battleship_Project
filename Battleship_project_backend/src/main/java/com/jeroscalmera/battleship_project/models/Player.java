@@ -23,10 +23,24 @@ public class Player {
     @JsonIgnoreProperties({"player"})
     private List<Ship> ships;
 
-    public Player(String name, int level) {
+    @ManyToOne
+    @JoinColumn(name="room_id", nullable = true)
+    @JsonIgnoreProperties({"player"})
+    private Room room;
+
+    public Player(String name) {
         this.name = name;
-        this.level = level;
+        this.level = 1;
         this.ships = new ArrayList<>();
+        this.room = room;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public Player() {

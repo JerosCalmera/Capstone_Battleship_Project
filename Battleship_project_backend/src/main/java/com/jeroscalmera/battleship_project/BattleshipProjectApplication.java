@@ -1,8 +1,6 @@
 package com.jeroscalmera.battleship_project;
 import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.Hidden;
-import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

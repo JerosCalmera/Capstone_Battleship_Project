@@ -27,8 +27,8 @@ public class ShipTest {
     }
     @Test
     public void playerHasStats() {
-        Player player1 = new Player("Jack", 1);
-        Player player2 = new Player("James", 10);
+        Player player1 = new Player("Jack");
+        Player player2 = new Player("James");
         assertEquals("Jack", player1.getName());
         assertEquals("James", player2.getName());
         assertEquals( 1, player1.getLevel());
@@ -38,7 +38,7 @@ public class ShipTest {
     public void playerTests() {
         shipRepository.deleteAll();
         playerRepository.deleteAll();
-        Player player1 = new Player("Jack", 1);
+        Player player1 = new Player("Jack");
         playerRepository.save(player1);
         Ship carrier = new Ship(player1, "carrier", 12, "");
         carrier.setDamage("B2");

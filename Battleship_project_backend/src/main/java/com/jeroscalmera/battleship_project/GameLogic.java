@@ -1,5 +1,6 @@
 package com.jeroscalmera.battleship_project;
 
+import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
@@ -9,8 +10,8 @@ import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameLogic {
@@ -18,6 +19,7 @@ public class GameLogic {
     private ShipRepository shipRepository;
     private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
+    private static final List<Player> playersNotInRoom = new ArrayList<>();
 
     public GameLogic(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
@@ -37,13 +39,28 @@ public class GameLogic {
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
     public void handlePassword(Room roomNumber) {
-        if (roomRepository.findAll().isEmpty()) {
+        if (roomRepository.findRoom().isEmpty()) {
             roomRepository.save(roomNumber);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
-        } else if (!roomRepository.findRoom().contains(roomNumber.getRoom())) {
+        } else if (!roomRepository.findRoom().contains(roomNumber.getRoomNumber())) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
         } else {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
+            for (Player player : playersNotInRoom) {
+                roomNumber.addPlayerToRoom(player);
+                playerRepository.save(player);
+            }
+        }
+    }
+
+    public void handleNewPlayer(Player playerName) {
+        if (!playerRepository.findName().contains(playerName.getName())) {
+            String name = playerName.getName();
+            Player player = new Player(name);
+            playersNotInRoom.add(playerName);
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));}
+        else{
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player already exists!"));
         }
     }
 
