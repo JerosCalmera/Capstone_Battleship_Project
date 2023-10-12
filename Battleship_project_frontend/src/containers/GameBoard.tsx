@@ -24,7 +24,7 @@ function GameBoard() {
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
     const [roomReady, setRoomReady] = useState<boolean>(false)
-    const [chat, setChat] = useState<string[]>([])
+    const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
     const [hidden, setHidden] = useState<string>("")
 
@@ -83,7 +83,7 @@ function GameBoard() {
     }
 
     const chatSend = () => {
-        stompClient.send("/app/chat", {}, JSON.stringify("(" + savedName + "): " + chatEntry));
+        stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
         setChatEntry("")
     }
 
@@ -98,7 +98,7 @@ function GameBoard() {
                     <h1>Waiting on other player.....</h1></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                        <Grids savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                     </div> : null}
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
                 <div>

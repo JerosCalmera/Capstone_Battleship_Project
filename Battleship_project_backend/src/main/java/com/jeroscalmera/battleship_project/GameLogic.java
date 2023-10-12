@@ -49,7 +49,7 @@ public class GameLogic {
 
     public void shootAtShip(String target) {
         if (shipRepository.findShipIdsByCoOrdsContainingPair(target) != null) {
-            webSocketMessageSender.sendMessage("/topic/connect", new Chat("Hit!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hit!"));
             Long shipID = shipRepository.findShipIdsByCoOrdsContainingPair(target);
             Optional<Ship> shipToUpdate = shipRepository.findById(shipID);
             Ship ship = shipToUpdate.get();
@@ -58,7 +58,7 @@ public class GameLogic {
             ship.setCoOrds(newShipHealth);
             shipRepository.save(ship);
         } else {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Miss!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Miss!"));
         }
     }
 }

@@ -8,9 +8,10 @@ interface Props {
     enemyShipInfo: string[];
     enemyShipDamage: string[];
     stompClient: StompClient;
+    savedName: string;
 }
 
-const Grids: React.FC<Props> = ({ shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -87,7 +88,7 @@ const Grids: React.FC<Props> = ({ shipInfo, shipDamage, enemyShipInfo, enemyShip
             <div className="gameBoardOuterGreater">
                 <div className="gameBoardOuter">
                     <div className="gameBoardRender">
-                        <h2>Player 1</h2>
+                        <h2>{savedName}</h2>
                         <ul>
                             {populateGrid()}
                             <button name="end" className="endCellCorner">*</button>

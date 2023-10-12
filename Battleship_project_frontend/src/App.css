@@ -1,17 +1,18 @@
 h2 {
-  padding-left: 290px;
+  padding-left: 240px;
 }
 
 body {
-  background-color: aliceblue;
+  background-color: black;
+  color: white;
 }
 
 .cell {
   height: 40px;
   width: 40px;
   border: 1px solid black;
-  background-color: lightgray;
-  color: lightgray;
+  background-color: darkcyan;
+  color: darkcyan;
   margin-right: -1px;
   margin-top: -1px;
 }
@@ -45,9 +46,9 @@ body {
 .endCell {
   height: 20px;
   width: 40px;
-  background-color: aliceblue;
-  color: black;
-  border: aliceblue;
+  background-color: black;
+  color: white;
+  border: black;
   margin-top: 5px;
   margin-right: -1px;
 }
@@ -55,9 +56,9 @@ body {
 .endCellCorner {
   height: 20px;
   width: 40px;
-  background-color: aliceblue;
-  color: aliceblue;
-  border: aliceblue;
+  background-color: black;
+  color: black;
+  border: black;
   margin-right: -1px;
 }
 
@@ -74,20 +75,20 @@ body {
 
 .gameBoardOuter {
   display: flex;
-  background-color: aliceblue;
+  background-color: black;
 }
 
 .gameBoardOuterGreater {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: aliceblue;
+  background-color: black;
 }
 
 .chatBox {
-  height: 250px;
+  height: 270px;
   width: 400px;
-  line-height: 25%;
+  line-height: 35%;
   padding-top: 10px;
-  background-color: lightgrey;
+  background-color: rgba(211, 211, 211, 0.126);
 }
