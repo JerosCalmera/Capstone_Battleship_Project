@@ -42,15 +42,17 @@ public class GameLogic {
 
     public void handlePassword(Room roomNumber) {
         if (roomRepository.findRoom().isEmpty()) {
-            roomRepository.save(roomNumber);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
         } else if (!roomRepository.findRoom().contains(roomNumber.getRoomNumber())) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
         } else {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             for (Player newPlayer : playersNotInRoom) {
+                String roomName = roomNumber.getRoomNumber();
+                Room room = new Room(roomName);
+                roomRepository.save(room);
+                room.addPlayerToRoom(newPlayer);
                 playerRepository.save(newPlayer);
-                roomNumber.addPlayerToRoom(newPlayer);
             }
         }
     }
@@ -61,7 +63,6 @@ public class GameLogic {
             Player player = new Player(name);
             System.out.println(player);
             playersNotInRoom.add(player);
-            System.out.println(playersNotInRoom);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));}
         else{
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player already exists!"));

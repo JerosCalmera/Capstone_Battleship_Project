@@ -4,7 +4,11 @@ h2 {
 
 body {
   background-color: black;
-  color: white;
+  color: rgb(96, 193, 193);
+  background-image: url(backround.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .cell {
@@ -46,8 +50,8 @@ body {
 .endCell {
   height: 20px;
   width: 40px;
-  background-color: black;
-  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  color: rgb(170, 194, 193);
   border: black;
   margin-top: 5px;
   margin-right: -1px;
@@ -56,8 +60,8 @@ body {
 .endCellCorner {
   height: 20px;
   width: 40px;
-  background-color: black;
-  color: black;
+  background-color: rgba(0, 0, 0, 0);
+  color: rgba(0, 0, 0, 0);
   border: black;
   margin-right: -1px;
 }
@@ -75,20 +79,59 @@ body {
 
 .gameBoardOuter {
   display: flex;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .gameBoardOuterGreater {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.708);
+}
+
+
+.button {
+  background-color: rgba(0, 160, 157, 0.575);
+  color: rgb(0, 242, 255);
+  font-weight: bold;
+  text-decoration: none;
+  border-color: rgb(96, 218, 206);
+  border-style: solid;
+  height: 20px;
+  padding-bottom: 18px;
+}
+
+.button:hover {
+  color: rgb(0, 221, 255);
+  background-color: #ffffff;
+  ;
+  transition: 0.2s;
+}
+
+.startupOuter {
+  background-color: rgba(0, 0, 0, 0.708);
+  height: 170px;
+  width: 500px;
+  padding: 20px;
+  padding-bottom: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .chatBox {
-  height: 270px;
-  width: 400px;
-  line-height: 35%;
-  padding-top: 10px;
-  background-color: rgba(211, 211, 211, 0.126);
+  height: 360px;
+  width: 510px;
+  line-height: 165%;
+  background-color: rgba(0, 0, 0, 0.708);
+  border-radius: 20px;
+  padding: 15px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.input {
+  background-color: rgba(116, 196, 194, 0.575);
 }
