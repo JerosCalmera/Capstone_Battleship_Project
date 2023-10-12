@@ -10,6 +10,7 @@ import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,6 +39,7 @@ public class GameLogic {
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
+
     public void handlePassword(Room roomNumber) {
         if (roomRepository.findRoom().isEmpty()) {
             roomRepository.save(roomNumber);
@@ -46,9 +48,9 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
         } else {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
-            for (Player player : playersNotInRoom) {
-                roomNumber.addPlayerToRoom(player);
-                playerRepository.save(player);
+            for (Player newPlayer : playersNotInRoom) {
+                playerRepository.save(newPlayer);
+                roomNumber.addPlayerToRoom(newPlayer);
             }
         }
     }
@@ -57,7 +59,9 @@ public class GameLogic {
         if (!playerRepository.findName().contains(playerName.getName())) {
             String name = playerName.getName();
             Player player = new Player(name);
-            playersNotInRoom.add(playerName);
+            System.out.println(player);
+            playersNotInRoom.add(player);
+            System.out.println(playersNotInRoom);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));}
         else{
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player already exists!"));

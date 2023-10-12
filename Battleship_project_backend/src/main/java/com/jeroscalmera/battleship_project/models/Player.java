@@ -1,5 +1,5 @@
 package com.jeroscalmera.battleship_project.models;
-
+import javax.persistence.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cascade;
 
@@ -23,7 +23,7 @@ public class Player {
     @JsonIgnoreProperties({"player"})
     private List<Ship> ships;
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     @JoinColumn(name="room_id", nullable = true)
     @JsonIgnoreProperties({"player"})
     private Room room;
@@ -32,7 +32,6 @@ public class Player {
         this.name = name;
         this.level = 1;
         this.ships = new ArrayList<>();
-        this.room = room;
     }
 
     public Room getRoom() {

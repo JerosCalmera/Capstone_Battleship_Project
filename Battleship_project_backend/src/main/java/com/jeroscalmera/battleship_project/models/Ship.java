@@ -11,7 +11,7 @@ public class Ship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name="player_id", nullable = false)
+    @JoinColumn(name="player_id", nullable = true)
     @JsonIgnoreProperties({"ship"})
     private Player player;
     @Column(name = "name")
