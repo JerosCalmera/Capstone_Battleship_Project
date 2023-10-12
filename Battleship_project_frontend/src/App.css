@@ -83,3 +83,11 @@ body {
   justify-content: center;
   background-color: aliceblue;
 }
+
+.chatBox {
+  height: 250px;
+  width: 400px;
+  line-height: 25%;
+  padding-top: 10px;
+  background-color: lightgrey;
+}

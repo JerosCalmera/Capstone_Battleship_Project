@@ -3,6 +3,11 @@ import SockJS from "sockjs-client";
 import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
 
+interface Chat {
+    id: number;
+    text: string;
+}
+
 function GameBoard() {
     const BASE_URL = "http://192.168.1.231"
 
@@ -19,8 +24,10 @@ function GameBoard() {
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
     const [roomReady, setRoomReady] = useState<boolean>(false)
-    const [chat, setChat] = useState<string>("")
+    const [chat, setChat] = useState<string[]>([])
+    const [chatEntry, setChatEntry] = useState<string>("")
     const [hidden, setHidden] = useState<string>("")
+
 
     useEffect(() => {
         const port = 8081;
@@ -44,7 +51,11 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/chat", (message: any) => {
-                setChat(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                setChat((prevChat) => {
+                    const updatedChat = [...prevChat, newMessage];
+                    return updatedChat.slice(-10)
+                });
             });
 
             client.subscribe("/topic/hidden", (message: any) => {
@@ -59,6 +70,8 @@ function GameBoard() {
                 setServerStatus(false)
             };
             setStompClient(client)
+
+
         });
     }, [attemptReconnect])
 
@@ -69,21 +82,25 @@ function GameBoard() {
         stompClient.send("/app/hidden", {}, JSON.stringify(password));
     }
 
+    const chatSend = () => {
+        stompClient.send("/app/chat", {}, JSON.stringify("(" + savedName + "): " + chatEntry));
+        setChatEntry("")
+    }
+
     return (
         <>
             {serverStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h4>{serverMessageLog}</h4>
-            Chat: <h4>{chat}</h4>
-            {serverMessageLog === "Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Another player has started a room") : null}
-            {serverMessageLog === "Room saved!" ?
+            {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
+            {serverMessageLog === "Server: Room saved!" ?
                 <div>
                     < h1 >Room number: {passwordEntry}</h1 >
                     <h1>Waiting on other player.....</h1></div >
-                : serverMessageLog === "Rooms synced" ?
+                : serverMessageLog === "Server: Rooms synced" ?
                     <div>
                         <Grids shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                     </div> : null}
-            {savedName != "name" && serverMessageLog != "Room saved!" ? serverMessageLog != "Rooms synced" ?
+            {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
                 <div>
                     <h1>Please enter the room number....</h1>
                     <input name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
@@ -95,6 +112,16 @@ function GameBoard() {
                     <input name="name" onChange={(e) => setPlayerName(e.target.value)}></input>
                     <button onClick={() => setSaveName(playerName)}>Save</button>
                 </div> : null}
+            {savedName != "name" ?
+                <div className="chatBox">
+                    Chat: <br />
+                    {chat.map((message, index) => (
+                        <ol key={index}>{message}<br /></ol>
+                    ))}
+                    <br />
+                    <input name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>
+                    <button onClick={chatSend}>Send</button>
+                </div> : "Enter a name to chat"}
         </>
     )
 }

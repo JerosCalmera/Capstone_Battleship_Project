@@ -39,11 +39,11 @@ public class GameLogic {
     public void handlePassword(Room roomNumber) {
         if (roomRepository.findAll().isEmpty()) {
             roomRepository.save(roomNumber);
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Room saved!"));
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
         } else if (!roomRepository.findRoom().contains(roomNumber.getRoom())) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Wrong room number!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
         } else {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Rooms synced"));
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
         }
     }
 
