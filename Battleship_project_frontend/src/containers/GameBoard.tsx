@@ -90,11 +90,7 @@ function GameBoard() {
     useEffect(() => {
         if (player1Data.includes(savedName))
             setPlayer1Data(player1Data)
-    }, [player1Data])
-
-    useEffect(() => {
-        if (player2Data.includes(savedName))
-            setPlayer2Data(player1Data)
+        setPlayer2Data(player2Data)
     }, [player2Data])
 
     const auth = () => {
