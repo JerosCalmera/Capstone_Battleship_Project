@@ -60,8 +60,8 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
-            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden(playersNotInRoom.get(1).getName()));
-            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden(playersNotInRoom.get(0).getName()));
+            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
+            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {

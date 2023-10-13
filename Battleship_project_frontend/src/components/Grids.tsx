@@ -10,9 +10,11 @@ interface Props {
     stompClient: StompClient;
     savedName: string;
     hidden: string;
+    player1Data: string;
+    player2Data: string;
 }
 
-const Grids: React.FC<Props> = ({ hidden, savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -89,7 +91,7 @@ const Grids: React.FC<Props> = ({ hidden, savedName, shipInfo, shipDamage, enemy
             <div className="gameBoardOuterGreater">
                 <div className="gameBoardOuter">
                     <div className="gameBoardRender">
-                        <h2>{savedName}</h2>
+                        <h2>{player1Data}</h2>
                         <ul>
                             {populateGrid()}
                             <button name="end" className="endCellCorner">*</button>
@@ -97,7 +99,7 @@ const Grids: React.FC<Props> = ({ hidden, savedName, shipInfo, shipDamage, enemy
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{hidden}</h2>
+                        <h2>{player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>

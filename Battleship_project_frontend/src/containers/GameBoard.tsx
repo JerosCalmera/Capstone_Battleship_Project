@@ -26,8 +26,9 @@ function GameBoard() {
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
-    const [hidden, setHidden] = useState<string>("Player 2")
-    const [workspace, setWorkspace] = useState<string>("Player 2")
+    const [player1Data, setPlayer1Data] = useState<string>("Player 1")
+    const [player2Data, setPlayer2Data] = useState<string>("Player 2")
+
 
 
 
@@ -64,11 +65,13 @@ function GameBoard() {
                 });
             });
 
-            client.subscribe("/topic/hidden", (message: any) => {
-                setWorkspace(message.body.slice(12, -2))
-                if (workspace != savedName) {
-                    setHidden(message.body.slice(12, -2))
-                }
+            client.subscribe("/topic/playerData1", (message: any) => {
+                setPlayer1Data(message.body.slice(12, -2))
+            });
+
+
+            client.subscribe("/topic/playerData2", (message: any) => {
+                setPlayer2Data(message.body.slice(12, -2))
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -84,6 +87,15 @@ function GameBoard() {
         });
     }, [attemptReconnect])
 
+    useEffect(() => {
+        if (player1Data.includes(savedName))
+            setPlayer1Data(player1Data)
+    }, [player1Data])
+
+    useEffect(() => {
+        if (player2Data.includes(savedName))
+            setPlayer2Data(player1Data)
+    }, [player2Data])
 
     const auth = () => {
         setPasswordEntry(password)
@@ -110,7 +122,8 @@ function GameBoard() {
         setPasswordEntry("")
         setPlayerName("")
         setSaveName("name")
-        setHidden("")
+        setPlayer1Data("")
+        setPlayer2Data("")
     }
 
     return (
@@ -125,7 +138,7 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                        <Grids player1Data={player1Data} player2Data={player2Data} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                     </div> : null}
             <button className="button" onClick={restart}>Restart</button>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
