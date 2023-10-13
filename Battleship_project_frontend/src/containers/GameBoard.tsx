@@ -27,6 +27,7 @@ function GameBoard() {
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
     const [hidden, setHidden] = useState<string>("Player 2")
+    const [workspace, setWorkspace] = useState<string>("Player 2")
 
 
 
@@ -64,7 +65,8 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/hidden", (message: any) => {
-                if (message.body.slice(12, -2) != saveName) {
+                setWorkspace(message.body.slice(12, -2))
+                if (workspace != savedName) {
                     setHidden(message.body.slice(12, -2))
                 }
             });
