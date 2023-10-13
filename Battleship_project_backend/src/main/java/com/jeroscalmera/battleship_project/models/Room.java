@@ -16,7 +16,6 @@ public class Room {
     @Column(name = "room")
     private String roomNumber;
     @OneToMany(mappedBy = "room")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JsonIgnoreProperties({"room"})
     private List<Player> players;
 

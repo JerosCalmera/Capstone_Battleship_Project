@@ -41,9 +41,12 @@ public class MessageController {
         GameLogic.shootAtShip(target);
         GameLogic.submitStats();
     }
-
+    @MessageMapping("/restart")
+    public void handleRestart(String hidden) {
+            GameLogic.restart(hidden);
+    }
     @MessageMapping("/room")
-    public void handlePassword(Room newRoom) {
+    public void handlePassword(String newRoom) {
         GameLogic.handlePassword(newRoom);
     }
 

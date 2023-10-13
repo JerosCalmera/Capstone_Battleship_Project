@@ -38,29 +38,45 @@ public class GameLogic {
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
+    boolean roomSaved = false;
+    boolean roomValidated = false;
+
+    public String roomNumberString;
     @Transactional
-    public void handlePassword(Room roomNumber) {
-        boolean roomSaved = false;
-        boolean roomValidated = false;
-        if (!roomRepository.findRoom().contains(roomNumber.getRoomNumber()) && roomSaved) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
-        } else if
-                (!roomRepository.findRoom().contains(roomNumber.getRoomNumber())){
-                roomRepository.save(roomNumber);
+    public void handlePassword(String roomNumber) {
+        if
+        (!Objects.equals(roomNumberString, roomNumber)) {
+            if (!roomSaved) {
                 roomSaved = true;
+                roomNumberString = roomNumber;
                 webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
+            } else {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
             }
-        else {roomValidated = true;}
-
-            if (roomSaved && roomValidated) {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
-            for (Player newPlayer : playersNotInRoom) {
-                roomNumber.addPlayerToRoom(newPlayer);
-                newPlayer.setRoom(roomNumber);
-                playerRepository.save(newPlayer);
-            }}
+        } else {
+            roomValidated = true;
         }
-
+        if (roomSaved && roomValidated) {
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
+            Room addRoom = new Room(roomNumber);
+            roomRepository.save(addRoom);
+            for (Player newPlayer : playersNotInRoom) {
+                Player playerToFind = playerRepository.findByName(newPlayer.getName());
+                if (playerToFind != null) {
+                    playerToFind.setRoom(addRoom);
+                    playerRepository.save(playerToFind);
+                } else {
+                    newPlayer.setRoom(addRoom);
+                    playerRepository.save(newPlayer);
+                }
+                addRoom.addPlayerToRoom(newPlayer);
+            }
+            roomRepository.save(addRoom);
+            roomSaved = false;
+            roomValidated = false;
+            playersNotInRoom.clear();
+        }
+    }
 
     public void handleNewPlayer(Player playerName) {
         if (!playerRepository.findName().contains(playerName.getName())) {
@@ -68,9 +84,15 @@ public class GameLogic {
             Player player = new Player(name);
             System.out.println(player);
             playersNotInRoom.add(player);
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));}
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));
+            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));}
         else{
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player already exists!"));
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName.getName() +  "!"));
+            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
+            String name = playerName.getName();
+            Player player = new Player(name);
+            System.out.println(player);
+            playersNotInRoom.add(player);
         }
     }
 
@@ -87,5 +109,14 @@ public class GameLogic {
         } else {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Miss!"));
         }
+    }
+    public void restart(String roomNumber) {
+    List<String>playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
+    for (String playerName : playerList) {
+        Player player = playerRepository.findByName(playerName);
+        player.setRoom(null);
+        playerRepository.save(player);
+    }
+    roomRepository.deleteAll();
     }
 }

@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
     void deleteAll();
-    @Query("SELECT r.roomNumber FROM Room r")
-    List<String> findRoom();
+    @Query
+    Room findByRoomNumber(String roomNumber);
 }

@@ -23,7 +23,7 @@ public class Player {
     @JsonIgnoreProperties({"player"})
     private List<Ship> ships;
 
-    @ManyToOne (cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="room_id", nullable = true)
     @JsonIgnoreProperties({"player"})
     private Room room;

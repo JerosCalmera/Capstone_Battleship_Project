@@ -94,14 +94,25 @@ function GameBoard() {
         stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
         setChatEntry("")
     }
+    const restart = () => {
+        stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
+        serverSetMessageLog("")
+        setShipInfo([])
+        setEnemyShipInfo([])
+        setEnemyShipDamage([])
+        setShipDamage([])
+        setPassword("")
+        setPasswordEntry("")
+        setPlayerName("")
+        setSaveName("name")
+    }
 
     return (
         <>
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h5>{serverMessageLog}</h5>
-            {serverMessageLog === "Server: Player already exists!" ? savedName != "name" ? setSaveName("name") : serverSetMessageLog("Server: Sorry that player already exists!") : null}
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            {serverMessageLog === "Server: Room saved!" && serverMessageLog != "Server: Another player has started a room" ?
+            {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
@@ -109,6 +120,7 @@ function GameBoard() {
                     <div>
                         <Grids savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                     </div> : null}
+            <button className="button" onClick={restart}>Restart</button>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
                 <div className="startupOuter">
                     <h3>Please enter the room number....</h3>
