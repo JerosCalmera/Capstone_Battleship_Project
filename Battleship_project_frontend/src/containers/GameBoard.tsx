@@ -64,8 +64,9 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/hidden", (message: any) => {
-                setHidden(message.body.slice(12, -2))
-                console.log(hidden)
+                if (message.body.slice(12, -2) != saveName) {
+                    setHidden(message.body.slice(12, -2))
+                }
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
