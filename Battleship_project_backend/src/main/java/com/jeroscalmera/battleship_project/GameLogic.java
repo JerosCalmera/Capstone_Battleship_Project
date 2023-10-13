@@ -60,6 +60,7 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
+            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden(playersNotInRoom.get(1).getName()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {
@@ -111,9 +112,11 @@ public class GameLogic {
         }
     }
     public void restart(String roomNumber) {
+        System.out.println(roomNumber);
     List<String>playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
     for (String playerName : playerList) {
         Player player = playerRepository.findByName(playerName);
+        System.out.println(playerName);
         player.setRoom(null);
         playerRepository.save(player);
     }

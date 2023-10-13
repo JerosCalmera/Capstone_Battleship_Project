@@ -26,7 +26,8 @@ function GameBoard() {
     const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
-    const [hidden, setHidden] = useState<string>("")
+    const [hidden, setHidden] = useState<string>("Player 2")
+
 
 
     useEffect(() => {
@@ -64,6 +65,7 @@ function GameBoard() {
 
             client.subscribe("/topic/hidden", (message: any) => {
                 setHidden(message.body.slice(12, -2))
+                console.log(hidden)
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -105,6 +107,7 @@ function GameBoard() {
         setPasswordEntry("")
         setPlayerName("")
         setSaveName("name")
+        setHidden("")
     }
 
     return (
@@ -112,6 +115,7 @@ function GameBoard() {
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h5>{serverMessageLog}</h5>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
+            {/* <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} /> */}
             {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
