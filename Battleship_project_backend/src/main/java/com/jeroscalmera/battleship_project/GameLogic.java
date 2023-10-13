@@ -21,7 +21,6 @@ public class GameLogic {
     private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
-
     public GameLogic(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
@@ -41,20 +40,27 @@ public class GameLogic {
     }
     @Transactional
     public void handlePassword(Room roomNumber) {
-        if (roomRepository.findRoom().isEmpty()) {
-            roomRepository.save(roomNumber);
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
-        } else if (!roomRepository.findRoom().contains(roomNumber.getRoomNumber())) {
+        boolean roomSaved = false;
+        boolean roomValidated = false;
+        if (!roomRepository.findRoom().contains(roomNumber.getRoomNumber()) && roomSaved) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
-        } else {
+        } else if
+                (!roomRepository.findRoom().contains(roomNumber.getRoomNumber())){
+                roomRepository.save(roomNumber);
+                roomSaved = true;
+                webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
+            }
+        else {roomValidated = true;}
+
+            if (roomSaved && roomValidated) {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             for (Player newPlayer : playersNotInRoom) {
                 roomNumber.addPlayerToRoom(newPlayer);
                 newPlayer.setRoom(roomNumber);
                 playerRepository.save(newPlayer);
-            }
+            }}
         }
-    }
+
 
     public void handleNewPlayer(Player playerName) {
         if (!playerRepository.findName().contains(playerName.getName())) {

@@ -101,7 +101,7 @@ function GameBoard() {
             <h5>{serverMessageLog}</h5>
             {serverMessageLog === "Server: Player already exists!" ? savedName != "name" ? setSaveName("name") : serverSetMessageLog("Server: Sorry that player already exists!") : null}
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            {serverMessageLog === "Server: Room saved!" ?
+            {serverMessageLog === "Server: Room saved!" && serverMessageLog != "Server: Another player has started a room" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
