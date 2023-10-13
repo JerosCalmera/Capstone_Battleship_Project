@@ -43,8 +43,8 @@ public class MessageController {
     }
 
     @MessageMapping("/room")
-    public void handlePassword(Room room) {
-        GameLogic.handlePassword(room);
+    public void handlePassword(Room newRoom) {
+        GameLogic.handlePassword(newRoom);
     }
 
     @MessageMapping("/name")

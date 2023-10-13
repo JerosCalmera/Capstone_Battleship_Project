@@ -24,7 +24,8 @@ public class Room {
         this.roomNumber = roomNumber;
         this.players = new ArrayList<>();
     }
-    public Room(){
+
+    public Room() {
     }
 
     public Long getId() {
@@ -35,6 +36,10 @@ public class Room {
         this.id = id;
     }
 
+    public void addPlayerToRoom(Player player) {
+        this.players.add(player);
+    }
+
     public String getRoomNumber() {
         return roomNumber;
     }
@@ -43,10 +48,11 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public int getPlayers() {
-        return players.size();
+    public List<Player> getPlayers() {
+        return players;
     }
-    public void addPlayerToRoom(Player player) {
-        this.players.add(player);
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 }

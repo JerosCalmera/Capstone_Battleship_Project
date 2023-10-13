@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://10.149.50.208"
+    const BASE_URL = "http://192.168.154.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -97,27 +97,27 @@ function GameBoard() {
 
     return (
         <>
-            {serverStatus == true ? <h4>Connected to game server</h4> : <div><h4>Not connected to game server</h4> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
-            <h4>{serverMessageLog}</h4>
+            {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
+            <h5>{serverMessageLog}</h5>
             {serverMessageLog === "Server: Player already exists!" ? savedName != "name" ? setSaveName("name") : serverSetMessageLog("Server: Sorry that player already exists!") : null}
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
-                    < h1 >Room number: {passwordEntry}</h1 >
-                    <h1>Waiting on other player.....</h1></div >
+                    <h3 >Room number: {passwordEntry}</h3 >
+                    <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
                         <Grids savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
                     </div> : null}
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
                 <div className="startupOuter">
-                    <h1>Please enter the room number....</h1>
+                    <h3>Please enter the room number....</h3>
                     <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button className="button" onClick={auth}>Send</button>
                 </div> : null : null}
             {savedName === "name" ?
                 <div className="startupOuter">
-                    <h1> Welcome to Solar Fury, Please enter your name....</h1>
+                    <h3> Welcome to Solar Fury, Please enter your name....</h3>
                     <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
                     <button className="button" onClick={saveName}>Save</button>
                 </div> : null}
