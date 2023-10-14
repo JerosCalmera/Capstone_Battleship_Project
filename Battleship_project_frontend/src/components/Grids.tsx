@@ -24,7 +24,7 @@ const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, s
         for (let i = 0; i < 10; i++) {
             const buttons = [];
             for (let j = 0; j < 10; j++) {
-                const cellValue: any = letter[i] + value[j];
+                const cellValue: any = letter[i] + label[j];
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedCell(cellValue)}
@@ -50,7 +50,7 @@ const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, s
         for (let i = 0; i < 10; i++) {
             const buttons = [];
             for (let j = 0; j < 10; j++) {
-                const cellValue: any = letter[i] + value[j];
+                const cellValue: any = letter[i] + label[j];
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedEnemyCell(cellValue)}

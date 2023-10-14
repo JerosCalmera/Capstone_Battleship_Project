@@ -97,6 +97,7 @@ function GameBoard() {
         setPlayer2Data(player2Data)
     }, [player2Data])
 
+
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
@@ -161,7 +162,7 @@ function GameBoard() {
                 <div className="chatBox">
                     Chat: <br />
                     {chat.map((message, index) => (
-                        <li key={index}>{message}<br /></li>
+                        <li className="chatList" key={index}>{message}<br /></li>
                     ))}
                     <br />
                     <input className="input" name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>

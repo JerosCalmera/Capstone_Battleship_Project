@@ -118,12 +118,9 @@ public class GameLogic {
         }
     }
 
-    public void restart(String roomNumber) {
-        System.out.println(roomNumber);
-        List<String> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
-        for (String playerName : playerList) {
-            Player player = playerRepository.findByName(playerName);
-            System.out.println(playerName);
+    public void restart() {
+        List<Player> playerList = playerRepository.findAll();
+        for (Player player : playerList) {
             player.setRoom(null);
             playerRepository.save(player);
         }
