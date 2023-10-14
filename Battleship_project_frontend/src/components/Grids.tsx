@@ -79,7 +79,7 @@ const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, s
 
     const clickedCell = (value: string) => {
         console.log(value)
-        stompClient.send("/app/gameData", {}, JSON.stringify(value));
+        stompClient.send("/app/placement", {}, JSON.stringify(value));
     }
 
     const clickedEnemyCell = (value: string) => {

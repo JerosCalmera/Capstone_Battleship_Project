@@ -55,4 +55,9 @@ public class MessageController {
     public void handleName (Player playerName) throws Exception {
         GameLogic.handleNewPlayer(playerName);
     }
+    @MessageMapping("/placement")
+    public void shipPlacement(String string) {
+        GameLogic.placeShip(string);
+        GameLogic.resetPlacement(string);
+    }
 }

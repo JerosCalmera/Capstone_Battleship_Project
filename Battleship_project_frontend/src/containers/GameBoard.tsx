@@ -53,6 +53,10 @@ function GameBoard() {
 
             });
 
+            client.subscribe("/topic/placement", (message: any) => {
+                setShipDamage(message.body.slice(12, -2))
+            });
+
             client.subscribe("/topic/name", (message: any) => {
                 setShipDamage(message.body.slice(12, -2))
             });
@@ -121,11 +125,15 @@ function GameBoard() {
         setPlayer1Data("")
         setPlayer2Data("")
     }
+    const resetPlacement = () => {
+        stompClient.send("/app/placement", {}, JSON.stringify("Clear"));
+    }
+
 
     return (
         <>
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
-            <h5>{serverMessageLog}</h5>
+            <h5>{serverMessageLog}</h5><button className="button" onClick={restart}>Restart</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {/* <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} /> */}
             {serverMessageLog === "Server: Room saved!" ?
@@ -135,8 +143,8 @@ function GameBoard() {
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
                         <Grids player1Data={player1Data} player2Data={player2Data} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                        <button className="button" onClick={resetPlacement}>Reset Placement</button>
                     </div> : null}
-            <button className="button" onClick={restart}>Restart</button>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
                 <div className="startupOuter">
                     <h3>Please enter the room number....</h3>

@@ -21,6 +21,7 @@ public class GameLogic {
     private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
+
     public GameLogic(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
@@ -33,15 +34,18 @@ public class GameLogic {
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData2", new GameData(converted));
     }
+
     public void submitStats() {
         List<String> allCoOrds = shipRepository.findAllCoOrds();
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
+
     boolean roomSaved = false;
     boolean roomValidated = false;
 
     public String roomNumberString;
+
     @Transactional
     public void handlePassword(String roomNumber) {
         if
@@ -87,9 +91,9 @@ public class GameLogic {
             System.out.println(player);
             playersNotInRoom.add(player);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));
-            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));}
-        else{
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName.getName() +  "!"));
+            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
+        } else {
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName.getName() + "!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
             String name = playerName.getName();
             Player player = new Player(name);
@@ -112,15 +116,41 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Miss!"));
         }
     }
+
     public void restart(String roomNumber) {
         System.out.println(roomNumber);
-    List<String>playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
-    for (String playerName : playerList) {
-        Player player = playerRepository.findByName(playerName);
-        System.out.println(playerName);
-        player.setRoom(null);
-        playerRepository.save(player);
+        List<String> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
+        for (String playerName : playerList) {
+            Player player = playerRepository.findByName(playerName);
+            System.out.println(playerName);
+            player.setRoom(null);
+            playerRepository.save(player);
+        }
+        roomRepository.deleteAll();
     }
-    roomRepository.deleteAll();
+
+    private List<String> coOrds = new ArrayList<>();
+
+    public void placeShip(String target) {
+        if (!coOrds.contains(target)) {
+            coOrds.add(target);
+            if (coOrds.size() == 2) {
+                if (coOrds.get(0).charAt(0) == coOrds.get(1).charAt(0)) {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Vertical alignment selected!"));
+                } else if (coOrds.get(0).charAt(1) == (coOrds.get(0).charAt(1) + 1)) {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
+                } else if (coOrds.get(0).charAt(1) == (coOrds.get(0).charAt(0) - 1)) {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
+                }
+            }
+        }
+    }
+    public void resetPlacement(String trigger) {
+        if (Objects.equals(trigger, "Clear")) {
+            coOrds.clear();
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Placement list cleared."));
+        }
     }
 }
+
+
