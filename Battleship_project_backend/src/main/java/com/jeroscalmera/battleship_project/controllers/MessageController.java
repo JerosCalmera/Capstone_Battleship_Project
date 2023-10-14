@@ -46,7 +46,7 @@ public class MessageController {
             GameLogic.restart(hidden);
     }
     @MessageMapping("/room")
-    public void handlePassword(String newRoom) {
+    public void handlePassword(String newRoom) throws InterruptedException {
         GameLogic.handlePassword(newRoom);
     }
 

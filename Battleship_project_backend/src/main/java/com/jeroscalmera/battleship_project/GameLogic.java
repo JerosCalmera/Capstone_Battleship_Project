@@ -47,7 +47,7 @@ public class GameLogic {
     public String roomNumberString;
 
     @Transactional
-    public void handlePassword(String roomNumber) {
+    public void handlePassword(String roomNumber) throws InterruptedException {
         if
         (!Objects.equals(roomNumberString, roomNumber)) {
             if (!roomSaved) {
@@ -65,6 +65,7 @@ public class GameLogic {
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
             webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
+            Thread.sleep(250);
             webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
@@ -132,15 +133,19 @@ public class GameLogic {
     private List<String> coOrds = new ArrayList<>();
 
     public void placeShip(String target) {
+        System.out.println((target));
         if (!coOrds.contains(target)) {
             coOrds.add(target);
             if (coOrds.size() == 2) {
                 if (coOrds.get(0).charAt(0) == coOrds.get(1).charAt(0)) {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Vertical alignment selected!"));
-                } else if (coOrds.get(0).charAt(1) == (coOrds.get(0).charAt(1) + 1)) {
+                    coOrds.clear();
+                } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) + 1)) {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
-                } else if (coOrds.get(0).charAt(1) == (coOrds.get(0).charAt(0) - 1)) {
+                    coOrds.clear();
+                } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) - 1)) {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
+                    coOrds.clear();
                 }
             }
         }

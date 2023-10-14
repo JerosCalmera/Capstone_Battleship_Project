@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.154.133"
+    const BASE_URL = "http://192.168.56.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
