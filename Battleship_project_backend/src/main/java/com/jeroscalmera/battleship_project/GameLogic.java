@@ -137,7 +137,7 @@ public class GameLogic {
         if (!coOrds.contains(target)) {
             coOrds.add(target);
             if (coOrds.size() == 2) {
-                if (coOrds.get(0).charAt(0) == coOrds.get(1).charAt(0)) {
+                if (coOrds.get(0).charAt(0) != coOrds.get(1).charAt(0)) {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Vertical alignment selected!"));
                     coOrds.clear();
                 } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) + 1)) {
@@ -145,6 +145,9 @@ public class GameLogic {
                     coOrds.clear();
                 } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) - 1)) {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
+                    coOrds.clear();
+                } else {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Invalid alignment selected!"));
                     coOrds.clear();
                 }
             }

@@ -99,7 +99,7 @@ const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, s
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{player1Data}</h2>
+                        <h2>{player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>
