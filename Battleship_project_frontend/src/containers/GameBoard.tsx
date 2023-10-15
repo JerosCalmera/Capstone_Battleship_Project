@@ -67,12 +67,12 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/playerData1", (message: any) => {
-                setPlayer1Data(message.body.slice(14, -5))
+                setPlayer1Data(message.body.slice(12, -2))
             });
 
 
             client.subscribe("/topic/playerData2", (message: any) => {
-                setPlayer2Data(message.body.slice(14, -5))
+                setPlayer2Data(message.body.slice(12, -2))
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -97,9 +97,14 @@ function GameBoard() {
     }, [attemptReconnect])
 
     useEffect(() => {
-        if (player1Data.includes(savedName))
-            setPlayer1Data(player1Data)
-        setPlayer2Data(player2Data)
+        if (player1Data.includes(savedName)) {
+            setPlayer1Data(player1Data);
+            setPlayer2Data(player2Data)
+        }
+        else if (player2Data.includes(savedName)) {
+            setPlayer1Data(player2Data)
+            setPlayer2Data(player1Data)
+        }
         // stompClient.send("/app/startup", {}, JSON.stringify(savedName));
         // stompClient.send("/app/gameUpdate", {}, JSON.stringify(savedName));
     }, [player2Data])

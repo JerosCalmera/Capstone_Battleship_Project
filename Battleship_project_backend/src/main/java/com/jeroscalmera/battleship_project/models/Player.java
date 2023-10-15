@@ -28,13 +28,17 @@ public class Player {
     @JsonIgnoreProperties({"player"})
     private Room room;
 
-    public Player(String name, int level) {
+    public Player(String name) {
         this.name = name;
         this.level = level;
         this.ships = new ArrayList<>();
     }
 
-    public Player(String name) {
+    public Player() {
+    }
+
+    public void setShips(List<Ship> ships) {
+        this.ships = ships;
     }
 
     public Room getRoom() {
@@ -43,9 +47,6 @@ public class Player {
 
     public void setRoom(Room room) {
         this.room = room;
-    }
-
-    public Player() {
     }
 
     public Long getId() {

@@ -56,7 +56,7 @@ public class MessageController {
 
     @MessageMapping("/name")
     @SendTo("/topic/name")
-    public void handleName (String playerName) throws Exception {
+    public void handleName (Player playerName) throws Exception {
         GameLogic.handleNewPlayer(playerName);
     }
     @MessageMapping("/placement")

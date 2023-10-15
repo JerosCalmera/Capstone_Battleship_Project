@@ -88,21 +88,19 @@ public class GameLogic {
         }
     }
 
-    public void handleNewPlayer(String playerName) {
+    public void handleNewPlayer(Player playerName) {
         System.out.println(playerName);
-        if (!playerRepository.findName().contains(playerName)) {
-            Player player = new Player();
-            player.setName(playerName);
-            System.out.println(player.getName());
+        if (!playerRepository.findName().contains(playerName.getName())) {
+            String name = playerName.getName();
+            Player player = new Player(name);
             playersNotInRoom.add(player);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
         } else {
-            Player player = new Player();
-            player.setName(playerName);
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + player.getName() + "!"));
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName + "!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
-            System.out.println(player.getName());
+            String name = playerName.getName();
+            Player player = new Player(name);
             playersNotInRoom.add(player);
         }
     }
@@ -137,7 +135,7 @@ public class GameLogic {
     public void placeShip(String target) {
         System.out.println(target);
         Ship newShip = new Ship("", 1, "");
-        Player newPlayer = new Player("", 1);
+        Player newPlayer = new Player("");
         String name = target.substring(4, 8);
         boolean validPlacement = false;
         boolean horizontalPlacement = false;
