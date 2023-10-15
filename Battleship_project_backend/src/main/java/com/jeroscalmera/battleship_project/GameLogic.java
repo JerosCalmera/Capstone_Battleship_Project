@@ -98,10 +98,10 @@ public class GameLogic {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
         } else {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName + "!"));
-            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
             Player player = new Player();
             player.setName(playerName);
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + player.getName() + "!"));
+            webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
             System.out.println(player.getName());
             playersNotInRoom.add(player);
         }

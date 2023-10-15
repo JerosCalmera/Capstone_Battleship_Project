@@ -131,7 +131,7 @@ const Grids: React.FC<Props> = ({ player1Data, player2Data, hidden, savedName, s
             <div className="gameBoardOuterGreater">
                 <div className="gameBoardOuter">
                     <div className="gameBoardRender">
-                        <h2>{player1Data}</h2>
+                        <h2>{player2Data}</h2>
                         <ul>
                             {shipPlacement == true ? populateGrid() : placementGrid()}
                             <button name="end" className="endCellCorner">*</button>
