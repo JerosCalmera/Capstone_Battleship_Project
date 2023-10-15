@@ -68,6 +68,7 @@ public class GameLogic {
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
             webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
+            Thread.sleep(100);
             webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
@@ -87,20 +88,21 @@ public class GameLogic {
         }
     }
 
-    public void handleNewPlayer(Player playerName) {
-        if (!playerRepository.findName().contains(playerName.getName())) {
-            String name = playerName.getName();
-            Player player = new Player(name);
-            System.out.println(player);
+    public void handleNewPlayer(String playerName) {
+        System.out.println(playerName);
+        if (!playerRepository.findName().contains(playerName)) {
+            Player player = new Player();
+            player.setName(playerName);
+            System.out.println(player.getName());
             playersNotInRoom.add(player);
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Player saved!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
         } else {
-            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName.getName() + "!"));
+            webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Welcome back " + playerName + "!"));
             webSocketMessageSender.sendMessage("/topic/hidden", new Hidden("player connected"));
-            String name = playerName.getName();
-            Player player = new Player(name);
-            System.out.println(player);
+            Player player = new Player();
+            player.setName(playerName);
+            System.out.println(player.getName());
             playersNotInRoom.add(player);
         }
     }

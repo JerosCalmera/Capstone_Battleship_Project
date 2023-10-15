@@ -67,12 +67,12 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/playerData1", (message: any) => {
-                setPlayer1Data(message.body.slice(12, -2))
+                setPlayer1Data(message.body.slice(14, -4))
             });
 
 
             client.subscribe("/topic/playerData2", (message: any) => {
-                setPlayer2Data(message.body.slice(12, -2))
+                setPlayer2Data(message.body.slice(14, -4))
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
