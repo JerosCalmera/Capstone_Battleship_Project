@@ -16,4 +16,7 @@ public interface ShipRepository extends JpaRepository<Ship, Long> {
 
     @Query("SELECT s.coOrds FROM Ship s")
     List<String> findAllCoOrds();
+
+    @Query("SELECT s.coOrds FROM Ship s WHERE s.player.name = :playerName")
+    List<String> findAllCoOrdsByPlayerName(@Param("playerName") String playerName);
 }

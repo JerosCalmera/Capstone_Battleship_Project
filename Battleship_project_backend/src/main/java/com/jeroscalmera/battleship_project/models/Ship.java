@@ -20,8 +20,7 @@ public class Ship {
     private int maxSize;
     @Column(name = "coOrds")
     private String coOrds;
-    public Ship(Player player, String name, int maxSize, String coOrds) {
-        this.player = player;
+    public Ship(String name, int maxSize, String coOrds) {
         this.name = name;
         this.maxSize = maxSize;
         this.coOrds = coOrds;
@@ -32,6 +31,11 @@ public class Ship {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Player getPlayer() {
         return player;
     }

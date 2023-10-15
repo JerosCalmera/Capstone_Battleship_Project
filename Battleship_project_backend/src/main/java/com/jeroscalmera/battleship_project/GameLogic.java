@@ -7,12 +7,15 @@ import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.*;
+import org.aspectj.weaver.ast.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GameLogic {
@@ -29,14 +32,14 @@ public class GameLogic {
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
-    public void submitStartStats() {
-        List<String> allCoOrds = shipRepository.findAllCoOrds();
+    public void submitStartStats(String name) {
+        List<String> allCoOrds = shipRepository.findAllCoOrdsByPlayerName(name);
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData2", new GameData(converted));
     }
 
-    public void submitStats() {
-        List<String> allCoOrds = shipRepository.findAllCoOrds();
+    public void submitStats(String name) {
+        List<String> allCoOrds = shipRepository.findAllCoOrdsByPlayerName(name);
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(converted));
     }
@@ -128,34 +131,92 @@ public class GameLogic {
     }
 
     private List<String> coOrds = new ArrayList<>();
+    private String damage = "";
 
     public void placeShip(String target) {
-        System.out.println((target));
-        if (!coOrds.contains(target)) {
-            coOrds.add(target);
-            if (coOrds.size() == 2) {
-                if (coOrds.get(0).charAt(0) != coOrds.get(1).charAt(0)) {
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Vertical alignment selected!"));
-                    coOrds.clear();
-                } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) + 1)) {
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
-                    coOrds.clear();
-                } else if (coOrds.get(0).charAt(1) == (coOrds.get(1).charAt(1) - 1)) {
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
-                    coOrds.clear();
-                } else {
+        System.out.println(target);
+        Ship newShip = new Ship("", 1, "");
+        Player newPlayer = new Player("", 1);
+        String name = target.substring(4, 8);
+        boolean validPlacement = false;
+        boolean horizontalPlacement = false;
+        boolean verticalPlacement = false;
+        boolean invalidPlacement = false;
+        int max = Integer.parseInt(target.substring(3, 4));
+        if (!coOrds.contains(target.substring(1, 3))) {
+            coOrds.add(target.substring(1, 3));
+            damage += target.substring(1, 3);
+        }
+        System.out.println(damage);
+        if (coOrds.size() == max) {
+            for (int i = 0; i < coOrds.size() - 1; i++) {
+                int inputOne = i;
+                int inputTwo = 1 + i;
+                int letter = 0;
+                int number = 1;
+                if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter) && coOrds.get(inputOne).charAt(number) != coOrds.get(inputTwo).charAt(number))) {
+                    invalidPlacement = true;
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat("Invalid alignment selected!"));
-                    coOrds.clear();
+                } else if (coOrds.get(inputOne).charAt(letter) == coOrds.get(inputTwo).charAt(letter)) {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
+                    horizontalPlacement = true;
+                } else if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter))) {
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Vertical alignment selected!"));
+                    verticalPlacement = true;
                 }
+            }
+            if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
+                System.out.println("Placement invalid");
+                damage = "";
+                coOrds.clear();
+                invalidPlacement = false;
+                horizontalPlacement = false;
+                verticalPlacement = false;
+
+            } else {
+                System.out.println(damage);
+                System.out.println("Placement valid");
+                coOrds.clear();
+                Player selectedPlayer = playerRepository.findByName(target.substring(4, 8));
+                newShip.setDamage(damage);
+                newShip.setName("carrier");
+                selectedPlayer.addShip(newShip);
+                newShip.setPlayer(selectedPlayer);
+                shipRepository.save(newShip);
+                playerRepository.save(selectedPlayer);
+
+                validPlacement = true;
+                invalidPlacement = false;
+                horizontalPlacement = false;
+                verticalPlacement = false;
             }
         }
     }
+
+
+//     if (validPlacement); {
+//            String username = target.substring(6,9);
+        //    String ship = target.substring(10,10);
+//            playerRepository.findName().contains(username);
+
+
+//        if (target.contains("S10")) {
+//            newShip = new Ship("Carrier", 10, "");
+//        }
+//        else if (target.contains("S8")) {
+//            newShip = new Ship("Battleship", 8, "");
+//        }
+//        else if (target.contains("S6")) {
+//            newShip = new Ship("Cruiser", 6, "");
+//        }
+//        else if (target.contains("S4")) {
+//            newShip = new Ship("Destroyer", 4, "");
+//        }else{
+
     public void resetPlacement(String trigger) {
-        if (Objects.equals(trigger, "Clear")) {
+        if (trigger.length() > 1) {
             coOrds.clear();
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Placement list cleared."));
         }
     }
 }
-
-

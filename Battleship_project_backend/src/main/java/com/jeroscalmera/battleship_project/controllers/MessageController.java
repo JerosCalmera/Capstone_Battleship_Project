@@ -18,10 +18,8 @@ public class MessageController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/connect")
-    public Greeting greeting(Connection message) throws Exception {
+    public Greeting greeting(Connection message, String name) throws Exception {
         System.out.println("Client connected: " + message);
-        GameLogic.submitStartStats();
-        GameLogic.submitStats();
         return new Greeting("Game server ready....");
     }
 
@@ -33,13 +31,19 @@ public class MessageController {
         System.out.println(chat);
         return new Chat(chat);
     }
-
+    @MessageMapping("/gameUpdate")
+    public void gameUpdate(String name) {
+        GameLogic.submitStats(name);
+    }
+    @MessageMapping("/startup")
+    public void startup(String name) {
+        GameLogic.submitStartStats(name);
+    }
     @MessageMapping("/gameData")
-    public void handleGameData(GameData gameData) {
+    public void handleGameData(GameData gameData, String name) {
         String target = gameData.getContent();
         System.out.println(target);
         GameLogic.shootAtShip(target);
-        GameLogic.submitStats();
     }
     @MessageMapping("/restart")
     public void handleRestart(String hidden) {
@@ -58,6 +62,9 @@ public class MessageController {
     @MessageMapping("/placement")
     public void shipPlacement(String string) {
         GameLogic.placeShip(string);
+    }
+    @MessageMapping("/placement2")
+    public void resetPlacement(String string) {
         GameLogic.resetPlacement(string);
     }
 }

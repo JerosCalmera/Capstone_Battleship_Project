@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.56.133"
+    const BASE_URL = "http://172.24.33.50"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -23,13 +23,10 @@ function GameBoard() {
     const [passwordEntry, setPasswordEntry] = useState<string>("")
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
-    const [roomReady, setRoomReady] = useState<boolean>(false)
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
-
-
 
 
     useEffect(() => {
@@ -81,6 +78,14 @@ function GameBoard() {
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
             setServerStatus(true);
 
+            client.subscribe("/topic/gameUpdate", (message: any) => {
+                setPlayer1Data(message.body.slice(12, -2))
+            });
+
+            client.subscribe("/topic/startup", (message: any) => {
+                setPlayer1Data(message.body.slice(12, -2))
+            });
+
             client.ws.onclose = () => {
                 (console.log("Connection terminated"))
                 setServerStatus(false)
@@ -95,6 +100,8 @@ function GameBoard() {
         if (player1Data.includes(savedName))
             setPlayer1Data(player1Data)
         setPlayer2Data(player2Data)
+        // stompClient.send("/app/startup", {}, JSON.stringify(savedName));
+        // stompClient.send("/app/gameUpdate", {}, JSON.stringify(savedName));
     }, [player2Data])
 
 
@@ -127,7 +134,7 @@ function GameBoard() {
         setPlayer2Data("")
     }
     const resetPlacement = () => {
-        stompClient.send("/app/placement", {}, JSON.stringify("Clear"));
+        stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
     }
 
 
@@ -136,6 +143,8 @@ function GameBoard() {
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h5>{serverMessageLog}</h5><button className="button" onClick={restart}>Restart</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
+            <Grids player1Data={player1Data} player2Data={player2Data} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+            <button className="button" onClick={resetPlacement}>Reset Placement</button>
             {/* <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} /> */}
             {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
