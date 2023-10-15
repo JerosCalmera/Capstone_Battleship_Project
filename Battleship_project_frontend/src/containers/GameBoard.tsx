@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://172.24.33.50"
+    const BASE_URL = "http://192.168.4.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -143,7 +143,6 @@ function GameBoard() {
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h5>{serverMessageLog}</h5><button className="button" onClick={restart}>Restart</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            <Grids player1Data={player1Data} player2Data={player2Data} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
             <button className="button" onClick={resetPlacement}>Reset Placement</button>
             {/* <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} /> */}
             {serverMessageLog === "Server: Room saved!" ?
