@@ -9,16 +9,16 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.4.133"
+    const BASE_URL = "http://192.168.1.231"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
-    const [shipInfo, setShipInfo] = useState<string[]>([])
-    const [enemyShipInfo, setEnemyShipInfo] = useState<string[]>([])
-    const [enemyShipDamage, setEnemyShipDamage] = useState<string[]>([])
-    const [shipDamage, setShipDamage] = useState<string[]>([])
+    const [shipInfo, setShipInfo] = useState<string>("")
+    const [enemyShipInfo, setEnemyShipInfo] = useState<string>("")
+    const [enemyShipDamage, setEnemyShipDamage] = useState<string>("")
+    const [shipDamage, setShipDamage] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [passwordEntry, setPasswordEntry] = useState<string>("")
     const [playerName, setPlayerName] = useState<string>("")
@@ -127,17 +127,19 @@ function GameBoard() {
             else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
             setPlacedShip("");
             stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+            
         }
     }, [placedShip])
 
     useEffect(() => {
         const toTrim = cellStorage;
-        if (playerName.includes(toTrim)) {
-            const trimmed: any = toTrim.replace(playerName, '');
-            setShipInfo(trimmed)
-            console.log(playerName)
+        if (toTrim.includes(savedName)) {
+            const trimmed: string = toTrim.replace(savedName, '');
+            setShipInfo(trimmed);
+            console.log(savedName);
+            console.log(trimmed);
         }
-    }, [placedShip])
+    }, [cellStorage]);
 
     const auth = () => {
         setPasswordEntry(password)
@@ -173,6 +175,10 @@ function GameBoard() {
         setPlacedShip("")
     }
     const resetPlacement = () => {
+        console.log(cellStorage)
+        console.log(shipInfo)
+        console.log(savedName)
+        console.log(playerName)
         stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
     }
 

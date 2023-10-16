@@ -4,10 +4,10 @@ interface StompClient {
     send(destination: string, headers?: Record<string, string>, body?: string): void;
 }
 interface Props {
-    shipInfo: string[];
-    shipDamage: string[];
-    enemyShipInfo: string[];
-    enemyShipDamage: string[];
+    shipInfo: string;
+    shipDamage: string;
+    enemyShipInfo: string;
+    enemyShipDamage: string;
     stompClient: StompClient;
     savedName: string;
     player1Data: string;

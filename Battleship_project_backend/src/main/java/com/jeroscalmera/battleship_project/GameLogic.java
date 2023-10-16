@@ -210,6 +210,7 @@ public class GameLogic {
     public void resetPlacement(String trigger) {
         if (trigger.length() > 1) {
             coOrds.clear();
+            damage="";
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Placement list cleared."));
         }
     }
