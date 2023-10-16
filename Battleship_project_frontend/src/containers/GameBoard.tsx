@@ -118,7 +118,32 @@ function GameBoard() {
     }, [player2Data, chat, placedShip])
 
 
+    // useEffect(() => {
+    //     const shipType = "CarrierBattleshipCruiserDestroyer";
+    //     const ship = placedShip;
+    //     console.log(placedShip)
+    //     if (ship.includes(savedName)) {
+    //         if (ship.includes(shipType)) {
+    //             if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
+    //             else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
+    //             else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
+    //             else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
+    //             setPlacedShip("");
+    //             stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+    //         }
+    //     }
+    // }, [placedShip])
+
     useEffect(() => {
+        const toTrim = cellStorage;
+        if (toTrim.includes(savedName)) {
+            const trimmed: string = toTrim.replace(savedName, '');
+            setShipInfo(trimmed);
+            console.log(savedName);
+            console.log(trimmed);
+        } else {
+            setEnemyShipInfo(cellStorage)
+        }
         const shipType = "CarrierBattleshipCruiserDestroyer";
         const ship = placedShip;
         console.log(placedShip)
@@ -131,18 +156,6 @@ function GameBoard() {
                 setPlacedShip("");
                 stompClient.send("/app/startup", {}, JSON.stringify(playerName));
             }
-        }
-    }, [placedShip])
-
-    useEffect(() => {
-        const toTrim = cellStorage;
-        if (toTrim.includes(savedName)) {
-            const trimmed: string = toTrim.replace(savedName, '');
-            setShipInfo(trimmed);
-            console.log(savedName);
-            console.log(trimmed);
-        } else {
-            setEnemyShipInfo(cellStorage)
         }
     }, [cellStorage, shipInfo, chat, enemyShipInfo]);
 
