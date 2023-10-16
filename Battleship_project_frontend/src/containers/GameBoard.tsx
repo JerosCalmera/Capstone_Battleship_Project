@@ -135,29 +135,32 @@ function GameBoard() {
     // }, [placedShip])
 
     useEffect(() => {
+        const shipType = "CarrierBattleshipCruiserDestroyer";
+        const ship = placedShip;
         const toTrim = cellStorage;
+
+        console.log(placedShip);
+
+        if (ship.includes(savedName)) {
+            if (ship.includes(shipType)) {
+                if (ship.includes("Carrier")) { setCarrier(carrier - 1); }
+                else if (ship.includes("Battleship")) { setBattleship(battleship - 1); }
+                else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1); }
+                else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1); }
+                setPlacedShip("");
+                stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+            }
+        }
+
         if (toTrim.includes(savedName)) {
             const trimmed: string = toTrim.replace(savedName, '');
             setShipInfo(trimmed);
             console.log(savedName);
             console.log(trimmed);
         } else {
-            setEnemyShipInfo(cellStorage)
+            setEnemyShipInfo(toTrim);
         }
-        const shipType = "CarrierBattleshipCruiserDestroyer";
-        const ship = placedShip;
-        console.log(placedShip)
-        if (ship.includes(savedName)) {
-            if (ship.includes(shipType)) {
-                if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
-                else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
-                else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
-                else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
-                setPlacedShip("");
-                stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-            }
-        }
-    }, [cellStorage, shipInfo, chat, enemyShipInfo]);
+    }, [placedShip, cellStorage, carrier, battleship, cruiser, destroyer, savedName, stompClient, playerName]);
 
 
     const auth = () => {
