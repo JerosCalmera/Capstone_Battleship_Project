@@ -26,16 +26,6 @@ public class GameLogic {
         this.roomRepository = roomRepository;
         this.webSocketMessageSender = webSocketMessageSender;
     }
-
-//    public void getEnemyShips (String target){
-//        List<String> shipList = new ArrayList<>();
-//        Player playerToCheck = playerRepository.findByNameContaining((target.substring(1, 3)));
-//        long ships = playerToCheck.getId();
-//        shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
-//        String converted = String.join("", shipList);
-//        System.out.println(converted);
-//        webSocketMessageSender.sendMessage("/topic/gameData", new GameData(playerToCheck.getName()+converted));
-//    }
     public void submitStartStats(Player name) {
         List<String> allCoOrds = playerRepository.findAllCoOrdsByPlayerName(name.getName());
         String converted = String.join("", allCoOrds);
@@ -217,7 +207,7 @@ public class GameLogic {
                     shipRepository.save(newShip);
                     playerRepository.save(selectedPlayer);
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat(newShip.getName() + " placed!"));
-                    webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getName()+newShip.getName()));
+                    webSocketMessageSender.sendMessage("/topic/placement2", new Chat(newShip.getName()));
                     damage = "";
                     Player playerToCheck = playerRepository.findByNameContaining((target.substring(4, 8)));
                     long ships = playerToCheck.getId();

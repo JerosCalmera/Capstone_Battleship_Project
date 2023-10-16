@@ -121,15 +121,14 @@ function GameBoard() {
     useEffect(() => {
         const shipType = ["Carrier", "Battleship", "Cruiser", "Destroyer"]
         const ship = placedShip;
-        if (ship.includes(savedName)) {
-            if (shipType.includes(ship)) {
-                if (ship === "Carrier") { setCarrier(carrier - 1) }
-                else if (ship === "Battleship") { setBattleship(battleship - 1) }
-                else if (ship === "Cruiser") { setCruiser(cruiser - 1) }
-                else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
-                setPlacedShip("");
-                stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-            }
+        console.log(placedShip)
+        if (shipType.includes(ship)) {
+            if (ship === "Carrier") { setCarrier(carrier - 1) }
+            else if (ship === "Battleship") { setBattleship(battleship - 1) }
+            else if (ship === "Cruiser") { setCruiser(cruiser - 1) }
+            else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
+            setPlacedShip("");
+            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
         }
     }, [placedShip])
 
