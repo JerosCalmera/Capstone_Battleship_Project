@@ -89,8 +89,10 @@ const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, playe
         if (shipPlacement === true) {
             stompClient.send("/app/gameData", {}, JSON.stringify(value));
         }
-        else { stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName)); }
-
+        else {
+            if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
+            else { stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName)); }
+        }
     }
 
     const clickedEnemyCell = (value: string) => {

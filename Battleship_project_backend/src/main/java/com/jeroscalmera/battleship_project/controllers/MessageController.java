@@ -26,9 +26,7 @@ public class MessageController {
     @MessageMapping("/chat")
     @SendTo("/topic/chat")
     public Chat chat(Chat message) throws Exception {
-        System.out.println(message);
         String chat = message.getContent();
-        System.out.println(chat);
         return new Chat(chat);
     }
     @MessageMapping("/gameUpdate")
@@ -40,10 +38,11 @@ public class MessageController {
         GameLogic.submitStartStats(name);
     }
     @MessageMapping("/gameData")
-    public void handleGameData(GameData gameData, String name) {
+    public void handleGameData(GameData gameData) {
         String target = gameData.getContent();
         System.out.println(target);
         GameLogic.shootAtShip(target);
+        GameLogic.enumerateShips(target);
     }
     @MessageMapping("/restart")
     public void handleRestart(String hidden) {
@@ -67,4 +66,8 @@ public class MessageController {
     public void resetPlacement(String string) {
         GameLogic.resetPlacement(string);
     }
+//    @MessageMapping("/enemyShips")
+//    public void getEnemyShips(String string) {
+//        GameLogic.getEnemyShips(string);
+//    }
 }

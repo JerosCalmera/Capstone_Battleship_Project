@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.1.231"
+    const BASE_URL = "http://192.168.252.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -97,6 +97,7 @@ function GameBoard() {
                 setPlacedShip(message.body.slice(12, -2))
             });
 
+
             client.ws.onclose = () => {
                 (console.log("Connection terminated"))
                 setServerStatus(false)
@@ -114,20 +115,21 @@ function GameBoard() {
             setPlayer1Data(player2Data)
             setPlayer2Data(player1Data)
         }
-    }, [player2Data])
+    }, [player2Data, chat, placedShip])
 
 
     useEffect(() => {
         const shipType = ["Carrier", "Battleship", "Cruiser", "Destroyer"]
         const ship = placedShip;
-        if (shipType.includes(ship)) {
-            if (ship === "Carrier") { setCarrier(carrier - 1) }
-            else if (ship === "Battleship") { setBattleship(battleship - 1) }
-            else if (ship === "Cruiser") { setCruiser(cruiser - 1) }
-            else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
-            setPlacedShip("");
-            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-
+        if (ship.includes(savedName)) {
+            if (shipType.includes(ship)) {
+                if (ship === "Carrier") { setCarrier(carrier - 1) }
+                else if (ship === "Battleship") { setBattleship(battleship - 1) }
+                else if (ship === "Cruiser") { setCruiser(cruiser - 1) }
+                else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
+                setPlacedShip("");
+                stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+            }
         }
     }, [placedShip])
 
@@ -139,9 +141,10 @@ function GameBoard() {
             console.log(savedName);
             console.log(trimmed);
         } else {
-            setCellStorage("")
+            setEnemyShipInfo(cellStorage)
         }
-    }, [cellStorage]);
+    }, [cellStorage, shipInfo, chat, enemyShipInfo]);
+
 
     const auth = () => {
         setPasswordEntry(password)

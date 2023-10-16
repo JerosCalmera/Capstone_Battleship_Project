@@ -27,9 +27,17 @@ public class GameLogic {
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
+//    public void getEnemyShips (String target){
+//        List<String> shipList = new ArrayList<>();
+//        Player playerToCheck = playerRepository.findByNameContaining((target.substring(1, 3)));
+//        long ships = playerToCheck.getId();
+//        shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
+//        String converted = String.join("", shipList);
+//        System.out.println(converted);
+//        webSocketMessageSender.sendMessage("/topic/gameData", new GameData(playerToCheck.getName()+converted));
+//    }
     public void submitStartStats(Player name) {
         List<String> allCoOrds = playerRepository.findAllCoOrdsByPlayerName(name.getName());
-        System.out.println(allCoOrds);
         String converted = String.join("", allCoOrds);
         webSocketMessageSender.sendMessage("/topic/gameData", new GameData(name.getName()+converted));
     }
@@ -86,7 +94,6 @@ public class GameLogic {
     }
 
     public void handleNewPlayer(Player playerName) {
-        System.out.println(playerName);
         if (!playerRepository.findName().contains(playerName.getName())) {
             String name = playerName.getName();
             Player player = new Player(name);
@@ -109,7 +116,7 @@ public class GameLogic {
             Optional<Ship> shipToUpdate = shipRepository.findById(shipID);
             Ship ship = shipToUpdate.get();
             String shipHealth = ship.getCoOrds();
-            String newShipHealth = shipHealth.replace(target, "");
+            String newShipHealth = shipHealth.replace(target, "XX");
             ship.setCoOrds(newShipHealth);
             shipRepository.save(ship);
         } else {
@@ -130,15 +137,38 @@ public class GameLogic {
     private List<String> coOrds = new ArrayList<>();
     private String damage = "";
 
+    public void enumerateShips (String target){
+        List<String> shipList = new ArrayList<>();
+        Player playerToCheck = playerRepository.findByNameContaining((target.substring(4, 8)));
+        long ships = playerToCheck.getId();
+        shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
+        System.out.println(shipList);
+        for (String ship: shipList){
+        if (!ship.matches("^X+$")) {
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
+            break;
+        }
+            if (ship.equals("XXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
+            } else if (ship.equals("XXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
+            } else if (ship.equals("XXXXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
+            } else if (ship.equals("XXXXXXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Carrier!"));
+            }
+        }
+    }
     public void placeShip(String target) {
-        System.out.println(target);
+        if (!coOrds.contains(target.substring(1, 3))) {
+            coOrds.add(target.substring(1, 3));
+            damage += target.substring(1, 3);}
         Player newPlayer = new Player("");
         boolean validPlacement = false;
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
         int max = Integer.parseInt(target.substring(3, 4));
-        System.out.println(max);
         Ship newShip = new Ship("",0,"");
         if (max == 5) {
             newShip = new Ship("Carrier", 10, "");
@@ -148,12 +178,6 @@ public class GameLogic {
             newShip = new Ship("Cruiser", 6, "");
         } else if (max == 2) {
             newShip = new Ship("Destroyer", 4, "");}
-            System.out.println(newShip.getName());
-            if (!coOrds.contains(target.substring(1, 3))) {
-                coOrds.add(target.substring(1, 3));
-                damage += target.substring(1, 3);
-            }
-            System.out.println(damage);
             if (coOrds.size() == max) {
                 for (int i = 0; i < coOrds.size() - 1; i++) {
                     int inputOne = i;
@@ -178,7 +202,6 @@ public class GameLogic {
                     }
                 }
                 if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
-                    System.out.println("Placement invalid");
                     damage = "";
                     coOrds.clear();
                     invalidPlacement = false;
@@ -186,8 +209,6 @@ public class GameLogic {
                     verticalPlacement = false;
 
                 } else {
-                    System.out.println(damage);
-                    System.out.println("Placement valid");
                     coOrds.clear();
                     Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 8)));
                     newShip.setDamage(damage);
@@ -196,9 +217,12 @@ public class GameLogic {
                     shipRepository.save(newShip);
                     playerRepository.save(selectedPlayer);
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat(newShip.getName() + " placed!"));
-                    webSocketMessageSender.sendMessage("/topic/placement2", new Chat(newShip.getName()));
-
+                    webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getName()+newShip.getName()));
                     damage = "";
+                    Player playerToCheck = playerRepository.findByNameContaining((target.substring(4, 8)));
+                    long ships = playerToCheck.getId();
+                    List<String> shipList = new ArrayList<>();
+                    shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
                     validPlacement = true;
                     invalidPlacement = false;
                     horizontalPlacement = false;
