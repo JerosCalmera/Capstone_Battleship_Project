@@ -115,7 +115,7 @@ function GameBoard() {
             setPlayer1Data(player2Data)
             setPlayer2Data(player1Data)
         }
-    }, [player2Data, chat, placedShip])
+    }, [player2Data, chat])
 
 
 
@@ -123,15 +123,13 @@ function GameBoard() {
         const shipType = "CarrierBattleshipCruiserDestroyer";
         const ship = placedShip;
         console.log(placedShip)
-        if (ship.includes(savedName)) {
-            if (ship.includes(shipType)) {
-                if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
-                else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
-                else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
-                else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
-                setPlacedShip("");
-                stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-            }
+        if (ship.includes(shipType && savedName)) {
+            if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
+            else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
+            else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
+            else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
+            setPlacedShip("");
+            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
         }
     }, [placedShip])
 
