@@ -44,7 +44,7 @@ public class GameLogic {
 
     public String roomNumberString;
 
-    @Transactional
+
     public void handlePassword(String roomNumber) throws InterruptedException {
         if
         (!Objects.equals(roomNumberString, roomNumber)) {
@@ -82,7 +82,7 @@ public class GameLogic {
             playersNotInRoom.clear();
         }
     }
-    @Transactional
+
     public void handleNewPlayer(Player playerName) {
         if (!playerRepository.findName().contains(playerName.getName())) {
             String name = playerName.getName();
@@ -149,7 +149,7 @@ public class GameLogic {
             }
         }
     }
-    @Transactional
+
     public void placeShip(String target) throws InterruptedException {
 
         if (!coOrds.contains(target.substring(1, 3))) {
@@ -212,10 +212,6 @@ public class GameLogic {
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat(newShip.getName() + " placed!"));
                     webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getName()+newShip.getName()));
                     damage = "";
-                    Player playerToCheck = playerRepository.findByNameContaining((target.substring(4, 8)));
-                    long ships = playerToCheck.getId();
-                    List<String> shipList = new ArrayList<>();
-                    shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
                     invalidPlacement = false;
                     horizontalPlacement = false;
                     verticalPlacement = false;

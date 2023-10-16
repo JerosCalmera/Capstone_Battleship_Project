@@ -25,11 +25,6 @@ const Grids: React.FC<Props> = ({ placedShip, destroyer, cruiser, battleship, ca
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
     const [shipSize, setShipSize] = useState<number>(0)
 
-    useEffect(() => {
-        setShipSize(0)
-        setPlacedReadyShip("")
-        stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
-    }, [shipInfo]);
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -110,7 +105,7 @@ const Grids: React.FC<Props> = ({ placedShip, destroyer, cruiser, battleship, ca
             if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
             else {
                 stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
-                if (placedReadyShip.length > shipSize * 2) {
+                if (placedReadyShip.length === shipSize * 2) {
                     setPlacedReadyShip("")
                 }
                 else { setPlacedReadyShip(placedReadyShip + value) }
