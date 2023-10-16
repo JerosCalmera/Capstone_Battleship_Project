@@ -127,7 +127,7 @@ function GameBoard() {
             else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
             setPlacedShip("");
             stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-            
+
         }
     }, [placedShip])
 
@@ -138,6 +138,8 @@ function GameBoard() {
             setShipInfo(trimmed);
             console.log(savedName);
             console.log(trimmed);
+        } else {
+            setCellStorage("")
         }
     }, [cellStorage]);
 
@@ -158,10 +160,10 @@ function GameBoard() {
     const restart = () => {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         serverSetMessageLog("")
-        setShipInfo([])
-        setEnemyShipInfo([])
-        setEnemyShipDamage([])
-        setShipDamage([])
+        setShipInfo("")
+        setEnemyShipInfo("")
+        setEnemyShipDamage("")
+        setShipDamage("")
         setPassword("")
         setPasswordEntry("")
         setPlayerName("")
@@ -173,6 +175,7 @@ function GameBoard() {
         setCruiser(3)
         setDestroyer(4)
         setPlacedShip("")
+        setCellStorage("")
     }
     const resetPlacement = () => {
         console.log(cellStorage)
