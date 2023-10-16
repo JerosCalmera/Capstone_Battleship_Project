@@ -9,7 +9,7 @@ interface Chat {
 }
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.252.133"
+    const BASE_URL = "http://localhost"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -143,7 +143,7 @@ function GameBoard() {
         } else {
             setEnemyShipInfo(cellStorage)
         }
-    }, [cellStorage, shipInfo, chat, enemyShipInfo]);
+    }, [cellStorage]);
 
 
     const auth = () => {
@@ -202,7 +202,7 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
+                        <Grids placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />

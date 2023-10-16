@@ -82,7 +82,7 @@ public class GameLogic {
             playersNotInRoom.clear();
         }
     }
-
+    @Transactional
     public void handleNewPlayer(Player playerName) {
         if (!playerRepository.findName().contains(playerName.getName())) {
             String name = playerName.getName();
@@ -149,12 +149,13 @@ public class GameLogic {
             }
         }
     }
-    public void placeShip(String target) {
+    @Transactional
+    public void placeShip(String target) throws InterruptedException {
+
         if (!coOrds.contains(target.substring(1, 3))) {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);}
         Player newPlayer = new Player("");
-        boolean validPlacement = false;
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
@@ -194,6 +195,8 @@ public class GameLogic {
                 if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
                     damage = "";
                     coOrds.clear();
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Invalid Placement!"));
+                    webSocketMessageSender.sendMessage("/topic/placement2", new Chat("Invalid"));
                     invalidPlacement = false;
                     horizontalPlacement = false;
                     verticalPlacement = false;
@@ -213,7 +216,6 @@ public class GameLogic {
                     long ships = playerToCheck.getId();
                     List<String> shipList = new ArrayList<>();
                     shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
-                    validPlacement = true;
                     invalidPlacement = false;
                     horizontalPlacement = false;
                     verticalPlacement = false;
@@ -224,8 +226,6 @@ public class GameLogic {
     public void resetPlacement(String trigger) {
         if (trigger.length() > 1) {
             coOrds.clear();
-            damage="";
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Placement list cleared."));
-        }
+            damage="";}
     }
 }

@@ -16,13 +16,20 @@ interface Props {
     battleship: number;
     cruiser: number;
     destroyer: number;
+    placedShip: string;
 }
 
-const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ placedShip, destroyer, cruiser, battleship, carrier, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
+    const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
     const [shipSize, setShipSize] = useState<number>(0)
 
+    useEffect(() => {
+        setShipSize(0)
+        setPlacedReadyShip("")
+        stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
+    }, [shipInfo]);
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -36,8 +43,7 @@ const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, playe
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedCell(cellValue)}
-                        className={shipInfo.includes(cellValue) ? "cellShip" : shipDamage.includes(cellValue) ? "cellDamaged" : "cell"
-                        }>**</button>);
+                        className={stylingCell(cellValue)}>**</button>);
             }
             end.push(
                 <div>
@@ -50,6 +56,18 @@ const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, playe
         return end;
     }
 
+    const stylingCell = (cellValue: string) => {
+        if (shipInfo.includes(cellValue)) { return "cellShip" }
+        else if (shipDamage.includes(cellValue)) { return "cellDamaged" }
+        else if (placedReadyShip.includes(cellValue)) { return "cellPlaced" }
+        else return "cell"
+    }
+
+    const stylingEnemyCell = (cellValue: string) => {
+        if (enemyShipInfo.includes(cellValue)) { return "cellShip" }
+        else if (enemyShipDamage.includes(cellValue)) { return "cellDamaged" }
+        else return "cell"
+    }
     const populateEnemyGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         const value: Array<string> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -62,8 +80,7 @@ const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, playe
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedEnemyCell(cellValue)}
-                        className={enemyShipInfo.includes(cellValue) ? "cellShip" : enemyShipDamage.includes(cellValue) ? "cellDamaged" : "cell"
-                        }>**</button>);
+                        className={stylingEnemyCell(cellValue)}>**</button>);
             }
             end.push(
                 <div>
@@ -91,7 +108,13 @@ const Grids: React.FC<Props> = ({ destroyer, cruiser, battleship, carrier, playe
         }
         else {
             if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
-            else { stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName)); }
+            else {
+                stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
+                if (placedReadyShip.length > shipSize * 2) {
+                    setPlacedReadyShip("")
+                }
+                else { setPlacedReadyShip(placedReadyShip + value) }
+            }
         }
     }
 

@@ -30,15 +30,18 @@ public class MessageController {
         return new Chat(chat);
     }
     @MessageMapping("/gameUpdate")
-    public void gameUpdate(Player name) {
+    public void gameUpdate(Player name) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.submitStats(name);
     }
     @MessageMapping("/startup")
-    public void startup(Player name) {
+    public void startup(Player name) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.submitStartStats(name);
     }
     @MessageMapping("/gameData")
-    public void handleGameData(GameData gameData) {
+    public void handleGameData(GameData gameData) throws InterruptedException {
+        Thread.sleep(25);
         String target = gameData.getContent();
         System.out.println(target);
         GameLogic.shootAtShip(target);
@@ -50,20 +53,24 @@ public class MessageController {
     }
     @MessageMapping("/room")
     public void handlePassword(String newRoom) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.handlePassword(newRoom);
     }
 
     @MessageMapping("/name")
     @SendTo("/topic/name")
-    public void handleName (Player playerName) throws Exception {
+    public void handleName (Player playerName) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.handleNewPlayer(playerName);
     }
     @MessageMapping("/placement")
-    public void shipPlacement(String string) {
+    public void shipPlacement(String string) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.placeShip(string);
     }
     @MessageMapping("/placement2")
-    public void resetPlacement(String string) {
+    public void resetPlacement(String string) throws InterruptedException {
+        Thread.sleep(25);
         GameLogic.resetPlacement(string);
     }
 //    @MessageMapping("/enemyShips")
