@@ -32,11 +32,11 @@ public class MessageController {
         return new Chat(chat);
     }
     @MessageMapping("/gameUpdate")
-    public void gameUpdate(String name) {
+    public void gameUpdate(Player name) {
         GameLogic.submitStats(name);
     }
     @MessageMapping("/startup")
-    public void startup(String name) {
+    public void startup(Player name) {
         GameLogic.submitStartStats(name);
     }
     @MessageMapping("/gameData")

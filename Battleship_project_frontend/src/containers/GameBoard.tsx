@@ -27,6 +27,12 @@ function GameBoard() {
     const [chatEntry, setChatEntry] = useState<string>("")
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
+    const [carrier, setCarrier] = useState<number>(1)
+    const [battleship, setBattleship] = useState<number>(2)
+    const [cruiser, setCruiser] = useState<number>(3)
+    const [destroyer, setDestroyer] = useState<number>(4)
+    const [placedShip, setPlacedShip] = useState<string>("")
+    const [cellStorage, setCellStorage] = useState<string>("")
 
 
     useEffect(() => {
@@ -38,10 +44,11 @@ function GameBoard() {
             console.log("Connected to server");
             client.subscribe("/topic/connect", (message: any) => {
                 serverSetMessageLog(message.body.slice(12, -2))
+
             });
 
             client.subscribe("/topic/gameData", (message: any) => {
-                setShipInfo(message.body.slice(12, -2))
+                setCellStorage(message.body.slice(12, -2))
 
             });
 
@@ -86,13 +93,15 @@ function GameBoard() {
                 setPlayer1Data(message.body.slice(12, -2))
             });
 
+            client.subscribe("/topic/placement2", (message: any) => {
+                setPlacedShip(message.body.slice(12, -2))
+            });
+
             client.ws.onclose = () => {
                 (console.log("Connection terminated"))
                 setServerStatus(false)
             };
             setStompClient(client)
-
-
         });
     }, [attemptReconnect])
 
@@ -105,10 +114,30 @@ function GameBoard() {
             setPlayer1Data(player2Data)
             setPlayer2Data(player1Data)
         }
-        // stompClient.send("/app/startup", {}, JSON.stringify(savedName));
-        // stompClient.send("/app/gameUpdate", {}, JSON.stringify(savedName));
     }, [player2Data])
 
+
+    useEffect(() => {
+        const shipType = ["Carrier", "Battleship", "Cruiser", "Destroyer"]
+        const ship = placedShip;
+        if (shipType.includes(ship)) {
+            if (ship === "Carrier") { setCarrier(carrier - 1) }
+            else if (ship === "Battleship") { setBattleship(battleship - 1) }
+            else if (ship === "Cruiser") { setCruiser(cruiser - 1) }
+            else if (ship === "Destroyer") { setDestroyer(destroyer - 1) }
+            setPlacedShip("");
+            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+        }
+    }, [placedShip])
+
+    useEffect(() => {
+        const toTrim = cellStorage;
+        if (playerName.includes(toTrim)) {
+            const trimmed: any = toTrim.replace(playerName, '');
+            setShipInfo(trimmed)
+            console.log(playerName)
+        }
+    }, [placedShip])
 
     const auth = () => {
         setPasswordEntry(password)
@@ -137,6 +166,11 @@ function GameBoard() {
         setSaveName("name")
         setPlayer1Data("")
         setPlayer2Data("")
+        setCarrier(1)
+        setBattleship(2)
+        setCruiser(3)
+        setDestroyer(4)
+        setPlacedShip("")
     }
     const resetPlacement = () => {
         stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
@@ -156,7 +190,10 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids player1Data={player1Data} player2Data={player2Data} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} />
+                        <Grids destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
+                            player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
+                            shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage}
+                            stompClient={stompClient} />
                         <button className="button" onClick={resetPlacement}>Reset Placement</button>
                     </div> : null}
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?

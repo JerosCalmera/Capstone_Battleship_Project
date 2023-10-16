@@ -48,6 +48,25 @@ h2 {
   margin-top: -1px;
 }
 
+.shipPlacementInner {
+  height: 400px;
+  width: 300px;
+  margin-left: -120px;
+  line-height: 80%;
+  margin-top: 30px;
+}
+
+
+.shipToPlace {
+  height: 39px;
+  width: 39px;
+  border: 1px solid black;
+  background-color: red;
+  color: red;
+  margin-right: -1px;
+  margin-top: -1px;
+}
+
 .cellDamaged {
   height: 40px;
   width: 40px;

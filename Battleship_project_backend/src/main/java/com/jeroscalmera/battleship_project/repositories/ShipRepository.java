@@ -11,12 +11,13 @@ import java.util.List;
 @Repository
 public interface ShipRepository extends JpaRepository<Ship, Long> {
     void deleteAll();
+
     @Query("SELECT s.id FROM Ship s WHERE s.coOrds LIKE %:target%")
     Long findShipIdsByCoOrdsContainingPair(@Param("target") String target);
 
     @Query("SELECT s.coOrds FROM Ship s")
     List<String> findAllCoOrds();
 
-    @Query("SELECT s.coOrds FROM Ship s WHERE s.player.name = :playerName")
-    List<String> findAllCoOrdsByPlayerName(@Param("playerName") String playerName);
+    @Query("SELECT s.coOrds FROM Ship s WHERE s.player.id = :playerId")
+    List<String> findAllCoOrdsByPlayerId(@Param("playerId") Long playerId);
 }
