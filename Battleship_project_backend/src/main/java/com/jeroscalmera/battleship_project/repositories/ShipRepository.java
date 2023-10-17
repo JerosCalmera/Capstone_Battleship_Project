@@ -20,4 +20,10 @@ public interface ShipRepository extends JpaRepository<Ship, Long> {
 
     @Query("SELECT s.coOrds FROM Ship s WHERE s.player.id = :playerId")
     List<String> findAllCoOrdsByPlayerId(@Param("playerId") Long playerId);
+
+    List<Ship> findAllShipsByPlayerId(Long playerId);
+
+    @Query("SELECT s.id FROM Ship s WHERE s.player.id = :playerId AND s.coOrds LIKE CONCAT('%', :targetCoordinatePattern, '%')")
+    Long findShipIdsByPlayerAndCoOrdsContainingPair(@Param("playerId") Long playerId, @Param("targetCoordinatePattern") String targetCoordinatePattern);
+
 }

@@ -42,7 +42,6 @@ public class MessageController {
         String target = gameData.getContent();
         System.out.println(target);
         GameLogic.shootAtShip(target);
-        GameLogic.enumerateShips(target);
     }
     @MessageMapping("/restart")
     public void handleRestart(String hidden) {
@@ -65,6 +64,10 @@ public class MessageController {
     @MessageMapping("/placement2")
     public void resetPlacement(String string) throws InterruptedException {
         GameLogic.resetPlacement(string);
+    }
+
+    @MessageMapping("/enemyDamage")
+    public void enemyDamage(String string) {
     }
 //    @MessageMapping("/enemyShips")
 //    public void getEnemyShips(String string) {

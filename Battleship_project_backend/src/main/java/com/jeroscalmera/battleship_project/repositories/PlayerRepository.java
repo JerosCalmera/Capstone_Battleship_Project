@@ -1,13 +1,13 @@
 package com.jeroscalmera.battleship_project.repositories;
 
 import com.jeroscalmera.battleship_project.models.Player;
-import com.jeroscalmera.battleship_project.models.Ship;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
@@ -19,8 +19,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query
     Player findByName(String name);
 
-//    @Query("SELECT p FROM Player p WHERE p.name = :name")
-//    Player findByName(@Param("name") String name);
+    @Query
+    Player findPlayerById(Long id);
 
     @Query("SELECT p.name FROM Player p WHERE p.room.roomNumber = :roomNumber")
     List<String> findPlayersByRoomNumber(@Param("roomNumber") String roomNumber);
@@ -32,7 +32,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query("SELECT s.coOrds FROM Ship s WHERE s.player.name = :playerName")
     List<String> findAllCoOrdsByPlayerName(@Param("playerName") String playerName);
 
-
+    @Query
+    String findAllCoOrdsById(Long id);
 }
 
 

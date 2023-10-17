@@ -59,6 +59,12 @@ public class Ship {
     public int getDamage() {
         return coOrds.length();
     }
+    public void setShipDamage(String damage) {
+        this.coOrds = damage;
+    }
+    public String getShipDamage() {
+        return coOrds;
+    }
     public void setCoOrds(String coOrds) {
         this.coOrds = coOrds;
     }

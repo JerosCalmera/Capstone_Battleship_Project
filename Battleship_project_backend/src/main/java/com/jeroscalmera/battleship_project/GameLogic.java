@@ -7,6 +7,7 @@ import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -100,19 +101,72 @@ public class GameLogic {
     }
 
     public void shootAtShip(String target) {
-        if (shipRepository.findShipIdsByCoOrdsContainingPair(target) != null) {
+        System.out.println(target);
+        System.out.println((target.substring(2,6)));
+        String aimPoint = target.substring(0, 2);
+        aimPoint = aimPoint.trim();
+        System.out.println(aimPoint);
+        Player selectedPlayer = playerRepository.findByNameContaining(target.substring(2,6));
+        List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
+        String converted = String.join("", shipList);
+        System.out.println(converted);
+        System.out.println(selectedPlayer.getId());
+        if (converted.contains(aimPoint)) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hit!"));
-            Long shipID = shipRepository.findShipIdsByCoOrdsContainingPair(target);
+            webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint+selectedPlayer.getName()));
+            Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
+            System.out.println();
             Optional<Ship> shipToUpdate = shipRepository.findById(shipID);
             Ship ship = shipToUpdate.get();
             String shipHealth = ship.getCoOrds();
-            String newShipHealth = shipHealth.replace(target, "XX");
+            String newShipHealth = shipHealth.replace(aimPoint, "XX");
             ship.setCoOrds(newShipHealth);
             shipRepository.save(ship);
+            enumerateShips(selectedPlayer.getId());
         } else {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Miss!"));
         }
     }
+    public void enumerateShips (Long id){
+        List<String> shipListToCheck = new ArrayList<>();
+        Player playerToCheck = playerRepository.findPlayerById(id);
+        shipListToCheck = shipRepository.findAllCoOrdsByPlayerId(id);
+        System.out.println(shipListToCheck);
+        boolean allShipsDestroyed = true;
+        List<Ship> shipToModify = shipRepository.findAllShipsByPlayerId(id);
+        for (String ship: shipListToCheck){
+            if (!ship.matches("")) {
+                allShipsDestroyed = false;
+            }
+            if (ship.equals("XXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
+            } else if (ship.equals("XXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
+            } else if (ship.equals("XXXXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
+            } else if (ship.equals("XXXXXXXXXX")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Carrier!"));
+            }
+            for (Ship shipMod :shipToModify) {
+                if (Objects.equals(shipMod.getShipDamage(), "XXXXXXXXXX")){
+                    shipMod.setShipDamage("");}
+                    shipRepository.save(shipMod);
+                if (Objects.equals(shipMod.getShipDamage(), "XXXXXXXX")){
+                    shipMod.setShipDamage("");}
+                    shipRepository.save(shipMod);
+                if (Objects.equals(shipMod.getShipDamage(), "XXXXXX")){
+                    shipMod.setShipDamage("");}
+                    shipRepository.save(shipMod);
+                if (Objects.equals(shipMod.getShipDamage(), "XXXX")){
+                    shipMod.setShipDamage("");}
+                    shipRepository.save(shipMod);
+            }
+        }
+        if (allShipsDestroyed){
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
+        }
+    }
+
 
     public void restart() {
         List<Player> playerList = playerRepository.findAll();
@@ -127,30 +181,8 @@ public class GameLogic {
     private List<String> coOrds = new ArrayList<>();
     private String damage = "";
 
-    public void enumerateShips (String target){
-        List<String> shipList = new ArrayList<>();
-        Player playerToCheck = playerRepository.findByNameContaining((target.substring(4, 8)));
-        long ships = playerToCheck.getId();
-        shipList = shipRepository.findAllCoOrdsByPlayerId(ships);
-        System.out.println(shipList);
-        for (String ship: shipList){
-        if (!ship.matches("^X+$")) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
-            break;
-        }
-            if (ship.equals("XXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
-            } else if (ship.equals("XXXXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
-            } else if (ship.equals("XXXXXXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
-            } else if (ship.equals("XXXXXXXXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Carrier!"));
-            }
-        }
-    }
-
     public void placeShip(String target) throws InterruptedException {
+        System.out.println(target);
 
         if (!coOrds.contains(target.substring(1, 3))) {
             coOrds.add(target.substring(1, 3));

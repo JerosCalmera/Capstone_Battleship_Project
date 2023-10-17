@@ -15,10 +15,16 @@ function GameBoard() {
     const [serverStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
+
     const [shipInfo, setShipInfo] = useState<string>("")
+    const [shipDamage, setShipDamage] = useState<string>("")
+
     const [enemyShipInfo, setEnemyShipInfo] = useState<string>("")
     const [enemyShipDamage, setEnemyShipDamage] = useState<string>("")
-    const [shipDamage, setShipDamage] = useState<string>("")
+    const [enemyCheck, setEnemyCheck] = useState<string>("")
+
+
+
     const [password, setPassword] = useState<string>("")
     const [passwordEntry, setPasswordEntry] = useState<string>("")
     const [playerName, setPlayerName] = useState<string>("")
@@ -27,12 +33,14 @@ function GameBoard() {
     const [chatEntry, setChatEntry] = useState<string>("")
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
+    const [player2Name, setPlayer2Name] = useState<string>("Player 2")
     const [carrier, setCarrier] = useState<number>(1)
     const [battleship, setBattleship] = useState<number>(2)
     const [cruiser, setCruiser] = useState<number>(3)
     const [destroyer, setDestroyer] = useState<number>(4)
     const [placedShip, setPlacedShip] = useState<string>("")
     const [cellStorage, setCellStorage] = useState<string>("")
+    const [matchStart, setMatchStart] = useState<boolean>(false)
 
 
     useEffect(() => {
@@ -62,15 +70,15 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/name", (message: any) => {
-                setShipDamage(message.body.slice(12, -2))
             });
+
 
             client.subscribe("/topic/chat", (message: any) => {
                 const newMessage: string = message.body.slice(12, -2)
                 setChat((prevChat) => {
                     const updatedChat = [...prevChat, newMessage];
                     return updatedChat.slice(-10)
-                });
+                })
             });
 
             client.subscribe("/topic/playerData1", (message: any) => {
@@ -87,6 +95,10 @@ function GameBoard() {
 
             client.subscribe("/topic/gameUpdate", (message: any) => {
                 setPlayer1Data(message.body.slice(12, -2))
+            });
+
+            client.subscribe("/topic/enemyDamage", (message: any) => {
+                setEnemyCheck(message.body.slice(12, -2))
             });
 
             client.subscribe("/topic/startup", (message: any) => {
@@ -110,10 +122,12 @@ function GameBoard() {
         if (player1Data.includes(savedName)) {
             setPlayer1Data(player1Data);
             setPlayer2Data(player2Data)
+            setPlayer2Name(player2Data)
         }
         else if (player2Data.includes(savedName)) {
             setPlayer1Data(player2Data)
             setPlayer2Data(player1Data)
+            setPlayer2Name(player1Data)
         }
     }, [player2Data, chat])
 
@@ -145,6 +159,13 @@ function GameBoard() {
         }
     }, [cellStorage]);
 
+
+    useEffect(() => {
+        if (!enemyCheck.includes(savedName)) {
+            setEnemyShipDamage(enemyShipDamage + enemyCheck.slice(0, 2));
+            console.log(enemyShipDamage)
+        }
+    }, [enemyCheck]);
 
     const auth = () => {
         setPasswordEntry(password)
@@ -202,7 +223,7 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
+                        <Grids player2Name={player2Name} chat={chat} placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
