@@ -136,3 +136,11 @@
     </ul>
     <h2>Cell:</h2>
 </div >
+
+
+const auth = () => {
+    const randomNumber = Math.floor(Math.random() * 10000)
+    const roomNumber = randomNumber.toString().padStart(4, "0");
+    setPasswordEntry(roomNumber)
+    stompClient.send("/app/room", {}, JSON.stringify(roomNumber));
+}

@@ -42,12 +42,21 @@ h2 {
   height: 40px;
   width: 40px;
   border: 1px solid black;
-  background-color: lawngreen;
-  color: lawngreen;
+  background-color: blue;
+  color: blue;
   margin-right: -1px;
   margin-top: -1px;
 }
 
+.miss {
+  height: 40px;
+  width: 40px;
+  border: 1px solid black;
+  background-color: darkgray;
+  color: darkgray;
+  margin-right: -1px;
+  margin-top: -1px;
+}
 
 .cellEnemyShip {
   height: 40px;
@@ -61,20 +70,28 @@ h2 {
 
 .shipPlacementInner {
   height: 400px;
-  width: 300px;
-  margin-left: -120px;
-  line-height: 80%;
-  margin-top: 30px;
+  width: 250px;
+  line-height: 50%;
+  margin-top: 60px;
 }
 
 .shipToPlace {
-  height: 39px;
-  width: 39px;
+  height: 40px;
+  width: 40px;
   border: 1px solid black;
-  background-color: red;
-  color: red;
+  background-color: blue;
+  color: blue;
   margin-right: -1px;
-  margin-top: -1px;
+}
+
+
+.shipToPlaceSelected {
+  height: 40px;
+  width: 40px;
+  border: 1px solid black;
+  background-color: green;
+  color: green;
+  margin-right: -1px;
 }
 
 .cellDamaged {
@@ -139,13 +156,13 @@ h2 {
 
 .gameBoardOuter {
   display: flex;
-  background-color: rgba(0, 0, 0, 0);
 }
 
 .gameBoardOuterGreater {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 20px;
   background-color: rgba(0, 0, 0, 0.708);
 }
 
@@ -164,13 +181,12 @@ h2 {
 .button:hover {
   color: rgb(0, 221, 255);
   background-color: #ffffff;
-  ;
   transition: 0.2s;
 }
 
 .startupOuter {
   background-color: rgba(0, 0, 0, 0.708);
-  height: 120px;
+  height: 140px;
   width: 530px;
   padding: 20px;
   padding-bottom: 30px;
@@ -194,4 +210,15 @@ h2 {
 
 .input {
   background-color: rgba(116, 196, 194, 0.575);
+}
+
+.gameInfo {
+  margin-top: 10px;
+  padding-top: 15px;
+  height: 120px;
+  width: 150px;
+  margin-bottom: 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.708);
+  border-radius: 20px;
 }

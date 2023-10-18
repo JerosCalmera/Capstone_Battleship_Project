@@ -69,6 +69,10 @@ public class Player {
         return level;
     }
 
+    public void levelUp() {
+        this.level = (level + level);
+    }
+
     public void setLevel(int level) {
         this.level = level;
     }

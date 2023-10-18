@@ -6,7 +6,6 @@ interface StompClient {
 interface Props {
     shipInfo: string;
     shipDamage: string;
-    enemyShipInfo: string;
     enemyShipDamage: string;
     stompClient: StompClient;
     savedName: string;
@@ -19,14 +18,18 @@ interface Props {
     placedShip: string;
     chat: string[];
     player2Name: string;
+    miss: string;
+    enemyMiss: string;
+    turn: string;
 }
 
-const Grids: React.FC<Props> = ({ setEnemyShipDamage, setShipDamage, player2Name, chat, placedShip, destroyer, cruiser, battleship, carrier, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipInfo, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, placedShip, destroyer, cruiser, battleship, carrier, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
     const [shipSize, setShipSize] = useState<number>(0)
     const [shipToPlace, setShipToPlace] = useState<string>("")
+
 
 
     useEffect(() => {
@@ -60,16 +63,25 @@ const Grids: React.FC<Props> = ({ setEnemyShipDamage, setShipDamage, player2Name
     }
 
     const stylingCell = (cellValue: string) => {
-        if (shipInfo.includes(cellValue)) { return "cellShip" }
-        if (shipDamage.includes(cellValue)) { return "cellDamaged" }
+        if (miss.includes(cellValue)) { return "miss" }
+        else if (shipDamage.includes(cellValue)) { return "cellDamaged" }
+        else if (shipInfo.includes(cellValue)) { return "cellShip" }
         else if (placedReadyShip.includes(cellValue)) { return "cellPlaced" }
         else return "cell"
     }
 
     const stylingEnemyCell = (cellValue: string) => {
         if (enemyShipDamage.includes(cellValue)) { return "cellEnemyShip" }
-        else if (enemyShipInfo.includes(cellValue)) { return "cell" }
+        else if (enemyMiss.includes(cellValue)) { return "miss" }
         else return "cell"
+    }
+
+    const shipToPlaceStyle = (value: string) => {
+        if (shipToPlace === "Carrier" && value === "Carrier") { return "shipToPlaceSelected " }
+        else if (shipToPlace === "Battleship" && value === "Battleship") { return "shipToPlaceSelected " }
+        else if (shipToPlace === "Cruiser" && value === "Cruiser") { return "shipToPlaceSelected " }
+        else if (shipToPlace === "Destroyer" && value === "Destroyer") { return "shipToPlaceSelected " }
+        else { return "shipToPlace" }
     }
     const populateEnemyGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -106,28 +118,34 @@ const Grids: React.FC<Props> = ({ setEnemyShipDamage, setShipDamage, player2Name
     }
 
     const clickedCell = (value: string) => {
-        if (carrier > 0 && shipToPlace === "Carrier" ||
-            battleship > 0 && shipToPlace === "Battleship" ||
-            cruiser > 0 && shipToPlace === "Cruiser" ||
-            destroyer > 0 && shipToPlace === "Destroyer") {
-            stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
-            setPlacedReadyShip(placedReadyShip + value)
-        }
-        else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
-        {
-            if (placedReadyShip.length > shipSize * 2) {
-                setPlacedReadyShip("")
-                setShipToPlace("")
+        if (shipPlacement === false) {
+            if (carrier > 0 && shipToPlace === "Carrier" ||
+                battleship > 0 && shipToPlace === "Battleship" ||
+                cruiser > 0 && shipToPlace === "Cruiser" ||
+                destroyer > 0 && shipToPlace === "Destroyer") {
+                stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
+                setPlacedReadyShip(placedReadyShip + value)
+            }
+            else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
+            {
+                if (placedReadyShip.length > shipSize * 2) {
+                    setPlacedReadyShip("")
+                    setShipToPlace("")
+                }
             }
         }
     }
 
 
     const clickedEnemyCell = (value: string) => {
-        if (shipPlacement === true) {
-            stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name));
-        }
+        if (turn === savedName) {
+            if (shipPlacement === true) {
+                if (enemyMiss.includes(value)) { null }
+                else
+                    stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + savedName));
 
+            }
+        }
     }
     const placeCarrier = () => {
         setShipSize(5);
@@ -149,10 +167,6 @@ const Grids: React.FC<Props> = ({ setEnemyShipDamage, setShipDamage, player2Name
         setShipToPlace("Destroyer")
     }
 
-    // const shipPlaced = (value: string) => {
-    //     stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
-    // }
-
     return (
         <>
             <div className="gameBoardOuterGreater">
@@ -161,35 +175,35 @@ const Grids: React.FC<Props> = ({ setEnemyShipDamage, setShipDamage, player2Name
                         <div className="shipPlacementInner">
                             {carrier > 0 ?
                                 <ul>
-                                    <button onClick={placeCarrier} className="shipToPlace">*</button>
-                                    <button onClick={placeCarrier} className="shipToPlace">*</button>
-                                    <button onClick={placeCarrier} className="shipToPlace">*</button>
-                                    <button onClick={placeCarrier} className="shipToPlace">*</button>
-                                    <button onClick={placeCarrier} className="shipToPlace">*</button>
+                                    <button onClick={placeCarrier} className={shipToPlaceStyle("Carrier")}>*</button>
+                                    <button onClick={placeCarrier} className={shipToPlaceStyle("Carrier")}>*</button>
+                                    <button onClick={placeCarrier} className={shipToPlaceStyle("Carrier")}>*</button>
+                                    <button onClick={placeCarrier} className={shipToPlaceStyle("Carrier")}>*</button>
+                                    <button onClick={placeCarrier} className={shipToPlaceStyle("Carrier")}>*</button>
                                     <h4>Carrier: x{carrier}</h4><br />
                                 </ul>
                                 : null}
                             {battleship > 0 ?
                                 <ul>
-                                    <button onClick={placeBattleship} className="shipToPlace">*</button>
-                                    <button onClick={placeBattleship} className="shipToPlace">*</button>
-                                    <button onClick={placeBattleship} className="shipToPlace">*</button>
-                                    <button onClick={placeBattleship} className="shipToPlace">*</button>
+                                    <button onClick={placeBattleship} className={shipToPlaceStyle("Battleship")}>*</button>
+                                    <button onClick={placeBattleship} className={shipToPlaceStyle("Battleship")}>*</button>
+                                    <button onClick={placeBattleship} className={shipToPlaceStyle("Battleship")}>*</button>
+                                    <button onClick={placeBattleship} className={shipToPlaceStyle("Battleship")}>*</button>
                                     <h4>Battleship: x{battleship}</h4><br />
                                 </ul>
                                 : null}
                             {cruiser > 0 ?
                                 <ul>
-                                    <button onClick={placeCruiser} className="shipToPlace">*</button>
-                                    <button onClick={placeCruiser} className="shipToPlace">*</button>
-                                    <button onClick={placeCruiser} className="shipToPlace">*</button>
+                                    <button onClick={placeCruiser} className={shipToPlaceStyle("Cruiser")}>*</button>
+                                    <button onClick={placeCruiser} className={shipToPlaceStyle("Cruiser")}>*</button>
+                                    <button onClick={placeCruiser} className={shipToPlaceStyle("Cruiser")}>*</button>
                                     <h4>Cruiser: x{cruiser}</h4> <br />
                                 </ul>
                                 : null}
                             {destroyer > 0 ?
                                 <ul>
-                                    <button onClick={placeDestroyer} className="shipToPlace">*</button>
-                                    <button onClick={placeDestroyer} className="shipToPlace">*</button>
+                                    <button onClick={placeDestroyer} className={shipToPlaceStyle("Destroyer")}>*</button>
+                                    <button onClick={placeDestroyer} className={shipToPlaceStyle("Destroyer")}>*</button>
                                     <h4>Destroyer: x{destroyer}</h4><br />
                                 </ul>
                                 : null}

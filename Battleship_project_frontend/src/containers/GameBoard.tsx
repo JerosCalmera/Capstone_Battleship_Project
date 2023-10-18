@@ -19,29 +19,39 @@ function GameBoard() {
     const [shipInfo, setShipInfo] = useState<string>("")
     const [shipDamage, setShipDamage] = useState<string>("")
 
-    const [enemyShipInfo, setEnemyShipInfo] = useState<string>("")
     const [enemyShipDamage, setEnemyShipDamage] = useState<string>("")
-    const [enemyCheck, setEnemyCheck] = useState<string>("")
 
+    const [damageCheck, setDamageCheck] = useState<string>("")
 
+    const [missCheck, setMissCheck] = useState<string>("")
+    const [miss, setMiss] = useState<string>("")
+    const [enemyMiss, setEnemyMiss] = useState<string>("")
 
     const [password, setPassword] = useState<string>("")
     const [passwordEntry, setPasswordEntry] = useState<string>("")
+    const [hidden, setHidden] = useState<string>("")
+
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
+
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
+
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
     const [player2Name, setPlayer2Name] = useState<string>("Player 2")
+
     const [carrier, setCarrier] = useState<number>(1)
     const [battleship, setBattleship] = useState<number>(2)
     const [cruiser, setCruiser] = useState<number>(3)
     const [destroyer, setDestroyer] = useState<number>(4)
+
     const [placedShip, setPlacedShip] = useState<string>("")
     const [cellStorage, setCellStorage] = useState<string>("")
-    const [matchStart, setMatchStart] = useState<boolean>(false)
 
+    const [gameInfo, setGameInfo] = useState<string>("")
+    const [turn, setTurn] = useState<string>("Waiting")
+    const [turnNumber, setTurnNumber] = useState<number>(-1)
 
     useEffect(() => {
         const port = 8081;
@@ -52,27 +62,28 @@ function GameBoard() {
             console.log("Connected to server");
             client.subscribe("/topic/connect", (message: any) => {
                 serverSetMessageLog(message.body.slice(12, -2))
-
             });
-
+            client.subscribe("/topic/gameInfo", (message: any) => {
+                setGameInfo(message.body.slice(12, -2))
+            });
             client.subscribe("/topic/gameData", (message: any) => {
                 setCellStorage(message.body.slice(12, -2))
-
             });
-
+            client.subscribe("/topic/turn", (message: any) => {
+                setTurn(message.body.slice(12, -2))
+            });
             client.subscribe("/topic/gameData2", (message: any) => {
                 setShipDamage(message.body.slice(12, -2))
-
             });
-
             client.subscribe("/topic/placement", (message: any) => {
                 setShipDamage(message.body.slice(12, -2))
             });
-
-            client.subscribe("/topic/name", (message: any) => {
+            client.subscribe("/topic/miss", (message: any) => {
+                setMissCheck(message.body.slice(12, -2))
             });
-
-
+            client.subscribe("/topic/hidden", (message: any) => {
+                setHidden(message.body.slice(12, -2))
+            });
             client.subscribe("/topic/chat", (message: any) => {
                 const newMessage: string = message.body.slice(12, -2)
                 setChat((prevChat) => {
@@ -80,12 +91,9 @@ function GameBoard() {
                     return updatedChat.slice(-10)
                 })
             });
-
             client.subscribe("/topic/playerData1", (message: any) => {
                 setPlayer1Data(message.body.slice(12, -2))
-            });
-
-
+            })
             client.subscribe("/topic/playerData2", (message: any) => {
                 setPlayer2Data(message.body.slice(12, -2))
             });
@@ -98,7 +106,7 @@ function GameBoard() {
             });
 
             client.subscribe("/topic/enemyDamage", (message: any) => {
-                setEnemyCheck(message.body.slice(12, -2))
+                setDamageCheck(message.body.slice(12, -2))
             });
 
             client.subscribe("/topic/startup", (message: any) => {
@@ -132,6 +140,21 @@ function GameBoard() {
     }, [player2Data, chat])
 
 
+    useEffect(() => {
+        setTurnNumber(turnNumber + 1)
+    }, [turn])
+
+    useEffect(() => {
+        if (missCheck.includes(savedName)) {
+            setMiss(miss + missCheck);
+            console.log(miss)
+        }
+        else if (!missCheck.includes(savedName)) {
+            setEnemyMiss(enemyMiss + missCheck)
+            console.log(enemyMiss)
+        }
+    }, [missCheck])
+
 
     useEffect(() => {
         const shipType = "CarrierBattleshipCruiserDestroyer";
@@ -152,31 +175,36 @@ function GameBoard() {
         if (toTrim.includes(savedName)) {
             const trimmed: string = toTrim.replace(savedName, '');
             setShipInfo(trimmed);
-            console.log(savedName);
-            console.log(trimmed);
-        } else {
-            setEnemyShipInfo(cellStorage)
         }
     }, [cellStorage]);
 
 
     useEffect(() => {
-        if (!enemyCheck.includes(savedName)) {
-            setEnemyShipDamage(enemyShipDamage + enemyCheck.slice(0, 2));
-            console.log(enemyShipDamage)
+        if (!damageCheck.includes(savedName)) {
+            setEnemyShipDamage(enemyShipDamage + damageCheck.slice(0, 2))
         }
-    }, [enemyCheck]);
+        else {
+            setShipDamage(shipDamage + damageCheck.slice(0, 2))
+        }
+        console.log(shipInfo)
+    }, [damageCheck]);
 
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
     }
 
+    const generate = () => {
+        const randomNumber = Math.floor(Math.random() * 10000)
+        const roomNumber = randomNumber.toString().padStart(4, "0");
+        setPasswordEntry(roomNumber)
+        stompClient.send("/app/room", {}, JSON.stringify(roomNumber));
+    }
+
     const saveName = () => {
         setSaveName(playerName)
         stompClient.send("/app/name", {}, JSON.stringify(playerName));
     }
-
     const chatSend = () => {
         stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
         setChatEntry("")
@@ -185,7 +213,6 @@ function GameBoard() {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         serverSetMessageLog("")
         setShipInfo("")
-        setEnemyShipInfo("")
         setEnemyShipDamage("")
         setShipDamage("")
         setPassword("")
@@ -209,48 +236,65 @@ function GameBoard() {
         stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
     }
 
+    const matchStart = () => {
+        stompClient.send("/app/turn", {}, JSON.stringify("Match start"));
+    }
+
+
 
     return (
         <>
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
-            <h5>{serverMessageLog}</h5><button className="button" onClick={restart}>Restart</button>
+            <h5>{serverMessageLog}</h5>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             <button className="button" onClick={resetPlacement}>Reset Placement</button>
-            {/* <Grids hidden={hidden} savedName={savedName} shipInfo={shipInfo} shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage} stompClient={stompClient} /> */}
             {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
-                    <div>
-                        <Grids player2Name={player2Name} chat={chat} placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
+                    <div className="gameInfoOuter">
+                        <div className="gameInfo">
+                            <h3>Turn: {turnNumber} {turn}</h3>
+                            <h3>{gameInfo}</h3>
+                            <button className="button" onClick={matchStart}>Match Start</button>
+                        </div>
+                        <Grids turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat} placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
-                            shipDamage={shipDamage} enemyShipInfo={enemyShipInfo} enemyShipDamage={enemyShipDamage}
+                            shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
                         <button className="button" onClick={resetPlacement}>Reset Placement</button>
                     </div> : null}
-            {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ?
+            {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
+                <div className="startupOuter">
+                    <h3>Please enter the room number, or press generate to generate one</h3>
+                    <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <button className="button" onClick={auth}>Start</button><button className="button" onClick={generate}>Generate</button>
+                </div>
+                :
                 <div className="startupOuter">
                     <h3>Please enter the room number....</h3>
                     <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Send</button>
-                </div> : null : null}
+                    <button className="button" onClick={auth}>Start</button>
+                </div>
+                :
+                null : null}
             {savedName === "name" ?
                 <div className="startupOuter">
                     <h3> Welcome to Solar Fury, Please enter your name....</h3>
                     <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
                     <button className="button" onClick={saveName}>Save</button>
                 </div> : null}
-            {savedName != "name" ?
-                <div className="chatBox">
-                    Chat: <br />
-                    {chat.map((message, index) => (
-                        <li className="chatList" key={index}>{message}<br /></li>
-                    ))}
-                    <br />
-                    <input className="input" name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>
-                    <button className="button" onClick={chatSend}>Send</button>
-                </div> : "Enter a name to chat"}
+            <div className="chatBox">
+                Chat: <br />
+                {chat.map((message, index) => (
+                    <li className="chatList" key={index}>{message}<br /></li>
+                ))}
+                <br />
+                <input className="input" name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>
+                <button className="button" onClick={chatSend}>Send</button>
+            </div>
+            <button className="button" onClick={restart}></button>
         </>
     )
 }
