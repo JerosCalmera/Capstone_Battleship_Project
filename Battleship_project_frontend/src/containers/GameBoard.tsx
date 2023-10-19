@@ -6,7 +6,7 @@ import StartUp from "../components/StartUp";
 
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.145.133"
+    const BASE_URL = "http://192.168.187.133"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
