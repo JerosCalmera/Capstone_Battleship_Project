@@ -230,13 +230,13 @@ function GameBoard() {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         location.reload()
     }
-    const resetPlacement = () => {
-        console.log(cellStorage)
-        console.log(shipInfo)
-        console.log(savedName)
-        console.log(playerName)
-        stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
-    }
+    // const resetPlacement = () => {
+    //     console.log(cellStorage)
+    //     console.log(shipInfo)
+    //     console.log(savedName)
+    //     console.log(playerName)
+    //     stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
+    // }
 
 
 

@@ -12,10 +12,6 @@ interface Props {
     savedName: string;
     player1Data: string;
     player2Data: string;
-    // carrier: number;
-    // battleship: number;
-    // cruiser: number;
-    // destroyer: number;
     placedShip: string;
     chat: string[];
     player2Name: string;
@@ -24,7 +20,6 @@ interface Props {
     turn: string;
     playerName: string;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
-    // destroyer, cruiser, battleship, carrier
 }
 
 const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
