@@ -1,13 +1,9 @@
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
-import { ReactComponentElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Grids from "../components/Grids";
-import StartUp from "../components/Startup";
+import StartUp from "../components/StartUp";
 
-interface Chat {
-    id: number;
-    text: string;
-}
 
 function GameBoard() {
     const BASE_URL = "http://localhost"
@@ -16,7 +12,10 @@ function GameBoard() {
     const [serverStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
+    const [hidden, setHidden] = useState("")
+
     const [leaderBoard, setLeaderBoard] = useState<string[]>([""])
+    const [leaderBoardCheck, setLeaderBoardCheck] = useState<boolean>(false)
 
     const [shipInfo, setShipInfo] = useState<string>("")
     const [shipDamage, setShipDamage] = useState<string>("")
@@ -31,10 +30,10 @@ function GameBoard() {
 
     const [password, setPassword] = useState<string>("")
     const [passwordEntry, setPasswordEntry] = useState<string>("")
-    const [hidden, setHidden] = useState<string>("")
 
     const [playerName, setPlayerName] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
+    const [ready, setReady] = useState<string>("name")
 
     const [chat, setChat] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""])
     const [chatEntry, setChatEntry] = useState<string>("")
@@ -42,11 +41,6 @@ function GameBoard() {
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
     const [player2Name, setPlayer2Name] = useState<string>("Player 2")
-
-    const [carrier, setCarrier] = useState<number>(1)
-    const [battleship, setBattleship] = useState<number>(2)
-    const [cruiser, setCruiser] = useState<number>(3)
-    const [destroyer, setDestroyer] = useState<number>(4)
 
     const [placedShip, setPlacedShip] = useState<string>("")
     const [cellStorage, setCellStorage] = useState<string>("")
@@ -66,6 +60,9 @@ function GameBoard() {
             client.subscribe("/topic/connect", (message: any) => {
                 serverSetMessageLog(message.body.slice(12, -2))
             });
+            client.subscribe("/topic/hidden", (message: any) => {
+                setHidden(message.body.slice(12, -2))
+            });
             client.subscribe("/topic/gameInfo", (message: any) => {
                 setGameInfo(message.body.slice(12, -2))
             });
@@ -83,9 +80,6 @@ function GameBoard() {
             });
             client.subscribe("/topic/miss", (message: any) => {
                 setMissCheck(message.body.slice(12, -2))
-            });
-            client.subscribe("/topic/hidden", (message: any) => {
-                setHidden(message.body.slice(12, -2))
             });
             client.subscribe("/topic/chat", (message: any) => {
                 const newMessage: string = message.body.slice(12, -2)
@@ -128,7 +122,6 @@ function GameBoard() {
                 setPlacedShip(message.body.slice(12, -2))
             });
 
-
             client.ws.onclose = () => {
                 (console.log("Connection terminated"))
                 setServerStatus(false)
@@ -148,7 +141,7 @@ function GameBoard() {
             setPlayer2Data(player1Data)
             setPlayer2Name(player1Data)
         }
-    }, [player2Data, chat])
+    }, [player2Data, chat, serverMessageLog])
 
 
     useEffect(() => {
@@ -167,26 +160,15 @@ function GameBoard() {
     }, [missCheck])
 
     useEffect(() => {
-        if (serverMessageLog.length > 1) {
-            if (leaderBoard.length == 1) {
-                stompClient.send("/app/leaderBoard", {}, JSON.stringify("Match start"));
+        if (leaderBoardCheck == false) {
+            if (serverMessageLog === "Game server ready....") {
+                if (leaderBoard.length == 1) {
+                    stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
+                    setLeaderBoardCheck(true)
+                }
             }
         }
     }, [serverMessageLog])
-
-    useEffect(() => {
-        const shipType = "CarrierBattleshipCruiserDestroyer";
-        const ship = placedShip;
-        console.log(placedShip)
-        if (ship.includes(shipType && savedName)) {
-            if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
-            else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
-            else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
-            else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
-            setPlacedShip("");
-            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
-        }
-    }, [placedShip])
 
     useEffect(() => {
         const toTrim = cellStorage;
@@ -207,10 +189,22 @@ function GameBoard() {
         console.log(shipInfo)
     }, [damageCheck]);
 
+    useEffect(() => {
+        if (hidden.includes(savedName)) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry " + savedName + " is too similar to an existing username!"));
+            setSaveName("name");
+            setHidden("");
+        }
+    }, [hidden, chat, serverMessageLog]);
 
     const auth = () => {
-        setPasswordEntry(password)
-        stompClient.send("/app/room", {}, JSON.stringify(password));
+        if (password.length < 4) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry room numbers must be minimum of 4 characters long!"));
+        }
+        else {
+            setPasswordEntry(password)
+            stompClient.send("/app/room", {}, JSON.stringify(password));
+        }
     }
 
     const generate = () => {
@@ -221,8 +215,14 @@ function GameBoard() {
     }
 
     const saveName = () => {
-        setSaveName(playerName)
-        stompClient.send("/app/name", {}, JSON.stringify(playerName));
+        if (playerName.length < 4) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry usernames must be minimum of 4 characters long!"));
+        }
+        else {
+            setSaveName(playerName);
+            stompClient.send("/app/name", {}, JSON.stringify(playerName));
+            setReady("ready");
+        }
     }
     const chatSend = () => {
         stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
@@ -245,11 +245,14 @@ function GameBoard() {
 
     return (
         <>
-            {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
+            {serverStatus == true ? <h5>Connected to game server</h5> :
+                <div>
+                    <h5>Not connected to game server</h5>
+                    <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button>
+                </div>}
             <h5>{serverMessageLog}</h5>
             <button className="button" onClick={restart}>Restart</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            {/* <button className="button" onClick={resetPlacement}>Reset Placement</button> */}
             {serverMessageLog === "Server: Rooms synced" ?
                 <div className="gameInfoOuter">
                     <div className="gameInfo">
@@ -257,21 +260,20 @@ function GameBoard() {
                         <h3>{gameInfo}</h3>
                     </div>
                 </div> : null}
-            {serverMessageLog === "Server: Room saved!" ?
+            {serverMessageLog === "Server: Room saved!" && savedName != "name" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
-                            placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship}
-                            carrier={carrier} player1Data={player1Data}
+                        <Grids playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                            placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
 
                     </div> : null}
-            <StartUp savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+            <StartUp hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />

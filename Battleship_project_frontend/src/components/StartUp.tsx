@@ -9,13 +9,15 @@ interface Props {
     auth: () => void;
     generate: () => void;
     playerName: string;
+    ready: string;
+    hidden: string;
     chat: string[];
     chatSend: () => void;
     setChatEntry: React.Dispatch<React.SetStateAction<string>>;
     leaderBoard: string[];
 }
 
-const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ ready, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
 
     return (

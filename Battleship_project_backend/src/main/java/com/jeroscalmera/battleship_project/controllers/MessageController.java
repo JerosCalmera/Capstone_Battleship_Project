@@ -72,7 +72,8 @@ public class MessageController {
     public void enemyDamage(String string) {
     }
     @MessageMapping("/hidden")
-    public void hidden(String string) {
+    public Hidden hidden(String string) {
+        return new Hidden(string);
     }
     @MessageMapping("/miss")
     public void miss(String string) {

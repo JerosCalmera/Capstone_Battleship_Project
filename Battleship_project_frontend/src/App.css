@@ -32,7 +32,7 @@ h2 {
 .startupOuter {
   background-color: rgba(0, 0, 0, 0.708);
   height: 140px;
-  width: 530px;
+  width: 550px;
   padding: 20px;
   padding-bottom: 30px;
   border-radius: 20px;
@@ -43,7 +43,7 @@ h2 {
 
 .chatBox {
   height: 360px;
-  width: 540px;
+  width: 560px;
   line-height: 165%;
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
@@ -78,7 +78,7 @@ h2 {
 
 .leaderBoard {
   height: 500px;
-  width: 540px;
+  width: 560px;
   line-height: 50%;
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;

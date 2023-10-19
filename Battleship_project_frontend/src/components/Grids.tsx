@@ -1,5 +1,5 @@
 import './Grids.css'
-import { ReactComponentElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface StompClient {
     send(destination: string, headers?: Record<string, string>, body?: string): void;
@@ -12,19 +12,22 @@ interface Props {
     savedName: string;
     player1Data: string;
     player2Data: string;
-    carrier: number;
-    battleship: number;
-    cruiser: number;
-    destroyer: number;
+    // carrier: number;
+    // battleship: number;
+    // cruiser: number;
+    // destroyer: number;
     placedShip: string;
     chat: string[];
     player2Name: string;
     miss: string;
     enemyMiss: string;
     turn: string;
+    playerName: string;
+    setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
+    // destroyer, cruiser, battleship, carrier
 }
 
-const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, placedShip, destroyer, cruiser, battleship, carrier, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -32,7 +35,26 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
     const [shipToPlace, setShipToPlace] = useState<string>("")
     const [matchStart, setMatchStart] = useState<string>("Not Ready")
 
+    const [carrier, setCarrier] = useState<number>(1)
+    const [battleship, setBattleship] = useState<number>(2)
+    const [cruiser, setCruiser] = useState<number>(3)
+    const [destroyer, setDestroyer] = useState<number>(4)
 
+
+    useEffect(() => {
+        const shipType = "CarrierBattleshipCruiserDestroyer";
+        const ship = placedShip;
+        console.log(placedShip)
+        if (ship.includes(shipType && savedName)) {
+            if (ship.includes("Carrier")) { setCarrier(carrier - 1) }
+            else if (ship.includes("Battleship")) { setBattleship(battleship - 1) }
+            else if (ship.includes("Cruiser")) { setCruiser(cruiser - 1) }
+            else if (ship.includes("Destroyer")) { setDestroyer(destroyer - 1) }
+            setPlacedShip("");
+            setShipToPlace("");
+            stompClient.send("/app/startup", {}, JSON.stringify(playerName));
+        }
+    }, [placedShip])
 
 
     useEffect(() => {
@@ -44,7 +66,6 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         const value: Array<string> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        const label: Array<string> = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         const end = [];
         for (let i = 0; i < 10; i++) {
             const buttons = [];
@@ -90,7 +111,6 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
     const populateEnemyGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         const value: Array<string> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        const label: Array<string> = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         const end = [];
         for (let i = 0; i < 10; i++) {
             const buttons = [];

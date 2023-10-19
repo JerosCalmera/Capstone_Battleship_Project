@@ -44,7 +44,7 @@ public class Placing {
         if (!coOrds.contains(target.substring(1, 3))) {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);}
-        Player newPlayer = new Player("");
+        Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 8)));
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
@@ -72,7 +72,7 @@ public class Placing {
                 }
                 if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter) && coOrds.get(inputOne).charAt(number) != coOrds.get(inputTwo).charAt(number))) {
                     invalidPlacement = true;
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Invalid alignment selected!"));
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + "Invalid alignment selected!"));
                 } else if (coOrds.get(inputOne).charAt(letter) == coOrds.get(inputTwo).charAt(letter)) {
 //                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Horizontal alignment selected!"));
                     horizontalPlacement = true;
@@ -84,7 +84,7 @@ public class Placing {
             if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
                 damage = "";
                 coOrds.clear();
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Invalid Placement!"));
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + "Invalid Placement!"));
                 webSocketMessageSender.sendMessage("/topic/placement2", new Chat("Invalid"));
                 invalidPlacement = false;
                 horizontalPlacement = false;
@@ -92,7 +92,6 @@ public class Placing {
 
             } else {
                 coOrds.clear();
-                Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 8)));
                 newShip.setDamage(damage);
                 selectedPlayer.addShip(newShip);
                 newShip.setPlayer(selectedPlayer);
