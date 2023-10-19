@@ -245,6 +245,7 @@ function GameBoard() {
                 <div>
                     <h5>Not connected to game server</h5>
                     <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button>
+                    <button className="button" onClick={resetPlacement}>Restart</button>
                 </div>}
             <h5>{serverMessageLog}</h5>
             <button className="button" onClick={restart}>Restart</button>
@@ -273,7 +274,6 @@ function GameBoard() {
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />
-            <button className="button" onClick={resetPlacement}>Restart</button>
         </>
     )
 }
