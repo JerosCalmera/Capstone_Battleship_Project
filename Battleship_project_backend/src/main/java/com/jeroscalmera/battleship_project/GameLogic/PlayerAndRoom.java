@@ -48,11 +48,12 @@ public class PlayerAndRoom {
         }
     }
 
-    public void leaderBoard() {
+    public void leaderBoard() throws InterruptedException {
         List<Player> leaderboard = playerRepository.findAll();
         Player player = new Player();
         Collections.sort(leaderboard);
         for (Player playerLeader : leaderboard) {
+            Thread.sleep(100);
             webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
         }
     }
@@ -89,10 +90,10 @@ public class PlayerAndRoom {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
-            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
+            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName()));
             player1 = playersNotInRoom.get(1).getName();
             player2 = playersNotInRoom.get(0).getName();
-            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName() + " LvL: " + playersNotInRoom.get(0).getLevel()));
+            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {

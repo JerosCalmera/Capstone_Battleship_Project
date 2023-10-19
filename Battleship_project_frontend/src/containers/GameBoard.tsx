@@ -160,12 +160,10 @@ function GameBoard() {
     }, [missCheck])
 
     useEffect(() => {
-        if (leaderBoardCheck == false) {
-            if (serverMessageLog === "Game server ready....") {
-                if (leaderBoard.length == 1) {
-                    stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
-                    setLeaderBoardCheck(true)
-                }
+        if (serverMessageLog === "Game server ready....") {
+            if (leaderBoardCheck == false) {
+                stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
+                setLeaderBoardCheck(true)
             }
         }
     }, [serverMessageLog])
@@ -277,7 +275,6 @@ function GameBoard() {
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />
-            <button className="button" onClick={resetPlacement}></button>
         </>
     )
 }

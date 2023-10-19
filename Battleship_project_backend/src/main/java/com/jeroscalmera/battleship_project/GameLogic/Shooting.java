@@ -11,6 +11,7 @@ import com.jeroscalmera.battleship_project.websocket.Hidden;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class Shooting {
     private ShipRepository shipRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private RoomRepository roomRepository;
+
     public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
         this.roomRepository = repository;
         this.playerRepository = playerRepository;
@@ -61,37 +63,49 @@ public class Shooting {
             webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getName() + aimPoint));
         }
     }
-
+    @Transactional
     public void enumerateShips(Long id) {
         Player playerToCheck = playerRepository.findPlayerById(id);
         boolean allShipsDestroyed = true;
         Ship ship = new Ship();
         List<Ship> shipToModify = shipRepository.findAllShipsByPlayerId(id);
         for (Ship shipToCheck : shipToModify)
-            if (!shipToCheck.getShipDamage().matches("^X+$")) {
-                allShipsDestroyed = false;
-            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
-            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
-            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXX")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
-            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXXXX")) {
+            if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXXXX")) {
+                shipToCheck.setShipDamage("Destroyed");
+                shipRepository.save(shipToCheck);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Carrier!"));
+            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXX")) {
+                shipToCheck.setShipDamage("Destroyed");
+                shipRepository.save(shipToCheck);
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
+            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXX")) {
+                shipToCheck.setShipDamage("Destroyed");
+                shipRepository.save(shipToCheck);
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
+            } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXX")) {
+                shipToCheck.setShipDamage("Destroyed");
+                shipRepository.save(shipToCheck);
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
             }
+        for (Ship shipToCheck : shipToModify)
+            if (!Objects.equals(shipToCheck.getShipDamage(), "Destroyed")) {
+                allShipsDestroyed = false;}
+
         if (allShipsDestroyed) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
-        Room roomToCheck = new Room();
-        Room roomId = roomRepository.findRoomIdByPlayersName(playerToCheck.getName());
-        System.out.println(roomId);
-        List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
-        System.out.println(players);
-        for (Player winner : players) {
-            if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
-                winner.setLevel(winner.getLevel() + 1);
+                    Room roomToCheck = new Room();
+                    Room roomId = roomRepository.findRoomIdByPlayersName(playerToCheck.getName());
+                    System.out.println(roomId);
+                    List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
+                    System.out.println(players);
+                    for (Player winner : players) {
+                        if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
+                            winner.setLevel(winner.levelUp(1));
+                            playerRepository.save(winner);
+                            webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
+                        }
+                    }
+                }
             }
-        }
-        }
     }
-}
+

@@ -40,7 +40,8 @@
 
 .shipPlacementInner {
     height: 400px;
-    width: 250px;
+    width: 240px;
+    margin-left: -20px;
     line-height: 50%;
     margin-top: 60px;
 }

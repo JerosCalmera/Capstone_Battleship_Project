@@ -1,5 +1,4 @@
 package com.jeroscalmera.battleship_project.models;
-import javax.persistence.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cascade;
 
@@ -31,7 +30,7 @@ public class Player implements Comparable<Player>{
 
     public Player(String name) {
         this.name = name;
-        this.level = 1;
+        this.level = level;
         this.ships = new ArrayList<>();
     }
 
@@ -74,8 +73,9 @@ public class Player implements Comparable<Player>{
         return level;
     }
 
-    public void levelUp() {
-        this.level = (level + 1);
+    public int levelUp(int value) {
+        this.level += value;
+        return this.level;
     }
 
     public void setLevel(int level) {

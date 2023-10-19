@@ -17,7 +17,7 @@ interface Props {
     leaderBoard: string[];
 }
 
-const StartUp: React.FC<Props> = ({ ready, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
 
     return (
@@ -53,12 +53,14 @@ const StartUp: React.FC<Props> = ({ ready, setPlayerName, saveName, savedName, s
                 <button className="button" onClick={chatSend}>Send</button>
             </div>
             {serverMessageLog != "Server: Rooms synced" ?
-                <div className="leaderBoard">
-                    <h3>Top Players:</h3>
-                    (one win = one level)
-                    <div>
-                        {leaderBoard.map((player, index) => (
-                            <li className="chatList" key={index}><h4>{player}</h4><br /></li>))}
+                <div className="leaderBoardOuter">
+                    <div className="leaderBoard">
+                        <h3>Top Players:</h3>
+                        (one win = one level)
+                        <div>
+                            {leaderBoard.map((player, index) => (
+                                <li className="chatList" key={index}><h4>{player}</h4><br /></li>))}
+                        </div>
                     </div>
                 </div> : null}
         </>

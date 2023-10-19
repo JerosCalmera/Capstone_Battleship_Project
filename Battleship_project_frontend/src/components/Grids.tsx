@@ -238,6 +238,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                                 </ul>
                                 : null}
                         </div>
+                        {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
                     </div>
                     <div className="gameBoardRender">
                         <h2>{player1Data}</h2>
@@ -246,7 +247,6 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                             <button name="end" className="endCellCorner">*</button>
                             {numbersBottom()}
                         </ul>
-                        {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Ready</button> : null}
                     </div >
                     <div className="gameBoardRender2">
                         <h2>{player2Data}</h2>

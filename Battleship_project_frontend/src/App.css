@@ -77,8 +77,8 @@ h2 {
 }
 
 .leaderBoard {
-  height: 500px;
-  width: 560px;
+  height: auto;
+  width: 500px;
   line-height: 50%;
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
@@ -87,4 +87,9 @@ h2 {
   display: flex;
   flex-direction: column;
   list-style: none;
+}
+
+.leaderBoardOuter {
+  margin-left: 600px;
+  margin-top: -596px;
 }
