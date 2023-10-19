@@ -5,165 +5,10 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-
-  /* width */
-  ::-webkit-scrollbar {
-    width: 20px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey;
-    border-radius: 10px;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: red;
-    border-radius: 10px;
-  }
 }
 
 h2 {
   padding-left: 14%;
-}
-
-.cell {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: darkcyan;
-  color: darkcyan;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-.cellShip {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: blue;
-  color: blue;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-.miss {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: darkgray;
-  color: darkgray;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-.cellEnemyShip {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: red;
-  color: red;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-.shipPlacementInner {
-  height: 400px;
-  width: 250px;
-  line-height: 50%;
-  margin-top: 60px;
-}
-
-.shipToPlace {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: blue;
-  color: blue;
-  margin-right: -1px;
-}
-
-
-.shipToPlaceSelected {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: green;
-  color: green;
-  margin-right: -1px;
-}
-
-.cellDamaged {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: grey;
-  color: grey;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-.cellPlaced {
-  height: 40px;
-  width: 40px;
-  border: 1px solid black;
-  background-color: lightcoral;
-  color: lightcoral;
-  margin-right: -1px;
-  margin-top: -1px;
-}
-
-
-
-.cell:hover {
-  color: lightcoral;
-  background-color: lightcoral;
-  transition: 0.2s;
-}
-
-.endCell {
-  height: 20px;
-  width: 40px;
-  background-color: rgba(0, 0, 0, 0);
-  color: rgb(170, 194, 193);
-  border: black;
-  margin-top: 5px;
-  margin-right: -1px;
-}
-
-.endCellCorner {
-  height: 20px;
-  width: 40px;
-  background-color: rgba(0, 0, 0, 0);
-  color: rgba(0, 0, 0, 0);
-  border: black;
-  margin-right: -1px;
-}
-
-.gameBoardRender {
-  height: 500px;
-  width: 470px;
-  margin-right: 50px;
-  text-align: center;
-}
-
-.gameBoardRender2 {
-  height: 500px;
-  width: 470px;
-  text-align: center;
-}
-
-.gameBoardOuter {
-  display: flex;
-}
-
-.gameBoardOuterGreater {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background-color: rgba(0, 0, 0, 0.708);
 }
 
 
@@ -193,6 +38,7 @@ h2 {
   border-radius: 20px;
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
 }
 
 .chatBox {
@@ -206,19 +52,39 @@ h2 {
   display: flex;
   flex-direction: column;
   list-style: none;
+  padding-bottom: 20px;
 }
 
 .input {
   background-color: rgba(116, 196, 194, 0.575);
 }
 
+.gameInfoOuter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .gameInfo {
   margin-top: 10px;
   padding-top: 15px;
   height: 120px;
-  width: 150px;
+  width: 350px;
   margin-bottom: 20px;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
+}
+
+.leaderBoard {
+  height: 500px;
+  width: 540px;
+  line-height: 50%;
+  background-color: rgba(0, 0, 0, 0.708);
+  border-radius: 20px;
+  padding: 15px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
 }

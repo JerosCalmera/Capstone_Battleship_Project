@@ -1,3 +1,4 @@
+import './Grids.css'
 import { ReactComponentElement, useEffect, useState } from "react";
 
 interface StompClient {
@@ -29,12 +30,15 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
     const [shipSize, setShipSize] = useState<number>(0)
     const [shipToPlace, setShipToPlace] = useState<string>("")
+    const [matchStart, setMatchStart] = useState<string>("Not Ready")
+
 
 
 
     useEffect(() => {
         if (placedShip.includes("Invalid"))
             setPlacedReadyShip("")
+        setShipToPlace("")
     }, [chat])
 
     const populateGrid = () => {
@@ -128,7 +132,7 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
             }
             else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
             {
-                if (placedReadyShip.length > shipSize * 2) {
+                if (placedReadyShip.length === shipSize * 2) {
                     setPlacedReadyShip("")
                     setShipToPlace("")
                 }
@@ -138,8 +142,8 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
 
 
     const clickedEnemyCell = (value: string) => {
-        if (turn === savedName) {
-            if (shipPlacement === true) {
+        if (shipPlacement === true) {
+            if (turn === savedName) {
                 if (enemyMiss.includes(value)) { null }
                 else
                     stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + savedName));
@@ -165,6 +169,12 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
     const placeDestroyer = () => {
         setShipSize(2);
         setShipToPlace("Destroyer")
+    }
+
+    const matchBegin = () => {
+        stompClient.send("/app/matchStart", {}, JSON.stringify("Match start"));
+        setMatchStart("")
+        setShipPlacement(true)
     }
 
     return (
@@ -215,8 +225,8 @@ const Grids: React.FC<Props> = ({ turn, miss, enemyMiss, player2Name, chat, plac
                             {populateGrid()}
                             <button name="end" className="endCellCorner">*</button>
                             {numbersBottom()}
-                            <button onClick={() => setShipPlacement(true)} className="button">Turn off placement mode</button>
                         </ul>
+                        {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Ready</button> : null}
                     </div >
                     <div className="gameBoardRender2">
                         <h2>{player2Data}</h2>

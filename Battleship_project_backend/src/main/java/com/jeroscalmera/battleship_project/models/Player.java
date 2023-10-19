@@ -10,7 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "players")
-public class Player {
+public class Player implements Comparable<Player>{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,13 +31,17 @@ public class Player {
 
     public Player(String name) {
         this.name = name;
-        this.level = level;
+        this.level = 1;
         this.ships = new ArrayList<>();
     }
 
     public Player() {
     }
 
+    @Override
+    public int compareTo(Player player) {
+        return Integer.compare(player.level, this.level);
+    }
     public void setShips(List<Ship> ships) {
         this.ships = ships;
     }
@@ -70,7 +75,7 @@ public class Player {
     }
 
     public void levelUp() {
-        this.level = (level + level);
+        this.level = (level + 1);
     }
 
     public void setLevel(int level) {

@@ -80,8 +80,17 @@ public class MessageController {
     @MessageMapping("/gameInfo")
     public void gameInfo(String string) {
     }
+
+    @MessageMapping("/leaderBoard")
+    public void leaderboard(String string) throws InterruptedException {
+        playerAndRoom.leaderBoard();
+    }
     @MessageMapping("/turn")
     public void turn(String string) {
         playerAndRoom.coinFlip();
+    }
+    @MessageMapping("/matchStart")
+    public void matchStart(String string) {
+        playerAndRoom.matchStart();
     }
 }

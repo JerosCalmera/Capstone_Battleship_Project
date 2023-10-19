@@ -34,7 +34,11 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     @Query
     String findAllCoOrdsById(Long id);
+
+    @Query
+    List<Player> findPlayersByRoomId(Long id);
 }
+
 
 
 

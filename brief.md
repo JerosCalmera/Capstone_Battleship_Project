@@ -11,20 +11,20 @@ Frontend - JavaScript using TypeScript and React
 Backend - Java using an SQL database to store game data (game board info, player names, games won etc)
 
 MVP:
-- Players can place ships on a board 10x10 board
-- Players can click on the other players board, which appears "empty" to start shooting at cells to attempt to hit their ships
-- Players game state is constantly updated due to the connection being handled via Websocket
-- Players have a name they can set
-- Players can see how many turns have passed and how many games they have won
-- Players can restart the game once complete
-- Players connect to a "room" designated by a randomly generated token that both players must enter
-- Styled in CSS
+- Players can place ships on a board 10x10 board  **Done**
+- Players can click on the other players board, which appears "empty" to start shooting at cells to attempt to hit their ships  **Done**
+- Players game state is constantly updated due to the connection being handled via Websocket  **Done**
+- Players have a name they can set  **Done**
+- Players can see how many turns have passed and how many games they have won  **Done**
+- Players can restart the game once complete  **Done**
+- Players connect to a "room" designated by a randomly generated token that both players must enter  **Done**
+- Styled in CSS  **Done**
 
 Possible extensions:
-- Special abilities (scan for ships, shoot a large area etc.)
-- Leaderboard
-- A player leveling system  (perhaps to unlock new special abilities as mentioned above)
-- Enhanced styling
-- Option/s for larger board/s
-- A chat function 
-- Anything else that comes up during development as a interesting idea
+- Special abilities (scan for ships, shoot a large area etc.) *TBA*
+- Leaderboard  **Done**
+- A player leveling system  (perhaps to unlock new special abilities as mentioned above) - **Done**
+- Enhanced styling  **Done**
+- Option/s for larger board/s *TBA*
+- A chat function  **Done**
+- Anything else that comes up during development as a interesting idea  **Done**

@@ -2,16 +2,14 @@ package com.jeroscalmera.battleship_project.GameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
+import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class PlayerAndRoom {
@@ -39,6 +37,23 @@ public class PlayerAndRoom {
 
     String player2;
     public String roomNumberString;
+
+    int trigger = 0;
+    public void matchStart(){
+        trigger = (trigger + 1);
+        if (trigger == 2)
+        {webSocketMessageSender.sendMessage("/topic/chat", new Chat("All ships placed! Match Start!"));
+            trigger = 0;
+            coinFlip();
+        }
+}
+    public void leaderBoard() {
+        List<Player> leaderboard = playerRepository.findAll();
+        Player player = new Player();
+        Collections.sort(leaderboard);
+        for (Player playerLeader : leaderboard) {
+        webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));}
+    }
     public void coinFlip () {
         Random random = new Random();
         int coin = random.nextInt(2) + 1;

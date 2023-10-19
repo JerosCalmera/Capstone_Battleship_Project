@@ -1,14 +1,17 @@
 package com.jeroscalmera.battleship_project.GameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
+import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
+import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.Hidden;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,8 +21,9 @@ public class Shooting {
     private PlayerRepository playerRepository;
     private ShipRepository shipRepository;
     private WebSocketMessageSender webSocketMessageSender;
-
-    public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
+    private RoomRepository roomRepository;
+    public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
+        this.roomRepository = repository;
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
         this.webSocketMessageSender = webSocketMessageSender;
@@ -41,6 +45,7 @@ public class Shooting {
         System.out.println(selectedPlayer.getId());
         if (converted.contains(aimPoint)) {
             webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));
+            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
@@ -53,9 +58,9 @@ public class Shooting {
             enumerateShips(selectedPlayer.getId());
         } else {
             webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Missed!"));
+            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getName() + aimPoint));
         }
-        webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
     }
 
     public void enumerateShips(Long id) {
@@ -77,6 +82,17 @@ public class Shooting {
             }
         if (allShipsDestroyed) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
+        Room roomToCheck = new Room();
+        Room roomId = roomRepository.findRoomIdByPlayersName(playerToCheck.getName());
+        System.out.println(roomId);
+        List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
+        System.out.println(players);
+        for (Player winner : players) {
+            if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
+                winner.setLevel(winner.getLevel() + 1);
+            }
+        }
         }
     }
 }

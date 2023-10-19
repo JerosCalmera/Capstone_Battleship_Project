@@ -2,6 +2,7 @@ import Stomp from "stompjs";
 import SockJS from "sockjs-client";
 import { ReactComponentElement, useEffect, useState } from "react";
 import Grids from "../components/Grids";
+import StartUp from "../components/Startup";
 
 interface Chat {
     id: number;
@@ -15,6 +16,7 @@ function GameBoard() {
     const [serverStatus, setServerStatus] = useState(false)
     const [attemptReconnect, setAttemptReconnect] = useState(0)
     const [serverMessageLog, serverSetMessageLog] = useState("")
+    const [leaderBoard, setLeaderBoard] = useState<string[]>([""])
 
     const [shipInfo, setShipInfo] = useState<string>("")
     const [shipDamage, setShipDamage] = useState<string>("")
@@ -52,6 +54,7 @@ function GameBoard() {
     const [gameInfo, setGameInfo] = useState<string>("")
     const [turn, setTurn] = useState<string>("Waiting")
     const [turnNumber, setTurnNumber] = useState<number>(-1)
+
 
     useEffect(() => {
         const port = 8081;
@@ -96,6 +99,14 @@ function GameBoard() {
             })
             client.subscribe("/topic/playerData2", (message: any) => {
                 setPlayer2Data(message.body.slice(12, -2))
+            });
+
+            client.subscribe("/topic/leaderBoard", (message: any) => {
+                const leaderBoardEntry: string = message.body.slice(12, -2)
+                setLeaderBoard((prevLeader) => {
+                    const updatedLeader = [...prevLeader, leaderBoardEntry];
+                    return updatedLeader
+                })
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -155,6 +166,13 @@ function GameBoard() {
         }
     }, [missCheck])
 
+    useEffect(() => {
+        if (serverMessageLog.length > 1) {
+            if (leaderBoard.length == 1) {
+                stompClient.send("/app/leaderBoard", {}, JSON.stringify("Match start"));
+            }
+        }
+    }, [serverMessageLog])
 
     useEffect(() => {
         const shipType = "CarrierBattleshipCruiserDestroyer";
@@ -189,6 +207,7 @@ function GameBoard() {
         console.log(shipInfo)
     }, [damageCheck]);
 
+
     const auth = () => {
         setPasswordEntry(password)
         stompClient.send("/app/room", {}, JSON.stringify(password));
@@ -211,22 +230,7 @@ function GameBoard() {
     }
     const restart = () => {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
-        serverSetMessageLog("")
-        setShipInfo("")
-        setEnemyShipDamage("")
-        setShipDamage("")
-        setPassword("")
-        setPasswordEntry("")
-        setPlayerName("")
-        setSaveName("name")
-        setPlayer1Data("")
-        setPlayer2Data("")
-        setCarrier(1)
-        setBattleship(2)
-        setCruiser(3)
-        setDestroyer(4)
-        setPlacedShip("")
-        setCellStorage("")
+        location.reload()
     }
     const resetPlacement = () => {
         console.log(cellStorage)
@@ -236,9 +240,6 @@ function GameBoard() {
         stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
     }
 
-    const matchStart = () => {
-        stompClient.send("/app/turn", {}, JSON.stringify("Match start"));
-    }
 
 
 
@@ -246,55 +247,35 @@ function GameBoard() {
         <>
             {serverStatus == true ? <h5>Connected to game server</h5> : <div><h5>Not connected to game server</h5> <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></div>}
             <h5>{serverMessageLog}</h5>
+            <button className="button" onClick={restart}>Restart</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            <button className="button" onClick={resetPlacement}>Reset Placement</button>
+            {/* <button className="button" onClick={resetPlacement}>Reset Placement</button> */}
+            {serverMessageLog === "Server: Rooms synced" ?
+                <div className="gameInfoOuter">
+                    <div className="gameInfo">
+                        <h3>Turn: {turnNumber} {turn}</h3>
+                        <h3>{gameInfo}</h3>
+                    </div>
+                </div> : null}
             {serverMessageLog === "Server: Room saved!" ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
-                    <div className="gameInfoOuter">
-                        <div className="gameInfo">
-                            <h3>Turn: {turnNumber} {turn}</h3>
-                            <h3>{gameInfo}</h3>
-                            <button className="button" onClick={matchStart}>Match Start</button>
-                        </div>
-                        <Grids turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat} placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship} carrier={carrier} player1Data={player1Data}
+                    <div>
+                        <Grids turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                            placedShip={placedShip} destroyer={destroyer} cruiser={cruiser} battleship={battleship}
+                            carrier={carrier} player1Data={player1Data}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
-                        <button className="button" onClick={resetPlacement}>Reset Placement</button>
+
                     </div> : null}
-            {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
-                <div className="startupOuter">
-                    <h3>Please enter the room number, or press generate to generate one</h3>
-                    <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Start</button><button className="button" onClick={generate}>Generate</button>
-                </div>
-                :
-                <div className="startupOuter">
-                    <h3>Please enter the room number....</h3>
-                    <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Start</button>
-                </div>
-                :
-                null : null}
-            {savedName === "name" ?
-                <div className="startupOuter">
-                    <h3> Welcome to Solar Fury, Please enter your name....</h3>
-                    <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
-                    <button className="button" onClick={saveName}>Save</button>
-                </div> : null}
-            <div className="chatBox">
-                Chat: <br />
-                {chat.map((message, index) => (
-                    <li className="chatList" key={index}>{message}<br /></li>
-                ))}
-                <br />
-                <input className="input" name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>
-                <button className="button" onClick={chatSend}>Send</button>
-            </div>
-            <button className="button" onClick={restart}></button>
+            <StartUp savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+                setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
+                saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
+                leaderBoard={leaderBoard} />
+            <button className="button" onClick={resetPlacement}></button>
         </>
     )
 }
