@@ -6,7 +6,7 @@ import StartUp from "../components/StartUp";
 
 
 function GameBoard() {
-    const BASE_URL = "http://192.168.187.133"
+    const BASE_URL = "http://localhost"
 
     const [stompClient, setStompClient] = useState<Stomp.Client>(Stomp.over(new SockJS(`${BASE_URL}:8081/game`)));
     const [serverStatus, setServerStatus] = useState(false)
@@ -32,6 +32,7 @@ function GameBoard() {
     const [passwordEntry, setPasswordEntry] = useState<string>("")
 
     const [playerName, setPlayerName] = useState<string>("")
+    const [playerNumber, setPlayerNumber] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
     const [ready, setReady] = useState<string>("name")
 
@@ -218,7 +219,7 @@ function GameBoard() {
         }
         else {
             setSaveName(playerName);
-            stompClient.send("/app/name", {}, JSON.stringify(playerName));
+            stompClient.send("/app/name", {}, JSON.stringify(playerName + playerNumber));
             setReady("ready");
         }
     }
@@ -271,7 +272,7 @@ function GameBoard() {
                             stompClient={stompClient} />
 
                     </div> : null}
-            <StartUp hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+            <StartUp playerNumber={playerNumber} setPlayerNumber={setPlayerNumber} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />

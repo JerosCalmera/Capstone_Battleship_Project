@@ -56,7 +56,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
         if (placedShip.includes("Invalid"))
             setPlacedReadyShip("")
         setShipToPlace("")
-    }, [chat])
+    }, [placedShip])
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]

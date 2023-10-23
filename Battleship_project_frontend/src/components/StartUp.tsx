@@ -15,9 +15,11 @@ interface Props {
     chatSend: () => void;
     setChatEntry: React.Dispatch<React.SetStateAction<string>>;
     leaderBoard: string[];
+    playerNumber: string;
+    setPlayerNumber: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ playerNumber, setPlayerNumber, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
 
     return (
@@ -38,8 +40,9 @@ const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMe
                 null : null}
             {savedName === "name" ?
                 <div className="startupOuter">
-                    <h3> Welcome to Solar Fury, Please enter your name....</h3>
-                    <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
+                    <h3> Welcome to Solar Fury, Please enter your name and player number if you have one</h3>
+                    Player name: <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
+                    Player number: <input className="input" name="name" value={playerNumber} onChange={(e) => setPlayerNumber(e.target.value)}></input>
                     <button className="button" onClick={saveName}>Save</button>
                 </div>
                 : null}

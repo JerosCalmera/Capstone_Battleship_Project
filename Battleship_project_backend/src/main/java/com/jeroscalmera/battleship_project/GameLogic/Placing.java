@@ -39,16 +39,19 @@ public class Placing {
     private String damage = "";
 
     public void placeShip(String target) throws InterruptedException {
-        System.out.println(target);
+        System.out.println("Target =" + target);
 
         if (!coOrds.contains(target.substring(1, 3))) {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);}
+        System.out.println("CoOrds list =" + coOrds);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 8)));
+        System.out.println("Selected player =" + selectedPlayer.getName());
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
         int max = Integer.parseInt(target.substring(3, 4));
+        System.out.println("Ship max size =" + max);
         Ship newShip = new Ship("",0,"");
         if (max == 5) {
             newShip = new Ship("Carrier", 10, "");

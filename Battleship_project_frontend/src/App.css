@@ -31,7 +31,7 @@ h2 {
 
 .startupOuter {
   background-color: rgba(0, 0, 0, 0.708);
-  height: 140px;
+  height: 180px;
   width: 550px;
   padding: 20px;
   padding-bottom: 30px;
@@ -91,5 +91,5 @@ h2 {
 
 .leaderBoardOuter {
   margin-left: 600px;
-  margin-top: -596px;
+  margin-top: -636px;
 }

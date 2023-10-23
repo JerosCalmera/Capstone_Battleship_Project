@@ -114,10 +114,8 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player playerName) throws InterruptedException {
             Thread.sleep(100);
-                if (!playerRepository.findName().contains(playerName.getName())) {
-                    if (playerRepository.findName().contains(playerName.getName().substring(0, 4))) {
-                        webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName() + "Admin: Sorry, this username is too similar to an existing username"));
-                    } else {
+                if (playerRepository.findName().contains(playerName.getName())
+                        && playerRepository.findByPlayerNumber().contains(playerName.getPlayerNumber())) {
                         String name = playerName.getName();
                         Player player = new Player(name);
                         playersNotInRoom.add(player);

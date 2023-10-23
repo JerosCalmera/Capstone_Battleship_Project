@@ -20,6 +20,9 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     Player findByName(String name);
 
     @Query
+    Player findByPlayerNumber(String number);
+
+    @Query
     Player findPlayerById(Long id);
 
     @Query("SELECT p.name FROM Player p WHERE p.room.roomNumber = :roomNumber")
