@@ -245,10 +245,11 @@ function GameBoard() {
                 <div>
                     <h5>Not connected to game server</h5>
                     <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button>
-                    <button className="button" onClick={resetPlacement}>Restart</button>
+
                 </div>}
             <h5>{serverMessageLog}</h5>
             <button className="button" onClick={restart}>Restart</button>
+            <button className="button" onClick={resetPlacement}>Reset</button>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Rooms synced" ?
                 <div className="gameInfoOuter">
