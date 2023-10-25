@@ -112,20 +112,18 @@ public class PlayerAndRoom {
         }
     }
 
-    public void handleNewPlayer(Player playerName) throws InterruptedException {
+    public void handleNewPlayer(String player) throws InterruptedException {
             Thread.sleep(100);
-                if (playerRepository.findName().contains(playerName.getName())
-                        && playerRepository.findByPlayerNumber().contains(playerName.getPlayerNumber())) {
-                        String name = playerName.getName();
-                        Player player = new Player(name);
-                        playersNotInRoom.add(player);
-                        webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
+                if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 4)))) {
+                        Player playerToAdd = playerRepository.findByPlayerNumber(player.substring(0,4));
+                        webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerToAdd.getName() + "!"));
+                        playersNotInRoom.add(playerToAdd);
                     }
-                } else {
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
-                    String name = playerName.getName();
-                    Player player = new Player(name);
-                    playersNotInRoom.add(player);
+                else {
+                Player playerToAdd = new Player();
+                playerToAdd.setName(player.substring(4));
+                playersNotInRoom.add(playerToAdd);
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerToAdd.getName() + " your profile has been saved!"));
                 }
             }
         }

@@ -217,9 +217,12 @@ function GameBoard() {
         if (playerName.length < 4) {
             stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry usernames must be minimum of 4 characters long!"));
         }
+        else if (playerNumber.length < 4 || playerNumber.length > 4) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry player numbers must be exactly 4 characters long!"));
+        }
         else {
             setSaveName(playerName);
-            stompClient.send("/app/name", {}, JSON.stringify(playerName + playerNumber));
+            stompClient.send("/app/name", {}, JSON.stringify(playerNumber + playerName));
             setReady("ready");
         }
     }

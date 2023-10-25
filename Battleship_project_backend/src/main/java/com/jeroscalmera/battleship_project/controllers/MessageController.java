@@ -57,8 +57,8 @@ public class MessageController {
 
     @MessageMapping("/name")
     @SendTo("/topic/name")
-    public void handleName (Player playerName) throws InterruptedException {
-        playerAndRoom.handleNewPlayer(playerName);
+    public void handleName (String playerNumber) throws InterruptedException {
+        playerAndRoom.handleNewPlayer(playerNumber);
     }
     @MessageMapping("/placement")
     public void shipPlacement(String string) throws InterruptedException {

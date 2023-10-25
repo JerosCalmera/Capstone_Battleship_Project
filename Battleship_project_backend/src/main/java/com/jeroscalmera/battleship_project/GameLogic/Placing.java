@@ -45,7 +45,7 @@ public class Placing {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);}
         System.out.println("CoOrds list =" + coOrds);
-        Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 8)));
+        Player selectedPlayer = playerRepository.findByPlayerNumber((target.substring(4, 8)));
         System.out.println("Selected player =" + selectedPlayer.getName());
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;

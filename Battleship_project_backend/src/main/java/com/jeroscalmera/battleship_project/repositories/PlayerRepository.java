@@ -35,6 +35,9 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query("SELECT s.coOrds FROM Ship s WHERE s.player.name = :playerName")
     List<String> findAllCoOrdsByPlayerName(@Param("playerName") String playerName);
 
+    @Query("SELECT s.coOrds FROM Ship s WHERE s.player.number = :playerNumber")
+    List<String> findAllCoOrdsByPlayerNumber(@Param("playerNumber") String playerNumber);
+
     @Query
     String findAllCoOrdsById(Long id);
 
