@@ -38,9 +38,9 @@ public class Shooting {
         String aimPoint = target.substring(0, 2);
         aimPoint = aimPoint.trim();
         System.out.println(aimPoint);
-        Player selectedPlayer = playerRepository.findByPlayerNumber(target.substring(2, 6));
-        Player selectedPlayer2 = playerRepository.findByPlayerNumber(target.substring(6, 10));
-        List<String> shipList = playerRepository.findAllCoOrdsByPlayerNumber(selectedPlayer.getPlayerNumber());
+        Player selectedPlayer = playerRepository.findByPlayerNumber(target.substring(2, 7));
+        Player selectedPlayer2 = playerRepository.findByPlayerNumber(target.substring(7, 12));
+        List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         String converted = String.join("", shipList);
         System.out.println(converted);
         System.out.println(selectedPlayer.getId());
@@ -94,7 +94,7 @@ public class Shooting {
         if (allShipsDestroyed) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
                     Room roomToCheck = new Room();
-                    Room roomId = roomRepository.findRoomIdByPlayersNumber(playerToCheck.getPlayerNumber());
+                    Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
                     System.out.println(roomId);
                     List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
                     System.out.println(players);

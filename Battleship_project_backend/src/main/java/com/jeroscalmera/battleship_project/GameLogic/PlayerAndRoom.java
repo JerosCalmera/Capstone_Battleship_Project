@@ -8,10 +8,10 @@ import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.Random;
 
 @Service
 public class PlayerAndRoom {
-
     private PlayerRepository playerRepository;
     private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
@@ -64,6 +64,12 @@ public class PlayerAndRoom {
         selectPlayer(coin);
     }
 
+    public String randomUserNumber() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(100000);
+        String formattedRandom = String.format("%05d", randomNumber);
+        return formattedRandom;
+    }
     public void selectPlayer(int coin) {
         if (coin == 1) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
@@ -113,17 +119,33 @@ public class PlayerAndRoom {
     }
 
     public void handleNewPlayer(String player) throws InterruptedException {
-            Thread.sleep(100);
-                if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 4)))) {
-                        Player playerToAdd = playerRepository.findByPlayerNumber(player.substring(0,4));
-                        webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerToAdd.getName() + "!"));
-                        playersNotInRoom.add(playerToAdd);
-                    }
-                else {
-                Player playerToAdd = new Player();
-                playerToAdd.setName(player.substring(4));
+        Thread.sleep(100);
+        if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
+                && (playerRepository.findAll().contains(playerRepository.findByName(player.substring(5)))))
+        {
+                Player playerToAdd = playerRepository.findByPlayerNumber(player.substring(0,5));
+                webSocketMessageSender.sendMessage(
+                        "/topic/chat", new Chat("Admin: Welcome back " + playerToAdd.getName() + "!"));
                 playersNotInRoom.add(playerToAdd);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerToAdd.getName() + " your profile has been saved!"));
+                    }
+        else if (!playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
+                && (playerRepository.findAll().contains(playerRepository.findByName(player.substring(5)))))
+        {
+            webSocketMessageSender.sendMessage(
+            "/topic/chat", new Chat("Admin: User found but the player number is incorrect!"));
+        }
+        else if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
+                && (!playerRepository.findAll().contains(playerRepository.findByName(player.substring(5))))) {
+            webSocketMessageSender.sendMessage(
+                    "/topic/chat", new Chat("Admin: User found but the player name is incorrect!"));
+        }
+        else {
+            Player playerToAdd = new Player();
+            playerToAdd.setName(player);
+            playerToAdd.setPlayerNumber(randomUserNumber());
+            playersNotInRoom.add(playerToAdd);
+            webSocketMessageSender.sendMessage(
+                    "/topic/chat", new Chat("Admin: Hello to our new player " + playerToAdd.getName() + " your profile has been saved!"));
                 }
             }
         }
