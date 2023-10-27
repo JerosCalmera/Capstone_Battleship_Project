@@ -45,7 +45,8 @@ public class Placing {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);}
         System.out.println("CoOrds list =" + coOrds);
-        Player selectedPlayer = playerRepository.findByPlayerNumber((target.substring(4, 9)));
+        Player selectedPlayer = playerRepository.findByName((target.substring(4, target.length() -1)));
+        System.out.println((target.substring(4)));
         System.out.println("Selected player =" + selectedPlayer.getName());
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
@@ -61,6 +62,10 @@ public class Placing {
             newShip = new Ship("Cruiser", 6, "");
         } else if (max == 2) {
             newShip = new Ship("Destroyer", 4, "");}
+        if (coOrds.size() > max){
+            coOrds.clear();
+            damage="";
+        }
         if (coOrds.size() == max) {
             for (int i = 0; i < coOrds.size() - 1; i++) {
                 int inputOne = i;

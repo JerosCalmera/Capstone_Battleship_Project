@@ -118,30 +118,30 @@ public class PlayerAndRoom {
         }
     }
 
-    public void handleNewPlayer(String player) throws InterruptedException {
+    public void handleNewPlayer(Player player) throws InterruptedException {
         Thread.sleep(100);
-        if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
-                && (playerRepository.findAll().contains(playerRepository.findByName(player.substring(5)))))
+        if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
+                && (playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5)))))
         {
-                Player playerToAdd = playerRepository.findByPlayerNumber(player.substring(0,5));
+                Player playerToAdd = playerRepository.findByPlayerNumber(player.getName().substring(0,5));
                 webSocketMessageSender.sendMessage(
                         "/topic/chat", new Chat("Admin: Welcome back " + playerToAdd.getName() + "!"));
                 playersNotInRoom.add(playerToAdd);
                     }
-        else if (!playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
-                && (playerRepository.findAll().contains(playerRepository.findByName(player.substring(5)))))
+        else if (!playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
+                && (playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5)))))
         {
             webSocketMessageSender.sendMessage(
             "/topic/chat", new Chat("Admin: User found but the player number is incorrect!"));
         }
-        else if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.substring(0, 5)))
-                && (!playerRepository.findAll().contains(playerRepository.findByName(player.substring(5))))) {
+        else if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
+                && (!playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5))))) {
             webSocketMessageSender.sendMessage(
                     "/topic/chat", new Chat("Admin: User found but the player name is incorrect!"));
         }
         else {
             Player playerToAdd = new Player();
-            playerToAdd.setName(player);
+            playerToAdd.setName(player.getName());
             playerToAdd.setPlayerNumber(randomUserNumber());
             playersNotInRoom.add(playerToAdd);
             webSocketMessageSender.sendMessage(
@@ -149,5 +149,22 @@ public class PlayerAndRoom {
                 }
             }
         }
+
+//    public void handleNewPlayer(Player playerName) throws InterruptedException {
+//        Thread.sleep(100);
+//        if (!playerRepository.findName().contains(playerName.getName())) {
+//            if (playerRepository.findName().contains(playerName.getName().substring(0, 4))) {
+//                webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName() + "Admin: Sorry, this username is too similar to an existing username"));
+//            } else {
+//                String name = playerName.getName();
+//                Player player = new Player(name);
+//                playersNotInRoom.add(player);
+//                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
+//            }
+//        } else {
+//            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+//            String name = playerName.getName();
+//            Player player = new Player(name);
+//            playersNotInRoom.add(player);
 
 

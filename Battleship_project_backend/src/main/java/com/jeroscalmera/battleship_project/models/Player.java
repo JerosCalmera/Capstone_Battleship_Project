@@ -31,7 +31,7 @@ public class Player implements Comparable<Player>{
     @JsonIgnoreProperties({"player"})
     private Room room;
 
-    public Player(String name, String playerNumber) {
+    public Player(String name) {
         this.name = name;
         this.playerNumber = playerNumber;
         this.level = level;

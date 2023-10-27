@@ -30,7 +30,6 @@ public class Shooting {
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
-
     public void shootAtShip(String input) {
         String target = input.trim();
         System.out.println(target);

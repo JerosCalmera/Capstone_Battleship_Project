@@ -214,17 +214,19 @@ function GameBoard() {
     }
 
     const saveName = () => {
-        if (playerName.length < 4) {
-            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry usernames must be minimum of 4 characters long!"));
+        if (playerName.length < 5) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry usernames must be minimum of 5 characters long!"));
         }
         else if (playerNumber.length > 0 && playerNumber.length < 5 || playerNumber.length > 5) {
             stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry player numbers must be exactly 5 numbers long!"));
         }
-        setSaveName(playerName);
-        stompClient.send("/app/name", {}, JSON.stringify(playerNumber + playerName));
-        console.log(playerNumber)
-        console.log(playerName)
-        setReady("ready");
+        else {
+            setSaveName(playerName);
+            stompClient.send("/app/name", {}, JSON.stringify(playerNumber + playerName));
+            console.log(playerNumber)
+            console.log(playerName)
+            setReady("ready");
+        }
 
     }
     const chatSend = () => {
@@ -263,7 +265,7 @@ function GameBoard() {
                         <h3>{gameInfo}</h3>
                     </div>
                 </div> : null}
-            {serverMessageLog === "Server: Room saved!" && savedName != "name" ?
+            {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
