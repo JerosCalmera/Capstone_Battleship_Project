@@ -71,7 +71,7 @@ public class Placing {
             coOrds.clear();
             damage = "";
         }
-        if (coOrds.size() == max) {
+        if (coOrds.size() == 2) {
             for (int i = 0; i < coOrds.size() - 1; i++) {
                 int inputOne = i;
                 int inputTwo = 1 + i;
@@ -94,8 +94,12 @@ public class Placing {
                     break;
                 } else if (coOrds.get(inputOne).charAt(letter) == coOrds.get(inputTwo).charAt(letter)) {
                     horizontalPlacement = true;
+                    
+
                 } else if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter))) {
                     verticalPlacement = true;
+
+
                 }
             }
             if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
