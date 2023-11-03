@@ -128,20 +128,19 @@ public class Placing {
                     for (int j = 0; j < numberOfLoops; j++) {
                         int indexFirst = coOrdLetters.indexOf((coOrds.get(inputOne).charAt(letter)));
                         int indexSecond = coOrdLetters.indexOf((coOrds.get(inputTwo).charAt(letter)));
-                        if (Objects.equals(coOrdLetters.get(indexSecond), "A") ||
-                                Objects.equals(coOrdLetters.get(indexSecond), "J") ){
+                        if (indexSecond > 9 || indexSecond < 0 ){
                             invalidPlacement = true;
                             break;
                         }
                         if (indexFirst > indexSecond) {
-                            letterToAdd = coOrdLetters.get(indexSecond + 1);
-                            String addCoOrd = String.valueOf(addNumber) + letterToAdd;
+                            letterToAdd = coOrdLetters.get(indexSecond - 1);
+                            String addCoOrd = letterToAdd + String.valueOf(addNumber);
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
                         } else {
-                            letterToAdd = coOrdLetters.get(indexSecond - 1);
-                            String addCoOrd = String.valueOf(addNumber) + letterToAdd;
+                            letterToAdd = coOrdLetters.get(indexSecond + 1);
+                            String addCoOrd = letterToAdd + String.valueOf(addNumber);
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
