@@ -9,10 +9,7 @@ import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class Placing {
@@ -67,9 +64,10 @@ public class Placing {
         } else if (max == 2) {
             newShip = new Ship("Destroyer", 4, "");
         }
-        if (coOrds.size() > max) {
+        if (coOrds.size() > 2) {
             coOrds.clear();
             damage = "";
+            System.out.println("CordsCleared");
         }
         if (coOrds.size() == 2) {
             for (int i = 0; i < coOrds.size() - 1; i++) {
@@ -93,11 +91,63 @@ public class Placing {
                     damage = "";
                     break;
                 } else if (coOrds.get(inputOne).charAt(letter) == coOrds.get(inputTwo).charAt(letter)) {
-                    horizontalPlacement = true;
-                    
+                    int numberOfLoops = max - 2;
+                    int numberToAdd = Character.getNumericValue(coOrds.get(inputTwo).charAt(number));
+                    char addLetter = coOrds.get(inputTwo).charAt(letter);
+                    for (int j = 0; j < numberOfLoops; j++) {
+                        if (coOrds.get(inputOne).charAt(number) > coOrds.get(inputTwo).charAt(number)) {
+                            numberToAdd = numberToAdd - 1;
+                            if (numberToAdd < 0){
+                                invalidPlacement = true;
+                                break;
+                            }
+                            String addCoOrd = addLetter + String.valueOf(numberToAdd);
+                            System.out.println(addCoOrd);
+                            damage += addCoOrd;
+                            System.out.println(damage);
+                        } else {
+                            numberToAdd = numberToAdd + 1;
+                            if (numberToAdd > 9){
+                                invalidPlacement = true;
+                                break;
+                            }
+                            String addCoOrd = addLetter + String.valueOf(numberToAdd);
+                            System.out.println(addCoOrd);
+                            damage += addCoOrd;
+                            System.out.println(damage);
+                        }
+                        horizontalPlacement = true;
+                    }
+
 
                 } else if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter))) {
-                    verticalPlacement = true;
+                    int numberOfLoops = max - 2;
+                    String letterToAdd = String.valueOf(coOrds.get(inputTwo).charAt(letter));
+                    int addNumber = coOrds.get(inputTwo).charAt(number);
+                    coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+                    for (int j = 0; j < numberOfLoops; j++) {
+                        int indexFirst = coOrdLetters.indexOf((coOrds.get(inputOne).charAt(letter)));
+                        int indexSecond = coOrdLetters.indexOf((coOrds.get(inputTwo).charAt(letter)));
+                        if (Objects.equals(coOrdLetters.get(indexSecond), "A") ||
+                                Objects.equals(coOrdLetters.get(indexSecond), "J") ){
+                            invalidPlacement = true;
+                            break;
+                        }
+                        if (indexFirst > indexSecond) {
+                            letterToAdd = coOrdLetters.get(indexSecond + 1);
+                            String addCoOrd = String.valueOf(addNumber) + letterToAdd;
+                            System.out.println(addCoOrd);
+                            damage += addCoOrd;
+                            System.out.println(damage);
+                        } else {
+                            letterToAdd = coOrdLetters.get(indexSecond - 1);
+                            String addCoOrd = String.valueOf(addNumber) + letterToAdd;
+                            System.out.println(addCoOrd);
+                            damage += addCoOrd;
+                            System.out.println(damage);
+                        }
+                        verticalPlacement = true;
+                    }
 
 
                 }
