@@ -75,6 +75,8 @@ public class Placing {
                 int inputTwo = 1 + i;
                 int letter = 0;
                 int number = 1;
+                System.out.println("inputOne letter: " + coOrds.get(inputOne).charAt(letter));
+                System.out.println("inputTwo letter: " + coOrds.get(inputTwo).charAt(letter));
 
                 if (!(Math.abs(coOrds.get(inputOne).charAt(letter) - coOrds.get(inputTwo).charAt(letter)) <= 1
                         && Math.abs(coOrds.get(inputOne).charAt(number) - coOrds.get(inputTwo).charAt(number)) <= 1)) {
@@ -123,32 +125,41 @@ public class Placing {
                 } else if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter))) {
                     int numberOfLoops = max - 2;
                     String letterToAdd = String.valueOf(coOrds.get(inputTwo).charAt(letter));
-                    int addNumber = coOrds.get(inputTwo).charAt(number);
+                    int addNumber = Character.getNumericValue(coOrds.get(inputTwo).charAt(number));
+                    System.out.println("Number: " + addNumber);
                     coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
                     for (int j = 0; j < numberOfLoops; j++) {
-                        int indexFirst = coOrdLetters.indexOf((coOrds.get(inputOne).charAt(letter)));
-                        int indexSecond = coOrdLetters.indexOf((coOrds.get(inputTwo).charAt(letter)));
-                        if (indexSecond > 9 || indexSecond < 0 ){
-                            invalidPlacement = true;
-                            break;
-                        }
+                        int indexFirst = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputOne).charAt(letter)));
+                        int indexSecond = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputTwo).charAt(letter)));
+                        System.out.println("indexFirst: " + indexFirst);
+                        System.out.println("indexSecond: " + indexSecond);
                         if (indexFirst > indexSecond) {
-                            letterToAdd = coOrdLetters.get(indexSecond - 1);
-                            String addCoOrd = letterToAdd + String.valueOf(addNumber);
+                            indexSecond = indexSecond - 1;
+                            letterToAdd = coOrdLetters.get(indexSecond);
+                            String addCoOrd = letterToAdd + addNumber;
+                            System.out.println("Letter to add: " + letterToAdd);
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
+                            if (indexSecond >= 9 || indexSecond <= 0 ){
+                                invalidPlacement = true;
+                                break;
+                            }
                         } else {
-                            letterToAdd = coOrdLetters.get(indexSecond + 1);
-                            String addCoOrd = letterToAdd + String.valueOf(addNumber);
+                            indexSecond = indexSecond + 1;
+                            letterToAdd = coOrdLetters.get(indexSecond);
+                            String addCoOrd = letterToAdd + addNumber;
+                            System.out.println("Letter to add: " + letterToAdd);
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
+                            if (indexSecond >= 9 || indexSecond <= 0 ){
+                                invalidPlacement = true;
+                                break;
+                            }
                         }
-                        verticalPlacement = true;
                     }
-
-
+                    verticalPlacement = true;
                 }
             }
             if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
