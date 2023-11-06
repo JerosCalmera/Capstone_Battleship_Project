@@ -133,16 +133,18 @@ function GameBoard() {
 
     useEffect(() => {
         if (player1Data.includes(savedName)) {
-            setPlayer1Data(player1Data);
-            setPlayer2Data(player2Data)
-            setPlayer2Name(player2Data)
+            setPlayerNumber(player1Data.slice(0,5))
+            console.log(playerNumber)
+            setPlayer1Data(player1Data.slice(5))
+            setPlayer2Data(player2Data.slice(5))
+            setPlayer2Name(player2Data.slice(5))
         }
         else if (player2Data.includes(savedName)) {
-            setPlayer1Data(player2Data)
-            setPlayer2Data(player1Data)
-            setPlayer2Name(player1Data)
+            setPlayer1Data(player2Data.slice(5))
+            setPlayer2Data(player1Data.slice(5))
+            setPlayer2Name(player1Data.slice(5))
         }
-    }, [player2Data, chat, serverMessageLog])
+    }, [player2Data])
 
 
     useEffect(() => {
@@ -271,7 +273,7 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                        <Grids playerNumber={playerNumber} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}

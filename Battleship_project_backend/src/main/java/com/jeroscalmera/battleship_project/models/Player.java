@@ -85,6 +85,10 @@ public class Player implements Comparable<Player>{
         return level;
     }
 
+    public String getDetails() {
+        return playerNumber + name + " Lvl:(" + level + ")";
+    }
+
     public int levelUp(int value) {
         this.level += value;
         return this.level;

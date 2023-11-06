@@ -36,22 +36,26 @@ public class Placing {
     }
 
     private List<String> coOrds = new ArrayList<>();
+    private String existingCoOrds;
     private String damage = "";
 
     public void placeShip(String target) throws InterruptedException {
-        System.out.println("Target =" + target);
-
-        if (!coOrds.contains(target.substring(1, 3))) {
-            coOrds.add(target.substring(1, 3));
-            damage += target.substring(1, 3);
-        }
-        System.out.println("CoOrds list =" + coOrds);
-        Player selectedPlayer = playerRepository.findByName((target.substring(4, target.length() - 1)));
-        System.out.println((target.substring(4)));
-        System.out.println("Selected player =" + selectedPlayer.getName());
         boolean horizontalPlacement = false;
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
+        System.out.println("Target =" + target);
+        List<String> shipList = playerRepository.findAllCoOrdsByPlayerNumber(target.substring(4,9));
+        System.out.println("ships:" + shipList);
+            if (!coOrds.contains(target.substring(1, 3)) && !shipList.contains(target.substring(1, 3))) {
+                coOrds.add(target.substring(1, 3));
+                damage += target.substring(1, 3);
+            } else {
+                invalidPlacement = true;
+            }
+        System.out.println("CoOrds list =" + coOrds);
+        Player selectedPlayer = playerRepository.findByPlayerNumber(target.substring(4,9));
+        System.out.println((target.substring(4)));
+        System.out.println("Selected player =" + selectedPlayer.getName());
         int max = Integer.parseInt(target.substring(3, 4));
         System.out.println("Ship max size =" + max);
         Ship newShip = new Ship("", 0, "");
@@ -128,9 +132,9 @@ public class Placing {
                     int addNumber = Character.getNumericValue(coOrds.get(inputTwo).charAt(number));
                     System.out.println("Number: " + addNumber);
                     coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+                    int indexFirst = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputOne).charAt(letter)));
+                    int indexSecond = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputTwo).charAt(letter)));
                     for (int j = 0; j < numberOfLoops; j++) {
-                        int indexFirst = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputOne).charAt(letter)));
-                        int indexSecond = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputTwo).charAt(letter)));
                         System.out.println("indexFirst: " + indexFirst);
                         System.out.println("indexSecond: " + indexSecond);
                         if (indexFirst > indexSecond) {
@@ -141,7 +145,7 @@ public class Placing {
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
-                            if (indexSecond >= 9 || indexSecond <= 0 ){
+                            if (indexSecond > 9 || indexSecond < 0 ){
                                 invalidPlacement = true;
                                 break;
                             }
@@ -153,7 +157,7 @@ public class Placing {
                             System.out.println(addCoOrd);
                             damage += addCoOrd;
                             System.out.println(damage);
-                            if (indexSecond >= 9 || indexSecond <= 0 ){
+                            if (indexSecond > 9 || indexSecond < 0 ){
                                 invalidPlacement = true;
                                 break;
                             }
@@ -174,6 +178,7 @@ public class Placing {
             } else {
                 coOrds.clear();
                 newShip.setDamage(damage);
+                existingCoOrds += damage;
                 selectedPlayer.addShip(newShip);
                 newShip.setPlayer(selectedPlayer);
                 shipRepository.save(newShip);

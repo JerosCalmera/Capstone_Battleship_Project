@@ -96,10 +96,11 @@ public class PlayerAndRoom {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
-            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getName()));
+            Thread.sleep(50);
+            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getDetails()));
             player1 = playersNotInRoom.get(1).getName();
             player2 = playersNotInRoom.get(0).getName();
-            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getName()));
+            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getDetails()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {
