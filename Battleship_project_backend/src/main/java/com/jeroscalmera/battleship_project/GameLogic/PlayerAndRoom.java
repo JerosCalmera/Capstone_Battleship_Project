@@ -121,6 +121,7 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player player) throws InterruptedException {
         Thread.sleep(100);
+        System.out.println("Player number = " + player.getName().substring(0, 5));
         if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
                 && (playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5)))))
         {
@@ -142,7 +143,7 @@ public class PlayerAndRoom {
         }
         else {
             Player playerToAdd = new Player();
-            playerToAdd.setName(player.getName());
+            playerToAdd.setName(player.getName().substring(5));
             playerToAdd.setPlayerNumber(randomUserNumber());
             playersNotInRoom.add(playerToAdd);
             webSocketMessageSender.sendMessage(

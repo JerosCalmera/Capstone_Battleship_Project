@@ -132,14 +132,14 @@ function GameBoard() {
     }, [attemptReconnect])
 
     useEffect(() => {
-        if (player1Data.includes(savedName)) {
+        if (player1Data.includes(savedName) && !player1Data.includes("Lvl") && !player2Data.includes("Lvl")) {
             setPlayerNumber(player1Data.slice(0,5))
-            console.log(playerNumber)
             setPlayer1Data(player1Data.slice(5))
             setPlayer2Data(player2Data.slice(5))
             setPlayer2Name(player2Data.slice(5))
         }
         else if (player2Data.includes(savedName)) {
+            setPlayerNumber(player2Data.slice(0,5))
             setPlayer1Data(player2Data.slice(5))
             setPlayer2Data(player1Data.slice(5))
             setPlayer2Name(player1Data.slice(5))

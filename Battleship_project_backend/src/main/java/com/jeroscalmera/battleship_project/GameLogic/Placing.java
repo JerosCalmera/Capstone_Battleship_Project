@@ -45,6 +45,7 @@ public class Placing {
         boolean invalidPlacement = false;
         System.out.println("Target =" + target);
         List<String> shipList = playerRepository.findAllCoOrdsByPlayerNumber(target.substring(4,9));
+        System.out.println("Player number = " + (target.substring(4,9)));
         System.out.println("ships:" + shipList);
             if (!coOrds.contains(target.substring(1, 3)) && !shipList.contains(target.substring(1, 3))) {
                 coOrds.add(target.substring(1, 3));
