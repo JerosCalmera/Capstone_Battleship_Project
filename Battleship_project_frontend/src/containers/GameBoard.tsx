@@ -32,7 +32,6 @@ function GameBoard() {
     const [passwordEntry, setPasswordEntry] = useState<string>("")
 
     const [playerName, setPlayerName] = useState<string>("")
-    const [playerNumber, setPlayerNumber] = useState<string>("")
     const [savedName, setSaveName] = useState<string>("name")
     const [ready, setReady] = useState<string>("name")
 
@@ -133,16 +132,14 @@ function GameBoard() {
 
     useEffect(() => {
         if (player1Data.includes(savedName) && !player1Data.includes("Lvl") && !player2Data.includes("Lvl")) {
-            setPlayerNumber(player1Data.slice(0,5))
-            setPlayer1Data(player1Data.slice(5))
-            setPlayer2Data(player2Data.slice(5))
-            setPlayer2Name(player2Data.slice(5))
+            setPlayer1Data(player1Data)
+            setPlayer2Data(player2Data)
+            setPlayer2Name(player2Data)
         }
         else if (player2Data.includes(savedName)) {
-            setPlayerNumber(player2Data.slice(0,5))
-            setPlayer1Data(player2Data.slice(5))
-            setPlayer2Data(player1Data.slice(5))
-            setPlayer2Name(player1Data.slice(5))
+            setPlayer1Data(player2Data)
+            setPlayer2Data(player1Data)
+            setPlayer2Name(player1Data)
         }
     }, [player2Data])
 
@@ -219,13 +216,9 @@ function GameBoard() {
         if (playerName.length < 5) {
             stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry usernames must be minimum of 5 characters long!"));
         }
-        else if (playerNumber.length > 0 && playerNumber.length < 5 || playerNumber.length > 5) {
-            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry player numbers must be exactly 5 numbers long!"));
-        }
         else {
             setSaveName(playerName);
-            stompClient.send("/app/name", {}, JSON.stringify(playerNumber + playerName));
-            console.log(playerNumber)
+            stompClient.send("/app/name", {}, JSON.stringify(playerName));
             console.log(playerName)
             setReady("ready");
         }
@@ -273,14 +266,14 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids playerNumber={playerNumber} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                        <Grids playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
 
                     </div> : null}
-            <StartUp playerNumber={playerNumber} setPlayerNumber={setPlayerNumber} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+            <StartUp hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />

@@ -19,11 +19,10 @@ interface Props {
     enemyMiss: string;
     turn: string;
     playerName: string;
-    playerNumber: string;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({ playerNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -143,7 +142,7 @@ const Grids: React.FC<Props> = ({ playerNumber, playerName, turn, miss, enemyMis
                 battleship > 0 && shipToPlace === "Battleship" ||
                 cruiser > 0 && shipToPlace === "Cruiser" ||
                 destroyer > 0 && shipToPlace === "Destroyer") {
-                stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + playerNumber));
+                stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
                 setPlacedReadyShip(placedReadyShip + value)
             }
             else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Ship already present!")) }

@@ -44,7 +44,7 @@ public class Placing {
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
         System.out.println("Target =" + target);
-        List<String> shipList = playerRepository.findAllCoOrdsByPlayerNumber(target.substring(4,9));
+        List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(target.substring()4);
         System.out.println("Player number = " + (target.substring(4,9)));
         System.out.println("ships:" + shipList);
             if (!coOrds.contains(target.substring(1, 3)) && !shipList.contains(target.substring(1, 3))) {
@@ -54,7 +54,7 @@ public class Placing {
                 invalidPlacement = true;
             }
         System.out.println("CoOrds list =" + coOrds);
-        Player selectedPlayer = playerRepository.findByPlayerNumber(target.substring(4,9));
+        Player selectedPlayer = playerRepository.findByName(target.substring(4));
         System.out.println((target.substring(4)));
         System.out.println("Selected player =" + selectedPlayer.getName());
         int max = Integer.parseInt(target.substring(3, 4));
