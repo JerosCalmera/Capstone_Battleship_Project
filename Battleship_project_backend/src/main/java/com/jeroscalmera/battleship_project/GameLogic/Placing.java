@@ -44,17 +44,15 @@ public class Placing {
         boolean verticalPlacement = false;
         boolean invalidPlacement = false;
         System.out.println("Target =" + target);
-        List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(target.substring()4);
-        System.out.println("Player number = " + (target.substring(4,9)));
+        Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4,10)));
+        List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
+        String shipList = String.join("", shipsList);
         System.out.println("ships:" + shipList);
-            if (!coOrds.contains(target.substring(1, 3)) && !shipList.contains(target.substring(1, 3))) {
+            if (!coOrds.contains(target.substring(1, 3))) {
                 coOrds.add(target.substring(1, 3));
                 damage += target.substring(1, 3);
-            } else {
-                invalidPlacement = true;
             }
         System.out.println("CoOrds list =" + coOrds);
-        Player selectedPlayer = playerRepository.findByName(target.substring(4));
         System.out.println((target.substring(4)));
         System.out.println("Selected player =" + selectedPlayer.getName());
         int max = Integer.parseInt(target.substring(3, 4));
@@ -110,8 +108,11 @@ public class Placing {
                             }
                             String addCoOrd = addLetter + String.valueOf(numberToAdd);
                             System.out.println(addCoOrd);
+                            if (shipList.contains(addCoOrd)){
+                                invalidPlacement = true;}
+                            else {
                             damage += addCoOrd;
-                            System.out.println(damage);
+                            System.out.println(damage);}
                         } else {
                             numberToAdd = numberToAdd + 1;
                             if (numberToAdd > 9){
@@ -120,8 +121,11 @@ public class Placing {
                             }
                             String addCoOrd = addLetter + String.valueOf(numberToAdd);
                             System.out.println(addCoOrd);
+                            if (shipList.contains(addCoOrd)){
+                                invalidPlacement = true;}
+                            else {
                             damage += addCoOrd;
-                            System.out.println(damage);
+                            System.out.println(damage);}
                         }
                         horizontalPlacement = true;
                     }
@@ -140,28 +144,34 @@ public class Placing {
                         System.out.println("indexSecond: " + indexSecond);
                         if (indexFirst > indexSecond) {
                             indexSecond = indexSecond - 1;
-                            letterToAdd = coOrdLetters.get(indexSecond);
-                            String addCoOrd = letterToAdd + addNumber;
-                            System.out.println("Letter to add: " + letterToAdd);
-                            System.out.println(addCoOrd);
-                            damage += addCoOrd;
-                            System.out.println(damage);
                             if (indexSecond > 9 || indexSecond < 0 ){
                                 invalidPlacement = true;
                                 break;
                             }
+                            letterToAdd = coOrdLetters.get(indexSecond);
+                            String addCoOrd = letterToAdd + addNumber;
+                            System.out.println("Letter to add: " + letterToAdd);
+                            System.out.println(addCoOrd);
+                            if (shipList.contains(addCoOrd)){
+                                invalidPlacement = true;}
+                            else {
+                            damage += addCoOrd;
+                            System.out.println(damage);}
                         } else {
                             indexSecond = indexSecond + 1;
-                            letterToAdd = coOrdLetters.get(indexSecond);
-                            String addCoOrd = letterToAdd + addNumber;
-                            System.out.println("Letter to add: " + letterToAdd);
-                            System.out.println(addCoOrd);
-                            damage += addCoOrd;
-                            System.out.println(damage);
                             if (indexSecond > 9 || indexSecond < 0 ){
                                 invalidPlacement = true;
                                 break;
                             }
+                            letterToAdd = coOrdLetters.get(indexSecond);
+                            String addCoOrd = letterToAdd + addNumber;
+                            System.out.println("Letter to add: " + letterToAdd);
+                            System.out.println(addCoOrd);
+                            if (shipList.contains(addCoOrd)){
+                                invalidPlacement = true;}
+                            else {
+                            damage += addCoOrd;
+                            System.out.println(damage);}
                         }
                     }
                     verticalPlacement = true;
@@ -205,6 +215,7 @@ public class Placing {
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
 
+
     public String computerRandomCoOrd() {
         Random random = new Random();
         int randomIndex = random.nextInt(10);
@@ -232,5 +243,6 @@ public class Placing {
     }
     public void computerPlaceShips(int size) {
         fillCoOrds();
+        List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName("Computer");
         }
     }
