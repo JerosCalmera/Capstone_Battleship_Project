@@ -48,7 +48,7 @@ public class PlayerAndRoom {
         }
     }
 
-    public void leaderBoard() throws InterruptedException {
+    public void leaderBoard(String trigger) throws InterruptedException {
         List<Player> leaderboard = playerRepository.findAll();
         Player player = new Player();
         Collections.sort(leaderboard);
@@ -147,20 +147,23 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player playerName) throws InterruptedException {
         Thread.sleep(100);
-        if (playerRepository.findName().contains(playerName.getName())) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
-            String name = playerName.getName();
-            Player player = new Player(name);
-            playersNotInRoom.add(player);
-        } else if (!playerRepository.findName().contains(playerName.getName().toLowerCase())) {
-            if (playerRepository.findName().contains(playerName.getName().substring(0, 4))) {
-                webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName() + "Admin: Sorry, this username is too similar to an existing username"));
+        System.out.println(playerName.getName().substring(0, 4));
+        List<String> players = playerRepository.findName();
+        if (!players.contains(playerName.getName())) {
+            if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 4)))) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Sorry, " + playerName.getName() + " is too similar to an existing username!"));
+                webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName()));
             } else {
                 String name = playerName.getName();
                 Player player = new Player(name);
                 playersNotInRoom.add(player);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
             }
+        } else {
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+            String name = playerName.getName();
+            Player player = new Player(name);
+            playersNotInRoom.add(player);
         }
     }
 }

@@ -29,9 +29,13 @@ h2 {
   transition: 0.2s;
 }
 
+.serverStatus{
+  position: fixed;
+}
+
 .startupOuter {
   background-color: rgba(0, 0, 0, 0.708);
-  height: 180px;
+  height: 150px;
   width: 550px;
   padding: 20px;
   padding-bottom: 30px;
@@ -54,6 +58,13 @@ h2 {
   list-style: none;
   padding-bottom: 20px;
   overflow-wrap: break-word;
+}
+
+.chatBoxOuter{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 
 .input {
@@ -84,7 +95,7 @@ h2 {
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
   padding: 15px;
-  margin-top: 5px;
+  margin-top: 36px;
   display: flex;
   flex-direction: column;
   list-style: none;

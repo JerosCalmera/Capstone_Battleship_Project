@@ -88,8 +88,8 @@ public class MessageController {
     }
 
     @MessageMapping("/leaderBoard")
-    public void leaderboard(String string) throws InterruptedException {
-        playerAndRoom.leaderBoard();
+    public void leaderboard(String trigger) throws InterruptedException {
+        playerAndRoom.leaderBoard(trigger);
     }
     @MessageMapping("/turn")
     public void turn(String string) {

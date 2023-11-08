@@ -14,7 +14,7 @@ function GameBoard() {
     const [serverMessageLog, serverSetMessageLog] = useState("")
     const [hidden, setHidden] = useState("")
 
-    const [leaderBoard, setLeaderBoard] = useState<string[]>([""])
+    const [leaderBoard, setLeaderBoard] = useState<string[]>([])
     const [leaderBoardCheck, setLeaderBoardCheck] = useState<boolean>(false)
 
     const [shipInfo, setShipInfo] = useState<string>("")
@@ -164,11 +164,11 @@ function GameBoard() {
     }, [missCheck])
 
     useEffect(() => {
-        if (serverMessageLog === "Game server ready....") {
+        console.log(leaderBoard)
+        if (leaderBoard.length < 1 && serverMessageLog === "Game server ready....") {
             stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
-            setLeaderBoardCheck(true)
         }
-    }, [serverMessageLog, leaderBoardCheck])
+    }, [serverMessageLog]);
 
     useEffect(() => {
         const toTrim = cellStorage;
@@ -191,7 +191,6 @@ function GameBoard() {
 
     useEffect(() => {
         if (hidden.includes(savedName)) {
-            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry " + savedName + " is too similar to an existing username!"));
             setSaveName("name");
             setHidden("");
         }
@@ -199,7 +198,7 @@ function GameBoard() {
 
     const auth = () => {
         if (password.length < 4) {
-            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry room numbers must be minimum of 4 characters long!"));
+            stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry room codes must be minimum of 4 characters long!"));
         }
         else {
             setPasswordEntry(password)
@@ -242,33 +241,34 @@ function GameBoard() {
         stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
     }
 
+    const serverStatusStyle = () => {
+        if (serverMessageLog != "Server: Rooms synced")
+        return
+        else {
+            return "serverStatus"
+        }
+    }
 
     return (
-        <>
+        <>  
+        <div className={serverStatusStyle()}>
             {serverStatus == true ? <h5>Connected to game server</h5> :
-                <div>
+            <>
                     <h5>Not connected to game server</h5>
-                    <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button>
-
-                </div>}
+                    <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
+                }
             <h5>{serverMessageLog}</h5>
             <button className="button" onClick={restart}>Restart</button>
-            <button className="button" onClick={resetPlacement}>Reset</button>
+            <button className="button" onClick={resetPlacement}>Dev</button>
+            </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
-            {serverMessageLog === "Server: Rooms synced" ?
-                <div className="gameInfoOuter">
-                    <div className="gameInfo">
-                        <h3>Turn: {turnNumber} {turn}</h3>
-                        <h3>{gameInfo}</h3>
-                    </div>
-                </div> : null}
             {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                        <Grids gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}

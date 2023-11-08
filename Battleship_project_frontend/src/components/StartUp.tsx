@@ -20,18 +20,25 @@ interface Props {
 
 const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
+    const chatBox = () => {
+        if (serverMessageLog === "Server: Rooms synced")
+        return "chatBoxOuter"
+        else {
+        return
+    }
+    }
 
     return (
         <>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
                 <div className="startupOuter">
-                    <h3>Please enter the room number, or press generate to generate one</h3>
+                    <h3>Please enter the room code, or press generate to generate one</h3>
                     <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button className="button" onClick={auth}>Start</button><button className="button" onClick={generate}>Generate</button>
                 </div>
                 :
                 <div className="startupOuter">
-                    <h3>Please enter the room number....</h3>
+                    <h3>Please enter the room code....</h3>
                     <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button className="button" onClick={auth}>Start</button>
                 </div>
@@ -39,11 +46,12 @@ const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedNam
                 null : null}
             {savedName === "name" ?
                 <div className="startupOuter">
-                    <h3> Welcome to Solar Fury, Please enter your name and player number if you have one</h3>
+                    <h3> Welcome to Solar Fury, Please enter your name</h3>
                     Player name: <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
                     <button className="button" onClick={saveName}>Save</button>
                 </div>
                 : null}
+            <div className={chatBox()}>
             <div className="chatBox">
                 Chat: <br />
                 {chat.map((message, index) => (
@@ -52,6 +60,7 @@ const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedNam
                 <br />
                 <input className="input" name="chat" value={chatEntry} onChange={(e) => setChatEntry(e.target.value)}></input>
                 <button className="button" onClick={chatSend}>Send</button>
+            </div>
             </div>
             {serverMessageLog != "Server: Rooms synced" ?
                 <div className="leaderBoardOuter">
