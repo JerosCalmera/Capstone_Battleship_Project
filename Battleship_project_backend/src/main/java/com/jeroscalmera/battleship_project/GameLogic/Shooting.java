@@ -12,9 +12,7 @@ import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class Shooting {
@@ -22,6 +20,12 @@ public class Shooting {
     private ShipRepository shipRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private RoomRepository roomRepository;
+    private List<String> coOrdLetters = new ArrayList<>();
+    private List<String> coOrdNumbers = new ArrayList<>();
+
+    boolean allShipsDestroyedForAutoShoot = false;
+    Player selectedPlayer1AutoShoot = new Player();
+    Player selectedPlayer2AutoShoot = new Player();
 
     public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
         this.roomRepository = repository;
@@ -66,8 +70,8 @@ public class Shooting {
     }
     @Transactional
     public void enumerateShips(Long id) {
-        Player playerToCheck = playerRepository.findPlayerById(id);
         boolean allShipsDestroyed = true;
+        Player playerToCheck = playerRepository.findPlayerById(id);
         Ship ship = new Ship();
         List<Ship> shipToModify = shipRepository.findAllShipsByPlayerId(id);
         for (Ship shipToCheck : shipToModify)
@@ -93,6 +97,7 @@ public class Shooting {
                 allShipsDestroyed = false;}
 
         if (allShipsDestroyed) {
+            allShipsDestroyedForAutoShoot = true;
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
                     Room roomToCheck = new Room();
                     Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
@@ -108,5 +113,26 @@ public class Shooting {
                     }
                 }
             }
+
+    public String computerRandomCoOrd() {
+        Random random = new Random();
+        int randomIndex = random.nextInt(10);
+        coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+        coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+        String startLetter = coOrdLetters.get(randomIndex);
+        String startNumber = coOrdNumbers.get(randomIndex);
+        return startLetter + startNumber;
+    }
+    public void autoShoot() throws InterruptedException {
+        List<Room> playersInRoom = roomRepository.findAllWithPlayers();
+        List<Player> players = new ArrayList<>();
+        for (Room room : playersInRoom) {
+            players = room.getPlayers();
+        }
+        while (!allShipsDestroyedForAutoShoot){
+        shootAtShip(computerRandomCoOrd() + players.get(0).getName());
+        Thread.sleep(50);
+        shootAtShip(computerRandomCoOrd() + players.get(0).getName());
+    }}
     }
 

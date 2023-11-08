@@ -17,4 +17,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findRoomIdByPlayersName(String name);
     @Query
     Room findRoomIdByPlayersId(Long id);
+
+    @Query
+    List<Room> findAllWithPlayers();
+
 }

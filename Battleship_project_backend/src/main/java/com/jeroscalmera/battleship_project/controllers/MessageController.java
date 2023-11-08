@@ -91,6 +91,11 @@ public class MessageController {
     public void leaderboard(String trigger) throws InterruptedException {
         playerAndRoom.leaderBoard(trigger);
     }
+
+    @MessageMapping("/autoShoot")
+    public void autoShoot() throws InterruptedException {
+        shooting.autoShoot();
+    }
     @MessageMapping("/turn")
     public void turn(String string) {
         playerAndRoom.coinFlip();

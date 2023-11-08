@@ -1,4 +1,4 @@
-import Stomp from "stompjs";
+import Stomp, { client } from "stompjs";
 import SockJS from "sockjs-client";
 import { useEffect, useState } from "react";
 import Grids from "../components/Grids";
@@ -15,7 +15,7 @@ function GameBoard() {
     const [hidden, setHidden] = useState("")
 
     const [leaderBoard, setLeaderBoard] = useState<string[]>([])
-    const [leaderBoardCheck, setLeaderBoardCheck] = useState<boolean>(false)
+    const [leaderBoardCheck, setLeaderBoardCheck] = useState<string[]>([])
 
     const [shipInfo, setShipInfo] = useState<string>("")
     const [shipDamage, setShipDamage] = useState<string>("")
@@ -102,10 +102,13 @@ function GameBoard() {
                 const leaderBoardEntry: string = message.body.slice(12, -2)
                 setLeaderBoard((prevLeader) => {
                     const updatedLeader = [...prevLeader, leaderBoardEntry];
-                    return updatedLeader
+                    return updatedLeader.slice(-10)
                 })
             }
             );
+
+            client.subscribe("/topic/autoShoot", (message: any) => {
+            });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
             setServerStatus(true);
@@ -167,8 +170,10 @@ function GameBoard() {
         console.log(leaderBoard)
         if (leaderBoard.length < 1 && serverMessageLog === "Game server ready....") {
             stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
+            stompClient.unsubscribe("/app/leaderBoard")
         }
-    }, [serverMessageLog]);
+    }, [serverMessageLog, leaderBoard]);
+
 
     useEffect(() => {
         const toTrim = cellStorage;
@@ -243,23 +248,29 @@ function GameBoard() {
 
     const serverStatusStyle = () => {
         if (serverMessageLog != "Server: Rooms synced")
-        return
+            return
         else {
             return "serverStatus"
         }
     }
 
+    const autoShoot = () => {
+        stompClient.send("/app/autoShoot", {}, JSON.stringify("shoot"));
+    }
+
     return (
-        <>  
-        <div className={serverStatusStyle()}>
-            {serverStatus == true ? <h5>Connected to game server</h5> :
-            <>
-                    <h5>Not connected to game server</h5>
-                    <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
+        <>
+            <div className={serverStatusStyle()}>
+                {serverStatus == true ? <h5>Connected to game server</h5> :
+                    <>
+                        <h5>Not connected to game server</h5>
+                        <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
                 }
-            <h5>{serverMessageLog}</h5>
-            <button className="button" onClick={restart}>Restart</button>
-            <button className="button" onClick={resetPlacement}>Dev</button>
+                <h5>{serverMessageLog}</h5>
+                <button className="button" onClick={restart}>Restart</button>
+                <button className="button" onClick={resetPlacement}>Dev</button>
+                <button className="button" onClick={autoShoot}>AutoShoot</button>
+
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?

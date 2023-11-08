@@ -52,11 +52,16 @@ public class PlayerAndRoom {
         List<Player> leaderboard = playerRepository.findAll();
         Player player = new Player();
         Collections.sort(leaderboard);
+        int total = 0;
         for (Player playerLeader : leaderboard) {
-            webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
+            if (total < 10) {
+                webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
+                total++;
+            } else {
+                break;
+            }
         }
     }
-
     public void coinFlip() {
         Random random = new Random();
         int coin = random.nextInt(2) + 1;
@@ -90,10 +95,7 @@ public class PlayerAndRoom {
             Room addRoom = new Room(roomNumber);
             roomRepository.save(addRoom);
             Thread.sleep(50);
-            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playersNotInRoom.get(1).getDetails()));
-            player1 = playersNotInRoom.get(1).getName();
-            player2 = playersNotInRoom.get(0).getName();
-            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playersNotInRoom.get(0).getDetails()));
+            System.out.println(("Player" + playersNotInRoom.get(1).getName()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {
@@ -105,6 +107,12 @@ public class PlayerAndRoom {
                 }
                 addRoom.addPlayerToRoom(newPlayer);
             }
+            Player playerDetails1 = playerRepository.findByNameContaining(playersNotInRoom.get(1).getName());
+            Player playerDetails2 = playerRepository.findByNameContaining(playersNotInRoom.get(0).getName());
+            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playerDetails1.getDetails()));
+            player1 = playersNotInRoom.get(1).getName();
+            player2 = playersNotInRoom.get(0).getName();
+            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playerDetails2.getDetails()));
             roomRepository.save(addRoom);
             roomSaved = false;
             roomValidated = false;
@@ -147,10 +155,10 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player playerName) throws InterruptedException {
         Thread.sleep(100);
-        System.out.println(playerName.getName().substring(0, 4));
+        System.out.println(playerName.getName().substring(0, 5));
         List<String> players = playerRepository.findName();
         if (!players.contains(playerName.getName())) {
-            if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 4)))) {
+            if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 5)))) {
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Sorry, " + playerName.getName() + " is too similar to an existing username!"));
                 webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName()));
             } else {

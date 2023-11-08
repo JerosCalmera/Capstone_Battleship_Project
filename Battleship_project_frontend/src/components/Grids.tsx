@@ -20,7 +20,7 @@ interface Props {
     turn: string;
     playerName: string;
     gameInfo: string;
-    serverMessageLog:string;
+    serverMessageLog: string;
     turnNumber: number;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -201,13 +201,13 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
 
     return (
         <>
-                {serverMessageLog === "Server: Rooms synced" ?
+            {serverMessageLog === "Server: Rooms synced" ?
                 <div className="gameInfoOuter">
                     <div className="gameInfo">
                         <h3>Turn: ({turnNumber}) {turn}</h3>
                         <h3>{gameInfo}</h3>
                         {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
-                        {shipInfo.length < 60 && matchStart.length > 1 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
+                        {shipInfo.length < 1 && matchStart.length > 1 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
                     </div>
                 </div> : null}
             <div className="gameBoardOuterGreater">

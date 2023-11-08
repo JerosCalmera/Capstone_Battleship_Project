@@ -22,10 +22,10 @@ const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedNam
 
     const chatBox = () => {
         if (serverMessageLog === "Server: Rooms synced")
-        return "chatBoxOuter"
+            return "chatBoxOuter"
         else {
-        return
-    }
+            return
+        }
     }
 
     return (
@@ -52,20 +52,20 @@ const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedNam
                 </div>
                 : null}
             <div className={chatBox()}>
-            <div className="chatBox">
-                Chat: <br />
-                {chat.map((message, index) => (
-                    <li className="chatList" key={index}>{message}<br /></li>
-                ))}
-                <br />
-                <input className="input" name="chat" value={chatEntry} onChange={(e) => setChatEntry(e.target.value)}></input>
-                <button className="button" onClick={chatSend}>Send</button>
-            </div>
+                <div className="chatBox">
+                    Chat: <br />
+                    {chat.map((message, index) => (
+                        <li className="chatList" key={index}>{message}<br /></li>
+                    ))}
+                    <br />
+                    <input className="input" name="chat" value={chatEntry} onChange={(e) => setChatEntry(e.target.value)}></input>
+                    <button className="button" onClick={chatSend}>Send</button>
+                </div>
             </div>
             {serverMessageLog != "Server: Rooms synced" ?
                 <div className="leaderBoardOuter">
                     <div className="leaderBoard">
-                        <h3>Top Players:</h3>
+                        <h3>Top 10 Players:</h3>
                         (one win = one level)
                         <div>
                             {leaderBoard.map((player, index) => (

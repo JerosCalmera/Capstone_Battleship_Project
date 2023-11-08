@@ -44,7 +44,8 @@ public class Placing {
     public void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);
         System.out.println("Target =" + target);
-        Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4,10)));
+        Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4,9)));
+        System.out.println("Name =" + (target.substring(4,9)));
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         if (shipsList.contains(target.substring(1,3))) {
             invalidPlacement = true;
@@ -215,23 +216,11 @@ public class Placing {
             damage = "";
         }
     }
-    
-    private List<String> computerPlayerCoOrds = new ArrayList<>();
-    private List<String> computerShipCoOrds = new ArrayList<>();
+
     private List<String> computerAllCoOrds = new ArrayList<>();
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
 
-
-    public String computerRandomCoOrd() {
-        Random random = new Random();
-        int randomIndex = random.nextInt(10);
-        coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
-        coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-        String startLetter = coOrdLetters.get(randomIndex);
-        String startNumber = coOrdNumbers.get(randomIndex);
-        return startLetter + startNumber;
-    }
 
     public void fillCoOrds() {
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
