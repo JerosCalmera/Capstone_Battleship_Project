@@ -12,12 +12,13 @@ interface Props {
     ready: string;
     hidden: string;
     chat: string[];
+    chatEntry: string;
     chatSend: () => void;
     setChatEntry: React.Dispatch<React.SetStateAction<string>>;
     leaderBoard: string[];
 }
 
-const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
 
     return (
@@ -49,7 +50,7 @@ const StartUp: React.FC<Props> = ({ setPlayerName, saveName, savedName, serverMe
                     <li className="chatList" key={index}>{message}<br /></li>
                 ))}
                 <br />
-                <input className="input" name="chat" onChange={(e) => setChatEntry(e.target.value)}></input>
+                <input className="input" name="chat" value={chatEntry} onChange={(e) => setChatEntry(e.target.value)}></input>
                 <button className="button" onClick={chatSend}>Send</button>
             </div>
             {serverMessageLog != "Server: Rooms synced" ?

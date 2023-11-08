@@ -46,6 +46,11 @@ public class MessageController {
         System.out.println(target);
         shooting.shootAtShip(target);
     }
+
+    @MessageMapping("/randomPlacement")
+    public void handleRandomPlacement(Player name) throws InterruptedException {
+        placing.computerPlaceShips(name);
+    }
     @MessageMapping("/restart")
     public void handleRestart(String hidden) {
         placing.restart();

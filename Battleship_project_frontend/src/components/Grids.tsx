@@ -22,7 +22,7 @@ interface Props {
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -161,7 +161,7 @@ const Grids: React.FC<Props> = ({playerName, turn, miss, enemyMiss, player2Name,
             if (turn === savedName) {
                 if (enemyMiss.includes(value)) { null }
                 else
-                    stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + savedName));
+                    stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + playerName));
 
             }
         }
@@ -184,6 +184,10 @@ const Grids: React.FC<Props> = ({playerName, turn, miss, enemyMiss, player2Name,
     const placeDestroyer = () => {
         setShipSize(2);
         setShipToPlace("Destroyer")
+    }
+
+    const randomPlacement = () => {
+        stompClient.send("/app/randomPlacement", {}, JSON.stringify(savedName));
     }
 
     const matchBegin = () => {
@@ -234,6 +238,8 @@ const Grids: React.FC<Props> = ({playerName, turn, miss, enemyMiss, player2Name,
                                 : null}
                         </div>
                         {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
+                        {shipInfo.length < 60 && matchStart.length > 1 ? <button onClick={randomPlacement} className="button">Random</button> : null}
+
                     </div>
                     <div className="gameBoardRender">
                         <h2>{player1Data}</h2>

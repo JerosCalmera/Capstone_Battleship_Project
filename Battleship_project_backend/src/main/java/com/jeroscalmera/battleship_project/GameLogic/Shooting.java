@@ -38,7 +38,9 @@ public class Shooting {
         aimPoint = aimPoint.trim();
         System.out.println(aimPoint);
         Player selectedPlayer = playerRepository.findByNameContaining(target.substring(2, 6));
+        System.out.println((target.substring(2, 6)));
         Player selectedPlayer2 = playerRepository.findByNameContaining(target.substring(6, 10));
+        System.out.println((target.substring(6, 10)));
         List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         String converted = String.join("", shipList);
         System.out.println(converted);

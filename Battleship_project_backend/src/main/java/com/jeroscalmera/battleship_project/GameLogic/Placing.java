@@ -38,19 +38,25 @@ public class Placing {
     private List<String> coOrds = new ArrayList<>();
     private String existingCoOrds;
     private String damage = "";
-
+    boolean horizontalPlacement = false;
+    boolean verticalPlacement = false;
+    boolean invalidPlacement = false;
     public void placeShip(String target) throws InterruptedException {
-        boolean horizontalPlacement = false;
-        boolean verticalPlacement = false;
-        boolean invalidPlacement = false;
+        Thread.sleep(50);
         System.out.println("Target =" + target);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4,10)));
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
+        if (shipsList.contains(target.substring(1,3))) {
+            invalidPlacement = true;
+        }
         String shipList = String.join("", shipsList);
         System.out.println("ships:" + shipList);
             if (!coOrds.contains(target.substring(1, 3))) {
                 coOrds.add(target.substring(1, 3));
                 damage += target.substring(1, 3);
+            }
+            if (shipList.contains(target.substring(1, 3))) {
+                invalidPlacement = true;
             }
         System.out.println("CoOrds list =" + coOrds);
         System.out.println((target.substring(4)));
@@ -180,7 +186,8 @@ public class Placing {
             if (invalidPlacement == true || horizontalPlacement == true && verticalPlacement == true) {
                 damage = "";
                 coOrds.clear();
-                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + " Invalid Placement!"));
+                if (target.charAt(0) != 'P')
+                {webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + " Invalid Placement!"));}
                 webSocketMessageSender.sendMessage("/topic/placement2", new Chat("Invalid"));
                 invalidPlacement = false;
                 horizontalPlacement = false;
@@ -229,20 +236,96 @@ public class Placing {
     public void fillCoOrds() {
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
         coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-        String coOrdLetter = "";
-        String coOrdNumber = "";
-        String coOrdSelected = "";
         for (int i = 0; i < 10; i++) {
+            String coOrdLetter = "";
+            String coOrdNumber = "";
+            String coOrdSelected = "";
             for (int j = 0; j < 10; j++) {
                 coOrdLetter = coOrdLetters.get(i);
                 coOrdNumber = coOrdNumbers.get(j);
-                coOrdSelected = coOrdLetter + coOrdSelected;
+                coOrdSelected = coOrdLetter + coOrdNumber;
                 computerAllCoOrds.add(coOrdSelected);
             }
         }
     }
-    public void computerPlaceShips(int size) {
-        fillCoOrds();
-        List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName("Computer");
+
+    public String generateStartingRandomCoOrds() {
+        coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+        coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+        if (computerAllCoOrds.size() < 100) {
+            fillCoOrds();
+        }
+        Random random = new Random();
+        int randomCoOrd = random.nextInt(100);
+        // Of random CoOrd letter = index 0, number index 1,
+        String firstCoOrd = computerAllCoOrds.get(randomCoOrd);
+        int rando = random.nextInt(3);
+        int firstCoOrdIndexLetter = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(0)));
+        int firstCoOrdIndexNumber = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(1)));
+        int secondCoOrdIndexLetter = 0;
+        int secondCoOrdIndexNumber = 0;
+        do {
+            randomCoOrd = random.nextInt(100);
+            firstCoOrd = computerAllCoOrds.get(randomCoOrd);
+            firstCoOrdIndexLetter = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(0)));
+            firstCoOrdIndexNumber = coOrdNumbers.indexOf(String.valueOf(firstCoOrd.charAt(1)));
+        } while (firstCoOrdIndexLetter == 0 || firstCoOrdIndexLetter == 9 || firstCoOrdIndexNumber == 0 || firstCoOrdIndexNumber == 9);
+        if (rando == 0) {
+            secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+            secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;
+        } else if (rando == 1) {
+            secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+            secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;
+        } else if (rando == 2) {
+            secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+            secondCoOrdIndexNumber = firstCoOrdIndexNumber;
+        } else {
+            secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+            secondCoOrdIndexNumber = firstCoOrdIndexNumber;
+        }
+        String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+        return firstCoOrd + secondCoOrd;
+    }
+
+    public void computerPlaceShips(Player player) throws InterruptedException {
+        List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(player.getName());
+        String shipList = String.join("", shipsList);
+        String placedShips = "";
+        while ((shipList = String.join("", playerRepository.findAllCoOrdsByPlayerName(player.getName()))).length() < 10) {
+            String placementCoOrds = generateStartingRandomCoOrds();
+            String firstCoOrd = placementCoOrds.substring(0, 2);
+            String secondCoOrd = placementCoOrds.substring(2, 4);
+            placeShip("P" + firstCoOrd + 5 + player.getName());
+            placeShip("P" + secondCoOrd + 5 + player.getName());
+        }
+        while ((shipList = String.join("", playerRepository.findAllCoOrdsByPlayerName(player.getName()))).length() < 26) {
+            String placementCoOrds = generateStartingRandomCoOrds();
+            String firstCoOrd = placementCoOrds.substring(0, 2);
+            String secondCoOrd = placementCoOrds.substring(2, 4);
+            placeShip("P" + firstCoOrd + 4 + player.getName());
+            placeShip("P" + secondCoOrd + 4 + player.getName());
+        }
+        while ((shipList = String.join("", playerRepository.findAllCoOrdsByPlayerName(player.getName()))).length() < 44) {
+            String placementCoOrds = generateStartingRandomCoOrds();
+            String firstCoOrd = placementCoOrds.substring(0, 2);
+            String secondCoOrd = placementCoOrds.substring(2, 4);
+            placeShip("P" + firstCoOrd + 3 + player.getName());
+            placeShip("P" + secondCoOrd + 3 + player.getName());
+        }
+        while ((shipList = String.join("", playerRepository.findAllCoOrdsByPlayerName(player.getName()))).length() < 60) {
+            String placementCoOrds = generateStartingRandomCoOrds();
+            String firstCoOrd = placementCoOrds.substring(0, 2);
+            String secondCoOrd = placementCoOrds.substring(2, 4);
+            placeShip("P" + firstCoOrd + 2 + player.getName());
+            placeShip("P" + secondCoOrd + 2 + player.getName());
         }
     }
+    }
+//        if (!playerRepository.findAll().contains(playerRepository.findByNameContaining(player))) {
+//        else {
+//            String name = "Computer";
+//            Player computer = new Player();
+//            computer.setName(name);
+//            computer.setPlayerNumber(computer.generatePlayerNumber());
+//            playerRepository.save(computer);
+//        }

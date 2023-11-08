@@ -53,7 +53,6 @@ public class PlayerAndRoom {
         Player player = new Player();
         Collections.sort(leaderboard);
         for (Player playerLeader : leaderboard) {
-            Thread.sleep(100);
             webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
         }
     }
@@ -64,12 +63,6 @@ public class PlayerAndRoom {
         selectPlayer(coin);
     }
 
-    public String randomUserNumber() {
-        Random random = new Random();
-        int randomNumber = random.nextInt(100000);
-        String formattedRandom = String.format("%05d", randomNumber);
-        return formattedRandom;
-    }
     public void selectPlayer(int coin) {
         if (coin == 1) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
@@ -154,8 +147,8 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player playerName) throws InterruptedException {
         Thread.sleep(100);
-        if (!playerRepository.findName().contains(playerName.getName())) {
-            if (playerRepository.findName().contains(playerName.getName().substring(0, 4))) {
+        if (!playerRepository.findName().contains(playerName.getName().toLowerCase())) {
+            if (playerRepository.findName().contains(playerName.getName().substring(0,4).toLowerCase())) {
                 webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName() + "Admin: Sorry, this username is too similar to an existing username"));
             } else {
                 String name = playerName.getName();

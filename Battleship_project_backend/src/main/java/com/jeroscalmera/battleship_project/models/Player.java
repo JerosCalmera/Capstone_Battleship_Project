@@ -1,10 +1,12 @@
 package com.jeroscalmera.battleship_project.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jeroscalmera.battleship_project.GameLogic.PlayerAndRoom;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 @Entity
@@ -93,6 +95,13 @@ public class Player implements Comparable<Player>{
         this.level += value;
         return this.level;
     }
+
+    public String generatePlayerNumber() {
+            Random random = new Random();
+            int randomNumber = random.nextInt(100000);
+            String formattedRandom = String.format("%05d", randomNumber);
+            return formattedRandom;
+        }
 
     public void setLevel(int level) {
         this.level = level;

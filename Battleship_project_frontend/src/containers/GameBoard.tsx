@@ -95,13 +95,17 @@ function GameBoard() {
                 setPlayer2Data(message.body.slice(12, -2))
             });
 
+            client.subscribe("/topic/randomPlacement", () => {
+            });
+
             client.subscribe("/topic/leaderBoard", (message: any) => {
                 const leaderBoardEntry: string = message.body.slice(12, -2)
                 setLeaderBoard((prevLeader) => {
                     const updatedLeader = [...prevLeader, leaderBoardEntry];
                     return updatedLeader
                 })
-            });
+            }
+            );
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
             setServerStatus(true);
@@ -131,7 +135,7 @@ function GameBoard() {
     }, [attemptReconnect])
 
     useEffect(() => {
-        if (player1Data.includes(savedName) && !player1Data.includes("Lvl") && !player2Data.includes("Lvl")) {
+        if (player1Data.includes(savedName)) {
             setPlayer1Data(player1Data)
             setPlayer2Data(player2Data)
             setPlayer2Name(player2Data)
@@ -161,12 +165,10 @@ function GameBoard() {
 
     useEffect(() => {
         if (serverMessageLog === "Game server ready....") {
-            if (leaderBoardCheck == false) {
-                stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
-                setLeaderBoardCheck(true)
-            }
+            stompClient.send("/app/leaderBoard", {}, JSON.stringify("Game start"));
+            setLeaderBoardCheck(true)
         }
-    }, [serverMessageLog])
+    }, [serverMessageLog, leaderBoardCheck])
 
     useEffect(() => {
         const toTrim = cellStorage;
@@ -273,7 +275,7 @@ function GameBoard() {
                             stompClient={stompClient} />
 
                     </div> : null}
-            <StartUp hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+            <StartUp chatEntry={chatEntry} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />
