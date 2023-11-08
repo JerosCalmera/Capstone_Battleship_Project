@@ -120,45 +120,12 @@ public class PlayerAndRoom {
         }
     }
 
-//    public void handleNewPlayer(Player player) throws InterruptedException {
-//        Thread.sleep(100);
-//        System.out.println("Player number = " + player.getName().substring(0, 5));
-//        if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
-//                && (playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5)))))
-//        {
-//                Player playerToAdd = playerRepository.findByPlayerNumber(player.getName().substring(0,5));
-//                webSocketMessageSender.sendMessage(
-//                        "/topic/chat", new Chat("Admin: Welcome back " + playerToAdd.getName() + "!"));
-//                playersNotInRoom.add(playerToAdd);
-//                    }
-//        else if (!playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
-//                && (playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5)))))
-//        {
-//            webSocketMessageSender.sendMessage(
-//            "/topic/chat", new Chat("Admin: User found but the player number is incorrect!"));
-//        }
-//        else if (playerRepository.findAll().contains(playerRepository.findByPlayerNumber(player.getName().substring(0, 5)))
-//                && (!playerRepository.findAll().contains(playerRepository.findByName(player.getName().substring(5))))) {
-//            webSocketMessageSender.sendMessage(
-//                    "/topic/chat", new Chat("Admin: User found but the player name is incorrect!"));
-//        }
-//        else {
-//            Player playerToAdd = new Player();
-//            playerToAdd.setName(player.getName().substring(5));
-//            playerToAdd.setPlayerNumber(randomUserNumber());
-//            playersNotInRoom.add(playerToAdd);
-//            webSocketMessageSender.sendMessage(
-//                    "/topic/chat", new Chat("Admin: Hello to our new player " + playerToAdd.getName() + " your profile has been saved!"));
-//                }
-//            }
-//        }
-
     public void handleNewPlayer(Player playerName) throws InterruptedException {
         Thread.sleep(100);
-        System.out.println(playerName.getName().substring(0, 5));
+        System.out.println(playerName.getName().substring(0, 4));
         List<String> players = playerRepository.findName();
         if (!players.contains(playerName.getName())) {
-            if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 5)))) {
+            if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 4)))) {
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Sorry, " + playerName.getName() + " is too similar to an existing username!"));
                 webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName()));
             } else {

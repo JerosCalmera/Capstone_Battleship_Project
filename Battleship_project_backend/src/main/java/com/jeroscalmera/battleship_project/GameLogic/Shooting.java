@@ -23,7 +23,7 @@ public class Shooting {
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
 
-    boolean allShipsDestroyedForAutoShoot = false;
+    public boolean allShipsDestroyedForAutoShoot = false;
     Player selectedPlayer1AutoShoot = new Player();
     Player selectedPlayer2AutoShoot = new Player();
 
@@ -34,9 +34,9 @@ public class Shooting {
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
-    public void shootAtShip(String input) {
+    public void shootAtShip(String input) throws InterruptedException {
         String target = input.trim();
-        System.out.println(target);
+        System.out.println("shooting target: " + target);
         System.out.println((target.substring(2, 6)));
         String aimPoint = target.substring(0, 2);
         aimPoint = aimPoint.trim();
@@ -69,7 +69,7 @@ public class Shooting {
         }
     }
     @Transactional
-    public void enumerateShips(Long id) {
+    public void enumerateShips(Long id) throws InterruptedException {
         boolean allShipsDestroyed = true;
         Player playerToCheck = playerRepository.findPlayerById(id);
         Ship ship = new Ship();
@@ -109,6 +109,8 @@ public class Shooting {
                             winner.setLevel(winner.levelUp(1));
                             playerRepository.save(winner);
                             webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
+                            Thread.sleep(50);
+                            webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(winner.getName() + " Wins!"));
                         }
                     }
                 }
@@ -120,19 +122,32 @@ public class Shooting {
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
         coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         String startLetter = coOrdLetters.get(randomIndex);
+        randomIndex = random.nextInt(10);
         String startNumber = coOrdNumbers.get(randomIndex);
         return startLetter + startNumber;
     }
-    public void autoShoot() throws InterruptedException {
+    public synchronized void autoShoot() throws InterruptedException {
+        List<String> used = new ArrayList<>();
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
             players = room.getPlayers();
         }
+        System.out.println("autoshoot1:" + computerRandomCoOrd() + players.get(0).getName());
+        System.out.println("autoshoot2:" + computerRandomCoOrd() + players.get(1).getName());
         while (!allShipsDestroyedForAutoShoot){
-        shootAtShip(computerRandomCoOrd() + players.get(0).getName());
+            String shoot = computerRandomCoOrd();
+            while (used.contains(shoot)){
+                shoot = computerRandomCoOrd();
+            }
+            used.add(shoot);
+            shootAtShip(shoot + players.get(1).getName().substring(0,4) + players.get(0).getName().substring(0,4));
         Thread.sleep(50);
-        shootAtShip(computerRandomCoOrd() + players.get(0).getName());
-    }}
+        shootAtShip(shoot + players.get(0).getName().substring(0,4) + players.get(1).getName().substring(0,4));
+
+        }
+        used.clear();
+        allShipsDestroyedForAutoShoot = false;
+    }
     }
 

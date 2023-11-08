@@ -41,7 +41,7 @@ public class Placing {
     boolean horizontalPlacement = false;
     boolean verticalPlacement = false;
     boolean invalidPlacement = false;
-    public void placeShip(String target) throws InterruptedException {
+    public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);
         System.out.println("Target =" + target);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4,9)));
@@ -310,11 +310,3 @@ public class Placing {
         }
     }
     }
-//        if (!playerRepository.findAll().contains(playerRepository.findByNameContaining(player))) {
-//        else {
-//            String name = "Computer";
-//            Player computer = new Player();
-//            computer.setName(name);
-//            computer.setPlayerNumber(computer.generatePlayerNumber());
-//            playerRepository.save(computer);
-//        }

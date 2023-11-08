@@ -148,7 +148,7 @@ function GameBoard() {
             setPlayer2Data(player1Data)
             setPlayer2Name(player1Data)
         }
-    }, [player2Data])
+    }, [player2Data, serverMessageLog])
 
 
     useEffect(() => {
@@ -269,7 +269,7 @@ function GameBoard() {
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
                 <button className="button" onClick={resetPlacement}>Dev</button>
-                <button className="button" onClick={autoShoot}>AutoShoot</button>
+                {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>}
 
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
@@ -284,8 +284,8 @@ function GameBoard() {
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
-
                     </div> : null}
+
             <StartUp chatEntry={chatEntry} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
