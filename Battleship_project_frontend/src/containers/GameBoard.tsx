@@ -41,6 +41,7 @@ function GameBoard() {
     const [player1Data, setPlayer1Data] = useState<string>("Player 1")
     const [player2Data, setPlayer2Data] = useState<string>("Player 2")
     const [player2Name, setPlayer2Name] = useState<string>("Player 2")
+    const [computerGame, setComputerGame] = useState<boolean>(false)
 
     const [placedShip, setPlacedShip] = useState<string>("")
     const [cellStorage, setCellStorage] = useState<string>("")
@@ -93,6 +94,9 @@ function GameBoard() {
             })
             client.subscribe("/topic/playerData2", (message: any) => {
                 setPlayer2Data(message.body.slice(12, -2))
+            });
+
+            client.subscribe("/topic/computer", (message: any) => {
             });
 
             client.subscribe("/topic/randomPlacement", () => {
@@ -258,6 +262,11 @@ function GameBoard() {
         stompClient.send("/app/autoShoot", {}, JSON.stringify("shoot"));
     }
 
+    const playVsComputer = () => {
+        stompClient.send("/app/computer", {}, JSON.stringify("computer"));
+        setComputerGame(true)
+    }
+
     return (
         <>
             <div className={serverStatusStyle()}>
@@ -279,14 +288,14 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced" ?
                     <div>
-                        <Grids gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
+                        <Grids computerGame={computerGame} gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name} chat={chat}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
                             stompClient={stompClient} />
                     </div> : null}
 
-            <StartUp chatEntry={chatEntry} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
+            <StartUp playVsComputer={playVsComputer} chatEntry={chatEntry} hidden={hidden} ready={ready} savedName={savedName} serverMessageLog={serverMessageLog} password={password}
                 setPassword={setPassword} auth={auth} generate={generate} playerName={playerName} chat={chat}
                 saveName={saveName} chatSend={chatSend} setPlayerName={setPlayerName} setChatEntry={setChatEntry}
                 leaderBoard={leaderBoard} />

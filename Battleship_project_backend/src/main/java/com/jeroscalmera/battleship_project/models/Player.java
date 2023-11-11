@@ -1,6 +1,5 @@
 package com.jeroscalmera.battleship_project.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.jeroscalmera.battleship_project.GameLogic.PlayerAndRoom;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;

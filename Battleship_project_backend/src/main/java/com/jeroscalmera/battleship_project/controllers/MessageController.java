@@ -1,8 +1,8 @@
 package com.jeroscalmera.battleship_project.controllers;
 
-import com.jeroscalmera.battleship_project.GameLogic.Placing;
-import com.jeroscalmera.battleship_project.GameLogic.PlayerAndRoom;
-import com.jeroscalmera.battleship_project.GameLogic.Shooting;
+import com.jeroscalmera.battleship_project.gameLogic.Placing;
+import com.jeroscalmera.battleship_project.gameLogic.PlayerAndRoom;
+import com.jeroscalmera.battleship_project.gameLogic.Shooting;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ public class MessageController {
     private Placing placing;
     @Autowired
     private Shooting shooting;
-
     @MessageMapping("/hello")
     @SendTo("/topic/connect")
     public Greeting greeting(Connection message, String name) throws Exception {
@@ -59,7 +58,6 @@ public class MessageController {
     public void handlePassword(String newRoom) throws InterruptedException {
         playerAndRoom.handlePassword(newRoom);
     }
-
     @MessageMapping("/name")
     @SendTo("/topic/name")
     public void handleName (Player player) throws InterruptedException {
@@ -78,8 +76,15 @@ public class MessageController {
     }
     @MessageMapping("/hidden")
     public Hidden hidden(String string) {
-        return new Hidden(string);
+        return null;
     }
+
+    @MessageMapping("/computer")
+    public void computer(String string) throws InterruptedException {
+        playerAndRoom.computerMatchStart();
+    }
+
+
     @MessageMapping("/miss")
     public void miss(String string) {
     }
@@ -97,11 +102,16 @@ public class MessageController {
         shooting.autoShoot();
     }
     @MessageMapping("/turn")
-    public void turn(String string) {
+    public void turn(String playerName) throws InterruptedException {
         playerAndRoom.coinFlip();
     }
+
+    @MessageMapping("/turnCheck")
+    public void turnCheck(String playerName) throws InterruptedException {
+    }
+
     @MessageMapping("/matchStart")
-    public void matchStart(String string) {
+    public void matchStart(String string) throws InterruptedException {
         playerAndRoom.matchStart();
     }
 }

@@ -8,6 +8,7 @@ interface Props {
     setPassword: React.Dispatch<React.SetStateAction<string>>;
     auth: () => void;
     generate: () => void;
+    playVsComputer: () => void;
     playerName: string;
     ready: string;
     hidden: string;
@@ -18,7 +19,7 @@ interface Props {
     leaderBoard: string[];
 }
 
-const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
     const chatBox = () => {
         if (serverMessageLog === "Server: Rooms synced")
@@ -32,9 +33,11 @@ const StartUp: React.FC<Props> = ({ chatEntry, setPlayerName, saveName, savedNam
         <>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
                 <div className="startupOuter">
-                    <h3>Please enter the room code, or press generate to generate one</h3>
+                    <h3>Please create or generate a room code, or play against the computer</h3>
                     <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Start</button><button className="button" onClick={generate}>Generate</button>
+                    <button className="button" onClick={auth}>Create</button>
+                    <button className="button" onClick={generate}>Generate</button>
+                    <button className="button" onClick={playVsComputer}>Play against the computer</button>
                 </div>
                 :
                 <div className="startupOuter">

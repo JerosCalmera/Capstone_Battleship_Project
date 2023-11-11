@@ -1,7 +1,6 @@
 package com.jeroscalmera.battleship_project;
 
-import com.jeroscalmera.battleship_project.GameLogic.Placing;
-import com.jeroscalmera.battleship_project.models.Player;
+import com.jeroscalmera.battleship_project.gameLogic.Placing;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;

@@ -1,4 +1,4 @@
-package com.jeroscalmera.battleship_project.GameLogic;
+package com.jeroscalmera.battleship_project.gameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
@@ -17,10 +17,15 @@ public class PlayerAndRoom {
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
 
-    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
+    private Placing placing;
+    private Shooting shooting;
+
+    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
         this.playerRepository = playerRepository;
         this.roomRepository = roomRepository;
         this.webSocketMessageSender = webSocketMessageSender;
+        this.placing = placing;
+        this.shooting = shooting;
     }
 
     public void submitStartStats(Player name) {
@@ -39,7 +44,8 @@ public class PlayerAndRoom {
 
     int trigger = 0;
 
-    public void matchStart() {
+
+    public void matchStart() throws InterruptedException {
         trigger = (trigger + 1);
         if (trigger == 2) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("All ships placed! Match Start!"));
@@ -62,18 +68,26 @@ public class PlayerAndRoom {
             }
         }
     }
-    public void coinFlip() {
+    public void coinFlip() throws InterruptedException {
         Random random = new Random();
         int coin = random.nextInt(2) + 1;
         selectPlayer(coin);
     }
 
-    public void selectPlayer(int coin) {
+    public void selectPlayer(int coin) throws InterruptedException {
         if (coin == 1) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
+            Player player = playerRepository.findByNameContaining(player1);
+            if (player.getPlayerNumber() != null) {
+                shooting.computerShoot();
+            }
         }
         if (coin == 2) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player2));
+        Player player = playerRepository.findByNameContaining(player2);
+            if (player.getPlayerNumber() != null) {;
+                shooting.computerShoot();
+            }
         }
     }
 
@@ -140,6 +154,25 @@ public class PlayerAndRoom {
             Player player = new Player(name);
             playersNotInRoom.add(player);
         }
+    }
+    public void computerMatchStart() throws InterruptedException {
+        matchStart();
+        Random random = new Random();
+        int rando = random.nextInt(100000);
+        String randomNumber = String.format("%05d", rando);
+        int randomRoomNumber = random.nextInt(1000);
+        String ident = randomNumber;
+        Player computerPlayerCreated = new Player();
+        computerPlayerCreated.setName(ident);
+        computerPlayerCreated.setPlayerNumber(computerPlayerCreated.generatePlayerNumber());
+        playerRepository.save(computerPlayerCreated);
+        handleNewPlayer(computerPlayerCreated);
+        Thread.sleep(50);
+        handlePassword(String.valueOf(randomRoomNumber));
+        Thread.sleep(50);
+        handlePassword(String.valueOf(randomRoomNumber));
+        Thread.sleep(50);;
+        placing.computerPlaceShips(computerPlayerCreated);
     }
 }
 

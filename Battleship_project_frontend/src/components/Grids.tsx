@@ -22,10 +22,11 @@ interface Props {
     gameInfo: string;
     serverMessageLog: string;
     turnNumber: number;
+    computerGame: boolean;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ computerGame, gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -259,7 +260,7 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{player2Data}</h2>
+                        <h2>{computerGame == true ? "Computer " : null}{player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>

@@ -1,4 +1,4 @@
-package com.jeroscalmera.battleship_project.GameLogic;
+package com.jeroscalmera.battleship_project.gameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
@@ -24,8 +24,6 @@ public class Shooting {
     private List<String> coOrdNumbers = new ArrayList<>();
 
     public boolean allShipsDestroyedForAutoShoot = false;
-    Player selectedPlayer1AutoShoot = new Player();
-    Player selectedPlayer2AutoShoot = new Player();
 
     public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
         this.roomRepository = repository;
@@ -33,18 +31,26 @@ public class Shooting {
         this.shipRepository = shipRepository;
         this.webSocketMessageSender = webSocketMessageSender;
     }
-
+    public void computerCheck(String string) throws InterruptedException {
+        System.out.println("Checking: " + string);
+        Player playerToCheck;
+        playerToCheck = playerRepository.findByNameContaining(string.substring(1,5));
+        if (playerToCheck.getPlayerNumber() != null) {
+            System.out.println("Computer Player Action");
+            computerShoot();
+            }
+    }
     public void shootAtShip(String input) throws InterruptedException {
+        boolean computerGame = false;
         String target = input.trim();
         System.out.println("shooting target: " + target);
-        System.out.println((target.substring(2, 6)));
         String aimPoint = target.substring(0, 2);
         aimPoint = aimPoint.trim();
-        System.out.println(aimPoint);
+        System.out.println("Target coOrd: " + aimPoint);
         Player selectedPlayer = playerRepository.findByNameContaining(target.substring(2, 6));
-        System.out.println((target.substring(2, 6)));
+        System.out.println("Player 1 :" + (target.substring(2, 6)));
         Player selectedPlayer2 = playerRepository.findByNameContaining(target.substring(6, 10));
-        System.out.println((target.substring(6, 10)));
+        System.out.println("Player 2 :" +(target.substring(6, 10)));
         List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         String converted = String.join("", shipList);
         System.out.println(converted);
@@ -62,12 +68,15 @@ public class Shooting {
             ship.setCoOrds(newShipHealth);
             shipRepository.save(ship);
             enumerateShips(selectedPlayer.getId());
+            computerCheck(selectedPlayer.getName());
         } else {
             webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Missed!"));
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getName() + aimPoint));
+            computerCheck(selectedPlayer.getName());
         }
     }
+
     @Transactional
     public void enumerateShips(Long id) throws InterruptedException {
         boolean allShipsDestroyed = true;
@@ -94,27 +103,30 @@ public class Shooting {
             }
         for (Ship shipToCheck : shipToModify)
             if (!Objects.equals(shipToCheck.getShipDamage(), "Destroyed")) {
-                allShipsDestroyed = false;}
+                allShipsDestroyed = false;
+            }
 
         if (allShipsDestroyed) {
             allShipsDestroyedForAutoShoot = true;
+            used.clear();
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
-                    Room roomToCheck = new Room();
-                    Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
-                    System.out.println(roomId);
-                    List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
-                    System.out.println(players);
-                    for (Player winner : players) {
-                        if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
-                            winner.setLevel(winner.levelUp(1));
-                            playerRepository.save(winner);
-                            webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
-                            Thread.sleep(50);
-                            webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(winner.getName() + " Wins!"));
-                        }
-                    }
+            Room roomToCheck = new Room();
+            Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
+            System.out.println(roomId);
+            List<Player> players = playerRepository.findPlayersByRoomId(roomId.getId());
+            System.out.println(players);
+            for (Player winner : players) {
+                if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
+                    winner.setLevel(winner.levelUp(1));
+                    playerRepository.save(winner);
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
+                    Thread.sleep(50);
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(winner.getName() + " Wins!"));
                 }
             }
+        }
+        allShipsDestroyedForAutoShoot = false;
+    }
 
     public String computerRandomCoOrd() {
         Random random = new Random();
@@ -126,8 +138,8 @@ public class Shooting {
         String startNumber = coOrdNumbers.get(randomIndex);
         return startLetter + startNumber;
     }
+    List<String> used = new ArrayList<>();
     public synchronized void autoShoot() throws InterruptedException {
-        List<String> used = new ArrayList<>();
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
@@ -135,19 +147,43 @@ public class Shooting {
         }
         System.out.println("autoshoot1:" + computerRandomCoOrd() + players.get(0).getName());
         System.out.println("autoshoot2:" + computerRandomCoOrd() + players.get(1).getName());
-        while (!allShipsDestroyedForAutoShoot){
+        while (!allShipsDestroyedForAutoShoot) {
             String shoot = computerRandomCoOrd();
-            while (used.contains(shoot)){
+            while (used.contains(shoot)) {
                 shoot = computerRandomCoOrd();
             }
             used.add(shoot);
-            shootAtShip(shoot + players.get(1).getName().substring(0,4) + players.get(0).getName().substring(0,4));
-        Thread.sleep(50);
-        shootAtShip(shoot + players.get(0).getName().substring(0,4) + players.get(1).getName().substring(0,4));
+            shootAtShip(shoot + players.get(1).getName().substring(0, 4) + players.get(0).getName().substring(0, 4));
+            Thread.sleep(50);
+            shootAtShip(shoot + players.get(0).getName().substring(0, 4) + players.get(1).getName().substring(0, 4));
 
         }
-        used.clear();
         allShipsDestroyedForAutoShoot = false;
     }
+
+    public void computerShoot() throws InterruptedException {
+        Thread.sleep(1000);
+        List<Room> playersInRoom = roomRepository.findAllWithPlayers();
+        List<Player> players = new ArrayList<>();
+        for (Room room : playersInRoom) {
+            players = room.getPlayers();
+        }
+        String humanPlayer;
+        String computerPlayer;
+        if (players.get(0).getPlayerNumber() != null) {
+            humanPlayer = players.get(1).getName();
+            computerPlayer = players.get(0).getName();}
+        else
+            humanPlayer = players.get(0).getName();
+            computerPlayer = players.get(1).getName();
+        System.out.println("human: " + humanPlayer);
+        System.out.println("Computer: " + computerPlayer);
+        String shoot = computerRandomCoOrd();
+            while (used.contains(shoot)) {
+                shoot = computerRandomCoOrd();
+            }
+            used.add(shoot);
+            shootAtShip(shoot + humanPlayer.substring(0, 4) + computerPlayer.substring(0, 4));
+        }
     }
 

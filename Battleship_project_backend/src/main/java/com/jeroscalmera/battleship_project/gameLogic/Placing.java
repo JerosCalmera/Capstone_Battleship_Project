@@ -1,4 +1,4 @@
-package com.jeroscalmera.battleship_project.GameLogic;
+package com.jeroscalmera.battleship_project.gameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Ship;
@@ -9,6 +9,7 @@ import com.jeroscalmera.battleship_project.websocket.Chat;
 import com.jeroscalmera.battleship_project.websocket.WebSocketMessageSender;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -41,6 +42,7 @@ public class Placing {
     boolean horizontalPlacement = false;
     boolean verticalPlacement = false;
     boolean invalidPlacement = false;
+
     public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);
         System.out.println("Target =" + target);
