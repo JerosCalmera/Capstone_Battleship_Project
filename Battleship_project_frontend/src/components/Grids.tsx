@@ -22,11 +22,10 @@ interface Props {
     gameInfo: string;
     serverMessageLog: string;
     turnNumber: number;
-    computerGame: boolean;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({ computerGame, gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -205,7 +204,7 @@ const Grids: React.FC<Props> = ({ computerGame, gameInfo, serverMessageLog, turn
             {serverMessageLog === "Server: Rooms synced" ?
                 <div className="gameInfoOuter">
                     <div className="gameInfo">
-                        <h3>Turn: ({turnNumber}) {turn}</h3>
+                        <h3>Turn: ({turnNumber}) {turn.includes("Computer") ? "Computer" : turn}</h3>
                         <h3>{gameInfo}</h3>
                         {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
                         {shipInfo.length < 1 && matchStart.length > 1 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
@@ -260,7 +259,7 @@ const Grids: React.FC<Props> = ({ computerGame, gameInfo, serverMessageLog, turn
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{computerGame == true ? "Computer " : null}{player2Data}</h2>
+                        <h2>{player2Data.includes("Computer") ? "Computer " : player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>

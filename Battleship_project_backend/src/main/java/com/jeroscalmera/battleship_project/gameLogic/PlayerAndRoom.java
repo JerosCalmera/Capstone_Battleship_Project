@@ -149,7 +149,10 @@ public class PlayerAndRoom {
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
             }
         } else {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+            if (!playerName.getName().contains("Computer")){
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));}
+                else
+            {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Game against the Computer selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
             playersNotInRoom.add(player);
@@ -163,7 +166,7 @@ public class PlayerAndRoom {
         int randomRoomNumber = random.nextInt(1000);
         String ident = randomNumber;
         Player computerPlayerCreated = new Player();
-        computerPlayerCreated.setName(ident);
+        computerPlayerCreated.setName(ident + "Computer");
         computerPlayerCreated.setPlayerNumber(computerPlayerCreated.generatePlayerNumber());
         playerRepository.save(computerPlayerCreated);
         handleNewPlayer(computerPlayerCreated);

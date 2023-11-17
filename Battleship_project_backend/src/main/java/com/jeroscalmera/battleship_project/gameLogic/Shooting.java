@@ -22,7 +22,8 @@ public class Shooting {
     private RoomRepository roomRepository;
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
-
+    private List<String> used = new ArrayList<>();
+    private List<String> computerHit= new ArrayList<>();
     public boolean allShipsDestroyedForAutoShoot = false;
 
     public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
@@ -56,8 +57,14 @@ public class Shooting {
         System.out.println(converted);
         System.out.println(selectedPlayer.getId());
         if (converted.contains(aimPoint)) {
-            webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));
+            if (selectedPlayer2.generatePlayerNumber() == null){
+            webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));}
+            else {
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Hit!"));
+            }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
+            if (selectedPlayer2.getPlayerNumber() != null){
+                computerHit.add(aimPoint);}
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
@@ -70,7 +77,11 @@ public class Shooting {
             enumerateShips(selectedPlayer.getId());
             computerCheck(selectedPlayer.getName());
         } else {
-            webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Missed!"));
+            if (selectedPlayer2.generatePlayerNumber() == null){
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Miss!"));}
+            else {
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Miss!"));
+            }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getName() + aimPoint));
             computerCheck(selectedPlayer.getName());
@@ -138,7 +149,6 @@ public class Shooting {
         String startNumber = coOrdNumbers.get(randomIndex);
         return startLetter + startNumber;
     }
-    List<String> used = new ArrayList<>();
     public synchronized void autoShoot() throws InterruptedException {
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
@@ -162,6 +172,10 @@ public class Shooting {
     }
 
     public void computerShoot() throws InterruptedException {
+        if (computerHit.size() > 0){
+            computerHit.get(0);
+
+        }
         Thread.sleep(1000);
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
