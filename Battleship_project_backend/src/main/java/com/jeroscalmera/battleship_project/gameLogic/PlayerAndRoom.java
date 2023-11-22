@@ -4,6 +4,7 @@ import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
+import com.jeroscalmera.battleship_project.repositories.ShipRepository;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +15,17 @@ import java.util.Random;
 public class PlayerAndRoom {
     private PlayerRepository playerRepository;
     private RoomRepository roomRepository;
+    private ShipRepository shipRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
 
     private Placing placing;
     private Shooting shooting;
 
-    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
+    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
         this.playerRepository = playerRepository;
         this.roomRepository = roomRepository;
+        this.shipRepository = shipRepository;
         this.webSocketMessageSender = webSocketMessageSender;
         this.placing = placing;
         this.shooting = shooting;
@@ -114,9 +117,12 @@ public class PlayerAndRoom {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {
                     playerToFind.setRoom(addRoom);
+                    shipRepository.deleteAllCoOrdsByPlayerId((playerToFind.getId()));
                     playerRepository.save(playerToFind);
+
                 } else {
                     newPlayer.setRoom(addRoom);
+                    shipRepository.deleteAllCoOrdsByPlayerId((newPlayer.getId()));
                     playerRepository.save(newPlayer);
                 }
                 addRoom.addPlayerToRoom(newPlayer);
@@ -150,9 +156,9 @@ public class PlayerAndRoom {
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
             }
         } else {
-            if (!playerName.getName().contains("Computer")){
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));}
-                else
+            if (!playerName.getName().contains("Computer")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+            }else
             {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Game against the Computer selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
