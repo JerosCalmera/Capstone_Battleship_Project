@@ -78,14 +78,14 @@ public class PlayerAndRoom {
         if (coin == 1) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
             Player player = playerRepository.findByNameContaining(player1);
-            if (player.getPlayerNumber() != null) {
+            if (Objects.equals(player.getPlayerType(), "Computer")) {
                 shooting.computerShoot();
             }
         }
         if (coin == 2) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player2));
         Player player = playerRepository.findByNameContaining(player2);
-            if (player.getPlayerNumber() != null) {;
+            if (Objects.equals(player.getPlayerNumber(), "Computer")) {;
                 shooting.computerShoot();
             }
         }
@@ -145,6 +145,7 @@ public class PlayerAndRoom {
             } else {
                 String name = playerName.getName();
                 Player player = new Player(name);
+                player.setPlayerType("Human");
                 playersNotInRoom.add(player);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
             }
@@ -155,6 +156,7 @@ public class PlayerAndRoom {
             {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Game against the Computer selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
+            player.setPlayerType("Human");
             playersNotInRoom.add(player);
         }
     }
@@ -167,7 +169,7 @@ public class PlayerAndRoom {
         String ident = randomNumber;
         Player computerPlayerCreated = new Player();
         computerPlayerCreated.setName(ident + "Computer");
-        computerPlayerCreated.setPlayerNumber(computerPlayerCreated.generatePlayerNumber());
+        computerPlayerCreated.setPlayerType("Computer");
         playerRepository.save(computerPlayerCreated);
         handleNewPlayer(computerPlayerCreated);
         Thread.sleep(50);
@@ -177,5 +179,6 @@ public class PlayerAndRoom {
         Thread.sleep(50);;
         placing.computerPlaceShips(computerPlayerCreated);
     }
+
 }
 

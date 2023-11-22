@@ -20,6 +20,10 @@ public class Player implements Comparable<Player>{
 
     @Column(name = "playerNumber")
     private String playerNumber;
+
+    @Column(name = "playerType")
+    private String playerType;
+
     @Column(name = "level")
     private int level;
     @OneToMany(mappedBy = "player")
@@ -35,6 +39,7 @@ public class Player implements Comparable<Player>{
     public Player(String name) {
         this.name = name;
         this.playerNumber = playerNumber;
+        this.playerType = playerType;
         this.level = level;
         this.ships = new ArrayList<>();
     }
@@ -48,6 +53,14 @@ public class Player implements Comparable<Player>{
     }
     public void setShips(List<Ship> ships) {
         this.ships = ships;
+    }
+
+    public String getPlayerType() {
+        return playerType;
+    }
+
+    public void setPlayerType(String playerType) {
+        this.playerType = playerType;
     }
 
     public String getPlayerNumber() {

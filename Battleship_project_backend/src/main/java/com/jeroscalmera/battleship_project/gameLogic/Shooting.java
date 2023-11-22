@@ -36,7 +36,7 @@ public class Shooting {
         System.out.println("Checking: " + string);
         Player playerToCheck;
         playerToCheck = playerRepository.findByNameContaining(string.substring(1,5));
-        if (playerToCheck.getPlayerNumber() != null) {
+        if (Objects.equals(playerToCheck.getPlayerType(), "Computer")) {
             System.out.println("Computer Player Action");
             computerShoot();
             }
@@ -57,13 +57,13 @@ public class Shooting {
         System.out.println(converted);
         System.out.println(selectedPlayer.getId());
         if (converted.contains(aimPoint)) {
-            if (selectedPlayer2.generatePlayerNumber() == null){
+            if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")){
             webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));}
             else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Hit!"));
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
-            if (selectedPlayer2.getPlayerNumber() != null){
+            if (Objects.equals(selectedPlayer2.getPlayerType(), "Computer")){
                 computerHit.add(aimPoint);}
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
@@ -77,7 +77,7 @@ public class Shooting {
             enumerateShips(selectedPlayer.getId());
             computerCheck(selectedPlayer.getName());
         } else {
-            if (selectedPlayer2.generatePlayerNumber() == null){
+            if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")){
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Miss!"));}
             else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Miss!"));
@@ -184,7 +184,7 @@ public class Shooting {
         }
         String humanPlayer;
         String computerPlayer;
-        if (players.get(0).getPlayerNumber() != null) {
+        if (Objects.equals(players.get(0).getPlayerType(), "Computer")) {
             humanPlayer = players.get(1).getName();
             computerPlayer = players.get(0).getName();}
         else
