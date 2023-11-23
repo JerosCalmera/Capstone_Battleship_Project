@@ -72,7 +72,7 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedCell(cellValue)}
-                        className={stylingCell(cellValue)}>**</button>);
+                        className={stylingCell(cellValue)}>X</button>);
             }
             end.push(
                 <div>
@@ -117,7 +117,7 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedEnemyCell(cellValue)}
-                        className={stylingEnemyCell(cellValue)}>**</button>);
+                        className={stylingEnemyCell(cellValue)}>X</button>);
             }
             end.push(
                 <div>
