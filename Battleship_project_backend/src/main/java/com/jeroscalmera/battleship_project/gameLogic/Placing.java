@@ -25,23 +25,23 @@ public class Placing {
         this.roomRepository = roomRepository;
         this.webSocketMessageSender = webSocketMessageSender;
     }
-
-    public void restart() {
-        List<Player> playerList = playerRepository.findAll();
-        for (Player player : playerList) {
-            player.setRoom(null);
-            playerRepository.save(player);
-        }
-        roomRepository.deleteAll();
-        shipRepository.deleteAll();
-    }
-
     private List<String> coOrds = new ArrayList<>();
     private String existingCoOrds;
     private String damage = "";
     boolean horizontalPlacement = false;
     boolean verticalPlacement = false;
     boolean invalidPlacement = false;
+
+    public void restart() {
+        List<Player> playerList = playerRepository.findAll();
+        for (Player player : playerList) {
+            if (Objects.equals(player.getPlayerType(), "Human")) {
+                player.setRoom(null);
+                playerRepository.save(player);}
+            else if (Objects.equals(player.getPlayerType(), "Computer")) {
+                playerRepository.delete(player);
+            }}
+    }
 
     public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);

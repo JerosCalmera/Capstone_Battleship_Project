@@ -20,21 +20,27 @@ public class Player implements Comparable<Player>{
 
     @Column(name = "playerNumber")
     private String playerNumber;
+
+    @Column(name = "playerType")
+    private String playerType;
+
     @Column(name = "level")
     private int level;
     @OneToMany(mappedBy = "player")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     @JsonIgnoreProperties({"player"})
     private List<Ship> ships;
 
     @ManyToOne
     @JoinColumn(name="room_id", nullable = true)
+    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     @JsonIgnoreProperties({"player"})
     private Room room;
 
     public Player(String name) {
         this.name = name;
         this.playerNumber = playerNumber;
+        this.playerType = playerType;
         this.level = level;
         this.ships = new ArrayList<>();
     }
@@ -48,6 +54,14 @@ public class Player implements Comparable<Player>{
     }
     public void setShips(List<Ship> ships) {
         this.ships = ships;
+    }
+
+    public String getPlayerType() {
+        return playerType;
+    }
+
+    public void setPlayerType(String playerType) {
+        this.playerType = playerType;
     }
 
     public String getPlayerNumber() {
@@ -113,4 +127,6 @@ public class Player implements Comparable<Player>{
     public void addShip(Ship ship) {
         this.ships.add(ship);
     }
+
+
 }

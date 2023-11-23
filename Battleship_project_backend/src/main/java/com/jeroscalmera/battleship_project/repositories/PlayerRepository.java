@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
@@ -24,6 +23,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     @Query
     Player findPlayerById(Long id);
+
 
     @Query("SELECT p.name FROM Player p WHERE p.room.roomNumber = :roomNumber")
     List<String> findPlayersByRoomNumber(@Param("roomNumber") String roomNumber);

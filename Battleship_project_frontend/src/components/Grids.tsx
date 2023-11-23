@@ -13,7 +13,6 @@ interface Props {
     player1Data: string;
     player2Data: string;
     placedShip: string;
-    chat: string[];
     player2Name: string;
     miss: string;
     enemyMiss: string;
@@ -25,7 +24,7 @@ interface Props {
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -207,7 +206,7 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
                         <h3>Turn: ({turnNumber}) {turn.includes("Computer") ? "Computer" : turn}</h3>
                         <h3>{gameInfo}</h3>
                         {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
-                        {shipInfo.length < 1 && matchStart.length > 1 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
+                        {shipInfo.length < 1 && matchStart.length > 2 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
                     </div>
                 </div> : null}
             <div className="gameBoardOuterGreater">
