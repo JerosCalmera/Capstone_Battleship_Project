@@ -26,12 +26,16 @@ public class Shooting {
     private List<String> computerHit= new ArrayList<>();
     public boolean allShipsDestroyedForAutoShoot = false;
 
-    public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
-        this.roomRepository = repository;
+    Placing placing;
+
+    public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, RoomRepository roomRepository, Placing placing) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
         this.webSocketMessageSender = webSocketMessageSender;
+        this.roomRepository = roomRepository;
+        this.placing = placing;
     }
+
     public void computerCheck(String string) throws InterruptedException {
         System.out.println("Checking: " + string);
         Player playerToCheck;
@@ -92,25 +96,29 @@ public class Shooting {
     public void enumerateShips(Long id) throws InterruptedException {
         boolean allShipsDestroyed = true;
         Player playerToCheck = playerRepository.findPlayerById(id);
+        String playerName = playerToCheck.getName();
+        if (Objects.equals(playerToCheck.getPlayerType(), "Computer")){
+            playerName = "Computer";
+        }
         Ship ship = new Ship();
         List<Ship> shipToModify = shipRepository.findAllShipsByPlayerId(id);
         for (Ship shipToCheck : shipToModify)
             if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Carrier!"));
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Carrier!"));
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Battleship!"));
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Battleship!"));
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Cruiser!"));
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Cruiser!"));
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + ": You destroyed my Destroyer!"));
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Destroyer!"));
             }
         for (Ship shipToCheck : shipToModify)
             if (!Objects.equals(shipToCheck.getShipDamage(), "Destroyed")) {
@@ -149,7 +157,7 @@ public class Shooting {
         String startNumber = coOrdNumbers.get(randomIndex);
         return startLetter + startNumber;
     }
-    public synchronized void autoShoot() throws InterruptedException {
+    public void autoShoot() throws InterruptedException {
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
@@ -173,7 +181,7 @@ public class Shooting {
 
     public void computerShoot() throws InterruptedException {
         if (computerHit.size() > 0){
-            computerHit.get(0);
+            String target = computerHit.get(0);
 
         }
         Thread.sleep(1000);
@@ -198,6 +206,36 @@ public class Shooting {
             }
             used.add(shoot);
             shootAtShip(shoot + humanPlayer.substring(0, 4) + computerPlayer.substring(0, 4));
+        }
+
+        public void computerSelectSecondTarget(String firstTarget) {
+            Random random = new Random();
+            int randomCoOrd = random.nextInt(100);
+            String firstCoOrd = placing.computerAllCoOrds.get(randomCoOrd);
+            int rando = random.nextInt(3);
+            int secondCoOrdIndexLetter = 0;
+            int secondCoOrdIndexNumber = 0;
+            do {
+                randomCoOrd = random.nextInt(100);
+                firstCoOrd = placing.computerAllCoOrds.get(randomCoOrd);
+                placing.firstCoOrdIndexLetter = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(0)));
+                placing.firstCoOrdIndexNumber = coOrdNumbers.indexOf(String.valueOf(firstCoOrd.charAt(1)));
+            } while (firstCoOrdIndexLetter == 0 || firstCoOrdIndexLetter == 9 || firstCoOrdIndexNumber == 0 || firstCoOrdIndexNumber == 9);
+            if (rando == 0) {
+                secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;
+            } else if (rando == 1) {
+                secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;
+            } else if (rando == 2) {
+                secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+                secondCoOrdIndexNumber = firstCoOrdIndexNumber;
+            } else {
+                secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+                secondCoOrdIndexNumber = firstCoOrdIndexNumber;
+            }
+            String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+            return firstCoOrd + secondCoOrd;
         }
     }
 
