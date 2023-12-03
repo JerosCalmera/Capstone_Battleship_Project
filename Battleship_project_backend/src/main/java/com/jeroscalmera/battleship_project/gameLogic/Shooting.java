@@ -26,7 +26,8 @@ public class Shooting {
     private String computerHit;
     public boolean allShipsDestroyedForAutoShoot = false;
 
-    Placing placing;
+    private Boolean computerHitCheck;
+    private Placing placing;
 
     public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, RoomRepository roomRepository, Placing placing) {
         this.playerRepository = playerRepository;
@@ -181,10 +182,6 @@ public class Shooting {
     }
 
     public void computerShoot() throws InterruptedException {
-        if (computerHit.size() > 0){
-            computerHit.get(0);
-
-        }
         Thread.sleep(1000);
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
