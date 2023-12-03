@@ -23,15 +23,20 @@ public class Shooting {
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
     private List<String> used = new ArrayList<>();
-    private List<String> computerHit= new ArrayList<>();
+    private String computerHit;
     public boolean allShipsDestroyedForAutoShoot = false;
 
-    public Shooting(RoomRepository repository, PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender) {
-        this.roomRepository = repository;
+    private Boolean computerHitCheck;
+    private Placing placing;
+
+    public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, RoomRepository roomRepository, Placing placing) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
         this.webSocketMessageSender = webSocketMessageSender;
+        this.roomRepository = roomRepository;
+        this.placing = placing;
     }
+
     public void computerCheck(String string) throws InterruptedException {
         System.out.println("Checking: " + string);
         Player playerToCheck;
@@ -42,7 +47,6 @@ public class Shooting {
             }
     }
     public void shootAtShip(String input) throws InterruptedException {
-        boolean computerGame = false;
         String target = input.trim();
         System.out.println("shooting target: " + target);
         String aimPoint = target.substring(0, 2);
@@ -64,7 +68,8 @@ public class Shooting {
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
             if (Objects.equals(selectedPlayer2.getPlayerType(), "Computer")){
-                computerHit.add(aimPoint);}
+                computerHit = aimPoint;
+                computerHitCheck = true;}
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
@@ -140,6 +145,7 @@ public class Shooting {
     }
 
     public String computerRandomCoOrd() {
+        computerHitCheck = false;
         Random random = new Random();
         int randomIndex = random.nextInt(10);
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
@@ -172,10 +178,6 @@ public class Shooting {
     }
 
     public void computerShoot() throws InterruptedException {
-        if (computerHit.size() > 0){
-            computerHit.get(0);
-
-        }
         Thread.sleep(1000);
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
@@ -193,8 +195,16 @@ public class Shooting {
         System.out.println("human: " + humanPlayer);
         System.out.println("Computer: " + computerPlayer);
         String shoot = computerRandomCoOrd();
+            if (computerHitCheck){
+            shoot = (placing.generateStartingRandomCoOrds(computerHit, true));}
+            System.out.println("computer shoot after hitting: " + shoot );
             while (used.contains(shoot)) {
-                shoot = computerRandomCoOrd();
+                if (computerHitCheck){
+                    shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
+                    System.out.println("computer shoot after hitting existing: " + shoot );}
+                else {
+            shoot = computerRandomCoOrd();}
+                System.out.println("computer shoot after NOT hitting: " + shoot);
             }
             used.add(shoot);
             shootAtShip(shoot + humanPlayer.substring(0, 4) + computerPlayer.substring(0, 4));
