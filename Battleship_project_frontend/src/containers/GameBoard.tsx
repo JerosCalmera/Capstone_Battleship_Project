@@ -237,6 +237,7 @@ function GameBoard() {
         stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
         setChatEntry("")
     }
+
     const restart = () => {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         location.reload()

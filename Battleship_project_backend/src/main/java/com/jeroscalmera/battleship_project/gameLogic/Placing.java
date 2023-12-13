@@ -19,6 +19,10 @@ public class Placing {
     private RoomRepository roomRepository;
     private WebSocketMessageSender webSocketMessageSender;
 
+    public List<String> computerAllCoOrds = new ArrayList<>();
+    public List<String> coOrdLetters = new ArrayList<>();
+    public List<String> coOrdNumbers = new ArrayList<>();
+
     public Placing(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
@@ -227,9 +231,6 @@ public class Placing {
         }
     }
 
-    private List<String> computerAllCoOrds = new ArrayList<>();
-    private List<String> coOrdLetters = new ArrayList<>();
-    private List<String> coOrdNumbers = new ArrayList<>();
 
 
     public void fillCoOrds() {
