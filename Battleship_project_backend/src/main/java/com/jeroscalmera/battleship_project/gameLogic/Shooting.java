@@ -27,6 +27,7 @@ public class Shooting {
     public boolean allShipsDestroyedForAutoShoot = false;
 
     private Boolean computerHitCheck;
+    private List<String> computerHitCheckStorage = new ArrayList<>();
     private Placing placing;
 
     public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, RoomRepository roomRepository, Placing placing) {
@@ -65,11 +66,10 @@ public class Shooting {
             webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));}
             else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Hit!"));
+                    computerHit = aimPoint;
+                    computerHitCheck = true;
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
-            if (Objects.equals(selectedPlayer2.getPlayerType(), "Computer")){
-                computerHit = aimPoint;
-                computerHitCheck = true;}
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
@@ -145,7 +145,6 @@ public class Shooting {
     }
 
     public String computerRandomCoOrd() {
-        computerHitCheck = false;
         Random random = new Random();
         int randomIndex = random.nextInt(10);
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
@@ -179,6 +178,9 @@ public class Shooting {
 
     public void computerShoot() throws InterruptedException {
         Thread.sleep(1000);
+        if (computerHitCheck == null) {
+            computerHitCheck = false;
+        }
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
@@ -196,12 +198,13 @@ public class Shooting {
         System.out.println("Computer: " + computerPlayer);
         String shoot = computerRandomCoOrd();
             if (computerHitCheck){
-            shoot = (placing.generateStartingRandomCoOrds(computerHit, true));}
-            System.out.println("computer shoot after hitting: " + shoot );
+            shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
+            System.out.println("computer shoot after hitting: " + shoot );}
             while (used.contains(shoot)) {
                 if (computerHitCheck){
                     shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
-                    System.out.println("computer shoot after hitting existing: " + shoot );}
+                    System.out.println("computer shoot after hitting existing: " + shoot );
+                computerHitCheckStorage.add(shoot);}
                 else {
             shoot = computerRandomCoOrd();}
                 System.out.println("computer shoot after NOT hitting: " + shoot);
