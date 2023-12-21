@@ -49,6 +49,9 @@ function GameBoard() {
     const [turn, setTurn] = useState<string>("Waiting")
     const [turnNumber, setTurnNumber] = useState<number>(-1)
 
+    const [bugReport, setBugReport] = useState<number>(0)
+    const [bugReportInput, setBugReportInput] = useState<string>("")
+
 
     useEffect(() => {
         const port = 8081;
@@ -130,6 +133,9 @@ function GameBoard() {
 
             client.subscribe("/topic/placement2", (message: any) => {
                 setPlacedShip(message.body.slice(12, -2))
+            });
+
+            client.subscribe("/topic/bugReport", (message: any) => {
             });
 
             client.ws.onclose = () => {
@@ -265,9 +271,39 @@ function GameBoard() {
     const playVsComputer = () => {
         stompClient.send("/app/computer", {}, JSON.stringify("computer"));
     }
+    
+    const bugReporting = () => {
+        if (bugReport === 0){
+        setBugReport(1)}
+        else
+        setBugReport(0);
+    }
+
+    const sendBugReport = () => {
+        stompClient.send("/app/bugReport", {}, JSON.stringify("DATE: " + Date() + ", USER: " + savedName + ", REPORT: "  + bugReportInput));
+        setBugReport(0)
+    }
+
+    const bugReportingRender = () => {
+        return (
+        <div className="bugReportPageFade">
+            <div className="bugReportOuter">
+                <div className="bugReport">
+                    <div className="cancelBox">
+                        <button className="button" onClick={bugReporting}>X</button>
+                    </div>
+                    <h3>Please write your bug report in as much detail as possible</h3>
+                    <input className="bugReportInputBox" name="room" value={bugReportInput} onChange={(e) => setBugReportInput(e.target.value)}></input><br />
+                        <button className="button" onClick={sendBugReport}>Send</button>
+                </div>
+            </div>
+        </div>
+        )
+    }
 
     return (
         <>
+            {bugReport === 1 ? bugReportingRender() : null}
             <div className={serverStatusStyle()}>
                 {serverStatus == true ? <h5>Connected to game server</h5> :
                     <>
@@ -277,8 +313,8 @@ function GameBoard() {
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
                 <button className="button" onClick={resetPlacement}>Dev</button>
+                <button className="button" onClick={bugReporting}>Bug Report</button>
                 {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>}
-
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?

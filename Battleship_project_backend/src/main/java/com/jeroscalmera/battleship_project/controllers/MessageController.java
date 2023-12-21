@@ -3,6 +3,7 @@ package com.jeroscalmera.battleship_project.controllers;
 import com.jeroscalmera.battleship_project.gameLogic.Placing;
 import com.jeroscalmera.battleship_project.gameLogic.PlayerAndRoom;
 import com.jeroscalmera.battleship_project.gameLogic.Shooting;
+import com.jeroscalmera.battleship_project.models.BugReport;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,5 +114,9 @@ public class MessageController {
     @MessageMapping("/matchStart")
     public void matchStart(String string) throws InterruptedException {
         playerAndRoom.matchStart();
+    }
+    @MessageMapping("/bugReport")
+    public void bugReport(BugReport bugReport) throws InterruptedException {
+        playerAndRoom.bugReport(bugReport);
     }
 }

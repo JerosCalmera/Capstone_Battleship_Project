@@ -1,7 +1,9 @@
 package com.jeroscalmera.battleship_project.gameLogic;
 
+import com.jeroscalmera.battleship_project.models.BugReport;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
+import com.jeroscalmera.battleship_project.repositories.BugreportRepository;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
@@ -16,19 +18,25 @@ public class PlayerAndRoom {
     private PlayerRepository playerRepository;
     private RoomRepository roomRepository;
     private ShipRepository shipRepository;
+    private BugreportRepository bugreportRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
 
     private Placing placing;
     private Shooting shooting;
 
-    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
+    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, ShipRepository shipRepository, BugreportRepository bugreportRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
         this.playerRepository = playerRepository;
         this.roomRepository = roomRepository;
         this.shipRepository = shipRepository;
+        this.bugreportRepository = bugreportRepository;
         this.webSocketMessageSender = webSocketMessageSender;
         this.placing = placing;
         this.shooting = shooting;
+    }
+
+    public void bugReport(BugReport bugReport) {
+        bugreportRepository.save(bugReport);
     }
 
     public void submitStartStats(Player name) {

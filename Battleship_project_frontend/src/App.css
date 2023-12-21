@@ -106,3 +106,46 @@ h2 {
   margin-left: 600px;
   margin-top: -636px;
 }
+
+.bugReportPageFade {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  margin-top: -2%;
+  margin-left: -2%;
+  padding-right: 2%;
+  padding-bottom: 2%;
+  background-color: rgba(59, 59, 59, 0.736);
+}
+
+.bugReportOuter {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.bugReport {
+  height: 100px;
+  width: 800px;
+  background-color: rgba(0, 0, 0, 0.888); 
+  border-radius: 20px;
+  padding: 40px;
+  padding-bottom: 60px;
+  text-align: center;
+  line-height: 165%;
+}
+
+.bugReportInputBox{
+  width: 800px;
+  background-color: rgba(116, 196, 194, 0.575);
+}
+
+.cancelBox {
+  display: flex;
+  align-items: right;
+  justify-content: right;
+}
