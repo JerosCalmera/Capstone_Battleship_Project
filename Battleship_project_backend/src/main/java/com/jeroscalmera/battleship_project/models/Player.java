@@ -26,6 +26,9 @@ public class Player implements Comparable<Player>{
 
     @Column(name = "level")
     private int level;
+
+    @Column(name = "room")
+    private String roomNumber;
     @OneToMany(mappedBy = "player")
     @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     @JsonIgnoreProperties({"player"})
@@ -38,11 +41,14 @@ public class Player implements Comparable<Player>{
     private Room room;
 
     public Player(String name) {
+        this.id = id;
         this.name = name;
         this.playerNumber = playerNumber;
         this.playerType = playerType;
         this.level = level;
-        this.ships = new ArrayList<>();
+        this.roomNumber = roomNumber;
+        this.ships = ships;
+        this.room = room;
     }
 
     public Player() {

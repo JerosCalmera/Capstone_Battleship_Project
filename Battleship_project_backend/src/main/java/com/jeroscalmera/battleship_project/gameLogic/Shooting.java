@@ -64,14 +64,14 @@ public class Shooting {
         System.out.println(selectedPlayer.getId());
         if (converted.contains(aimPoint)) {
             if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")) {
-                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Hit!"));
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Hit!"));
             } else {
-                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Hit!"));
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Hit!"));
                 computerHit = aimPoint;
                 computerHitCheck = true;
             }
-            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
-            webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(aimPoint + selectedPlayer.getName()));
+            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName()));
+            webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(selectedPlayer.getRoom().getRoomNumber() + aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
             Optional<Ship> shipToUpdate = shipRepository.findById(shipID);
@@ -84,12 +84,12 @@ public class Shooting {
             computerCheck(selectedPlayer.getName());
         } else {
             if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")) {
-                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer2.getName() + " Miss!"));
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Miss!"));
             } else {
-                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat("Computer Miss!"));
+                webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Miss!"));
             }
-            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getName()));
-            webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getName() + aimPoint));
+            webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName()));
+            webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + aimPoint));
             computerCheck(selectedPlayer.getName());
         }
     }
@@ -108,29 +108,29 @@ public class Shooting {
             if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Carrier!"));
-                if (playerName.contains("Computer")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Carrier!"));
+                if (!playerName.contains("Computer")) {
                     computerHitCheck = false;
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Battleship!"));
-                if (playerName.contains("Computer")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Battleship!"));
+                if (!playerName.contains("Computer")) {
                     computerHitCheck = false;
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Cruiser!"));
-                if (playerName.contains("Computer")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Cruiser!"));
+                if (!playerName.contains("Computer")) {
                     computerHitCheck = false;
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerName + ": You destroyed my Destroyer!"));
-                if (playerName.contains("Computer")) {
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Destroyer!"));
+                if (!playerName.contains("Computer")) {
                     computerHitCheck = false;
                 }
             }
@@ -142,7 +142,7 @@ public class Shooting {
         if (allShipsDestroyed) {
             allShipsDestroyedForAutoShoot = true;
             used.clear();
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
             Room roomToCheck = new Room();
             Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
             System.out.println(roomId);
@@ -152,9 +152,9 @@ public class Shooting {
                 if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
                     winner.setLevel(winner.levelUp(1));
                     playerRepository.save(winner);
-                    webSocketMessageSender.sendMessage("/topic/chat", new Chat(winner.getName() + " is the Winner!"));
+                    webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + winner.getName() + " is the Winner!"));
                     Thread.sleep(50);
-                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(winner.getName() + " Wins!"));
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(playerToCheck.getRoom().getRoomNumber() + winner.getName() + " Wins!"));
                 }
             }
         }
@@ -199,7 +199,7 @@ public class Shooting {
         if (computerHitCheck == null) {
             computerHitCheck = false;
         }
-        List<Room> playersInRoom = roomRepository.findAllWithPlayers();
+        List<Room> playersInRoom = roomRepository.findAllWithPlayers(); // change this
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
             players = room.getPlayers();

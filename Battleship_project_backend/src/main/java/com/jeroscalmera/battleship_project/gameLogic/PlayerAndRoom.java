@@ -40,9 +40,10 @@ public class PlayerAndRoom {
     }
 
     public void submitStartStats(Player name) {
+        Player player = playerRepository.findByNameContaining(name.getName());
         List<String> allCoOrds = playerRepository.findAllCoOrdsByPlayerName(name.getName());
         String converted = String.join("", allCoOrds);
-        webSocketMessageSender.sendMessage("/topic/gameData", new GameData(name.getName() + converted));
+        webSocketMessageSender.sendMessage("/topic/gameData", new GameData(player.getRoom().getRoomNumber() + name.getName() + converted));
     }
 
     boolean roomSaved = false;
@@ -59,7 +60,6 @@ public class PlayerAndRoom {
     public void matchStart() throws InterruptedException {
         trigger = (trigger + 1);
         if (trigger == 2) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("All ships placed! Match Start!"));
             trigger = 0;
             coinFlip();
         }
@@ -90,19 +90,22 @@ public class PlayerAndRoom {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
             Player player = playerRepository.findByNameContaining(player1);
             if (Objects.equals(player.getPlayerType(), "Computer")) {
-                shooting.computerShoot();
+                shooting.computerShoot(player1);
             }
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
         }
         if (coin == 2) {
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player2));
         Player player = playerRepository.findByNameContaining(player2);
             if (Objects.equals(player.getPlayerNumber(), "Computer")) {;
-                shooting.computerShoot();
+                shooting.computerShoot(player1);
             }
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
         }
     }
 
     public void handlePassword(String roomNumber) throws InterruptedException {
+        String roomNumberSave = roomNumber;
         if
         (!Objects.equals(roomNumberString, roomNumber)) {
             if (!roomSaved) {
@@ -117,7 +120,8 @@ public class PlayerAndRoom {
         }
         if (roomSaved && roomValidated) {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
-            Room addRoom = new Room(roomNumber);
+            Room addRoom = new Room(roomNumberSave);
+            addRoom.setRoomNumber(roomNumber.substring(1, 5));
             roomRepository.save(addRoom);
             Thread.sleep(50);
             System.out.println(("Player" + playersNotInRoom.get(1).getName()));
@@ -137,14 +141,17 @@ public class PlayerAndRoom {
             }
             Player playerDetails1 = playerRepository.findByNameContaining(playersNotInRoom.get(1).getName());
             Player playerDetails2 = playerRepository.findByNameContaining(playersNotInRoom.get(0).getName());
-            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(playerDetails1.getDetails()));
+            webSocketMessageSender.sendMessage("/topic/playerData1", new Hidden(addRoom.getRoomNumber() + playerDetails1.getDetails()));
             player1 = playersNotInRoom.get(1).getName();
             player2 = playersNotInRoom.get(0).getName();
-            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(playerDetails2.getDetails()));
+            webSocketMessageSender.sendMessage("/topic/playerData2", new Hidden(addRoom.getRoomNumber() + playerDetails2.getDetails()));
             roomRepository.save(addRoom);
             roomSaved = false;
             roomValidated = false;
+            playerRepository.save(playerDetails1);
+            playerRepository.save(playerDetails2);
             playersNotInRoom.clear();
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now"));
         }
     }
 
@@ -167,19 +174,17 @@ public class PlayerAndRoom {
             if (!playerName.getName().contains("Computer")) {
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
             }else
-            {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Game against the Computer selected"));}
+            {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: A Game against the Computer has been selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
             player.setPlayerType("Human");
             playersNotInRoom.add(player);
         }
     }
-    public void computerMatchStart() throws InterruptedException {
-        matchStart();
+    public void computerMatchStart(String roomNumber) throws InterruptedException {
         Random random = new Random();
-        int rando = random.nextInt(100000);
+        int rando = random.nextInt(10000);
         String randomNumber = String.format("%05d", rando);
-        int randomRoomNumber = random.nextInt(1000);
         String ident = randomNumber;
         Player computerPlayerCreated = new Player();
         computerPlayerCreated.setName(ident + "Computer");
@@ -187,11 +192,12 @@ public class PlayerAndRoom {
         playerRepository.save(computerPlayerCreated);
         handleNewPlayer(computerPlayerCreated);
         Thread.sleep(50);
-        handlePassword(String.valueOf(randomRoomNumber));
+        handlePassword(roomNumber);
         Thread.sleep(50);
-        handlePassword(String.valueOf(randomRoomNumber));
+        handlePassword(roomNumber);
         Thread.sleep(50);;
         placing.computerPlaceShips(computerPlayerCreated);
+        matchStart();
     }
 
 }

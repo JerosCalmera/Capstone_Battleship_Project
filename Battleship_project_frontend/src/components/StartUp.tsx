@@ -33,16 +33,16 @@ const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, sa
         <>
             {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
                 <div className="startupOuter">
-                    <h3>Please create or generate a room code, or play against the computer</h3>
-                    <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Create</button>
+                    <h3>Please enter or generate a room code, or play against the computer</h3>
+                    <input type="number" className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <button className="button" onClick={auth}>Save</button>
                     <button className="button" onClick={generate}>Generate</button>
                     <button className="button" onClick={playVsComputer}>Play against the computer</button>
                 </div>
                 :
                 <div className="startupOuter">
                     <h3>Please enter the room code....</h3>
-                    <input className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+                    <input type="number" className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                     <button className="button" onClick={auth}>Start</button>
                 </div>
                 :

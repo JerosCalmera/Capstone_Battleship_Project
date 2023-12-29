@@ -5,6 +5,7 @@ import com.jeroscalmera.battleship_project.gameLogic.PlayerAndRoom;
 import com.jeroscalmera.battleship_project.gameLogic.Shooting;
 import com.jeroscalmera.battleship_project.models.BugReport;
 import com.jeroscalmera.battleship_project.models.Player;
+import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -81,10 +82,9 @@ public class MessageController {
     }
 
     @MessageMapping("/computer")
-    public void computer(String string) throws InterruptedException {
-        playerAndRoom.computerMatchStart();
+    public void computer(String roomNumber) throws InterruptedException {
+        playerAndRoom.computerMatchStart(roomNumber);
     }
-
 
     @MessageMapping("/miss")
     public void miss(String string) {

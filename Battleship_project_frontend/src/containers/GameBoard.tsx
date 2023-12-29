@@ -15,7 +15,6 @@ function GameBoard() {
     const [hidden, setHidden] = useState("")
 
     const [leaderBoard, setLeaderBoard] = useState<string[]>([])
-    const [leaderBoardCheck, setLeaderBoardCheck] = useState<string[]>([])
 
     const [shipInfo, setShipInfo] = useState<string>("")
     const [shipDamage, setShipDamage] = useState<string>("")
@@ -64,38 +63,65 @@ function GameBoard() {
                 serverSetMessageLog(message.body.slice(12, -2))
             });
             client.subscribe("/topic/hidden", (message: any) => {
-                setHidden(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setHidden(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/gameInfo", (message: any) => {
-                setGameInfo(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setGameInfo(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/gameData", (message: any) => {
-                setCellStorage(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setCellStorage(message.body.slice(16, -2))}
             });
+
             client.subscribe("/topic/turn", (message: any) => {
-                setTurn(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setTurn(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/gameData2", (message: any) => {
-                setShipDamage(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setShipDamage(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/placement", (message: any) => {
-                setShipDamage(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setShipDamage(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/miss", (message: any) => {
-                setMissCheck(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setMissCheck(message.body.slice(16, -2))}
             });
             client.subscribe("/topic/chat", (message: any) => {
-                const newMessage: string = message.body.slice(12, -2)
+                let newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes("/global" || "/Global") || newMessage.includes("Lobby") || !newMessage.includes("Admin:")) {
+                        newMessage = message.body.slice(16, -2);
+                        if (!newMessage.includes("Admin")){
+                        newMessage = newMessage.replace(/\/global|\/Global/g, "[Global]")}
+                }
+                else if (newMessage.includes(passwordEntry) && passwordEntry.length > 0) {
+                    newMessage = message.body.slice(16, -2);
+                }
                 setChat((prevChat) => {
                     const updatedChat = [...prevChat, newMessage];
-                    return updatedChat.slice(-10)
-                })
+                    return updatedChat.slice(-10);
+                });
             });
             client.subscribe("/topic/playerData1", (message: any) => {
-                setPlayer1Data(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setPlayer1Data(message.body.slice(16, -2))}
             })
             client.subscribe("/topic/playerData2", (message: any) => {
-                setPlayer2Data(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setPlayer2Data(message.body.slice(16, -2))}
             });
 
             client.subscribe("/topic/computer", (message: any) => {
@@ -120,19 +146,27 @@ function GameBoard() {
             setServerStatus(true);
 
             client.subscribe("/topic/gameUpdate", (message: any) => {
-                setPlayer1Data(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setPlayer1Data(message.body.slice(16, -2))}
             });
 
             client.subscribe("/topic/enemyDamage", (message: any) => {
-                setDamageCheck(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setDamageCheck(message.body.slice(16, -2))}
             });
 
             client.subscribe("/topic/startup", (message: any) => {
-                setPlayer1Data(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setPlayer1Data(message.body.slice(16, -2))}
             });
 
             client.subscribe("/topic/placement2", (message: any) => {
-                setPlacedShip(message.body.slice(12, -2))
+                const newMessage: string = message.body.slice(12, -2)
+                if (newMessage.includes(passwordEntry)) {
+                setPlacedShip(message.body.slice(16, -2))}
             });
 
             client.subscribe("/topic/bugReport", (message: any) => {
@@ -224,6 +258,7 @@ function GameBoard() {
         const randomNumber = Math.floor(Math.random() * 10000)
         const roomNumber = randomNumber.toString().padStart(4, "0");
         setPasswordEntry(roomNumber)
+        setPassword(roomNumber)
         stompClient.send("/app/room", {}, JSON.stringify(roomNumber));
     }
 
@@ -240,7 +275,10 @@ function GameBoard() {
 
     }
     const chatSend = () => {
-        stompClient.send("/app/chat", {}, JSON.stringify(savedName + ": " + chatEntry));
+        if (passwordEntry.length < 4) {
+            stompClient.send("/app/chat", {}, JSON.stringify("Game[Lobby] Player: " + chatEntry));}
+        else {
+            stompClient.send("/app/chat", {}, JSON.stringify(passwordEntry + savedName + ": " + chatEntry));}
         setChatEntry("")
     }
 
@@ -269,7 +307,11 @@ function GameBoard() {
     }
 
     const playVsComputer = () => {
-        stompClient.send("/app/computer", {}, JSON.stringify("computer"));
+        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+        const roomNumber = randomNumber.toString().padStart(4, "0");
+        setPasswordEntry(roomNumber)
+        setPassword(roomNumber)
+        stompClient.send("/app/computer", {}, JSON.stringify(roomNumber));
     }
     
     const bugReporting = () => {
@@ -305,7 +347,7 @@ function GameBoard() {
         <>
             {bugReport === 1 ? bugReportingRender() : null}
             <div className={serverStatusStyle()}>
-                {serverStatus == true ? <h5>Connected to game server</h5> :
+                {serverStatus == true ? <h5>Connected to game server {passwordEntry}</h5> :
                     <>
                         <h5>Not connected to game server</h5>
                         <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
@@ -321,7 +363,7 @@ function GameBoard() {
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
-                : serverMessageLog === "Server: Rooms synced" ?
+                : passwordEntry.length > 2 ?
                     <div>
                         <Grids gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}

@@ -99,14 +99,14 @@ public class Placing {
                 if (!(Math.abs(coOrds.get(inputOne).charAt(letter) - coOrds.get(inputTwo).charAt(letter)) <= 1
                         && Math.abs(coOrds.get(inputOne).charAt(number) - coOrds.get(inputTwo).charAt(number)) <= 1)) {
                     invalidPlacement = true;
-                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + " Invalid alignment selected!"));
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + " Invalid alignment selected!"));
                     coOrds.clear();
                     damage = "";
                     break;
                 }
                 if ((coOrds.get(inputOne).charAt(letter) != coOrds.get(inputTwo).charAt(letter) && coOrds.get(inputOne).charAt(number) != coOrds.get(inputTwo).charAt(number))) {
                     invalidPlacement = true;
-                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + " Invalid alignment selected!"));
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + " Invalid alignment selected!"));
                     coOrds.clear();
                     damage = "";
                     break;
@@ -200,9 +200,9 @@ public class Placing {
                 damage = "";
                 coOrds.clear();
                 if (target.charAt(0) != 'P') {
-                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getName() + " Invalid Placement!"));
+                    webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + " Invalid Placement!"));
                 }
-                webSocketMessageSender.sendMessage("/topic/placement2", new Chat("Invalid"));
+                webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Invalid"));
                 invalidPlacement = false;
                 horizontalPlacement = false;
                 verticalPlacement = false;
@@ -215,7 +215,7 @@ public class Placing {
                 newShip.setPlayer(selectedPlayer);
                 shipRepository.save(newShip);
                 playerRepository.save(selectedPlayer);
-                webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getName() + newShip.getName()));
+                webSocketMessageSender.sendMessage("/topic/placement2", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + newShip.getName()));
                 damage = "";
                 invalidPlacement = false;
                 horizontalPlacement = false;
