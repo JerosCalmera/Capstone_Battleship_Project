@@ -44,7 +44,7 @@ public class Shooting {
         playerToCheck = playerRepository.findByNameContaining(string.substring(1, 5));
         if (Objects.equals(playerToCheck.getPlayerType(), "Computer")) {
             System.out.println("Computer Player Action");
-            computerShoot();
+            computerShoot(playerToCheck.getName());
         }
     }
 
@@ -71,6 +71,7 @@ public class Shooting {
                 computerHitCheck = true;
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName()));
+            System.out.println("Room and Player:" + selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName());
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(selectedPlayer.getRoom().getRoomNumber() + aimPoint + selectedPlayer.getName()));
             Long shipID = shipRepository.findShipIdsByPlayerAndCoOrdsContainingPair(selectedPlayer.getId(), aimPoint);
             System.out.println();
@@ -172,7 +173,7 @@ public class Shooting {
         return startLetter + startNumber;
     }
 
-    public void autoShoot() throws InterruptedException {
+    public void autoShoot() throws InterruptedException { // for presentations
         List<Room> playersInRoom = roomRepository.findAllWithPlayers();
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
@@ -194,12 +195,12 @@ public class Shooting {
         allShipsDestroyedForAutoShoot = false;
     }
 
-    public void computerShoot() throws InterruptedException {
+    public void computerShoot(String playerName) throws InterruptedException {
         Thread.sleep(1000);
         if (computerHitCheck == null) {
             computerHitCheck = false;
         }
-        List<Room> playersInRoom = roomRepository.findAllWithPlayers(); // change this
+        List<Room> playersInRoom = roomRepository.findByPlayersName(playerName);
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
             players = room.getPlayers();

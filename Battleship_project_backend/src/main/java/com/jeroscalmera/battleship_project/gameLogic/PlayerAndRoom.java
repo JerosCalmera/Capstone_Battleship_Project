@@ -87,18 +87,18 @@ public class PlayerAndRoom {
 
     public void selectPlayer(int coin) throws InterruptedException {
         if (coin == 1) {
-            webSocketMessageSender.sendMessage("/topic/turn", new Chat(player1));
             Player player = playerRepository.findByNameContaining(player1);
+            webSocketMessageSender.sendMessage("/topic/turn", new Chat(player.getRoom().getRoomNumber() + player.getName()));
             if (Objects.equals(player.getPlayerType(), "Computer")) {
                 shooting.computerShoot(player1);
             }
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
         }
         if (coin == 2) {
-            webSocketMessageSender.sendMessage("/topic/turn", new Chat(player2));
         Player player = playerRepository.findByNameContaining(player2);
+            webSocketMessageSender.sendMessage("/topic/turn", new Chat(player.getRoom().getRoomNumber() + player.getName()));
             if (Objects.equals(player.getPlayerNumber(), "Computer")) {;
-                shooting.computerShoot(player1);
+                shooting.computerShoot(player2);
             }
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
         }
