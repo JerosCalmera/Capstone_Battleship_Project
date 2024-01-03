@@ -5,6 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 @Entity
@@ -16,22 +17,38 @@ public class Player implements Comparable<Player>{
     private Long id;
     @Column(name = "name")
     private String name;
+
+    @Column(name = "playerNumber")
+    private String playerNumber;
+
+    @Column(name = "playerType")
+    private String playerType;
+
     @Column(name = "level")
     private int level;
+
+    @Column(name = "room")
+    private String roomNumber;
     @OneToMany(mappedBy = "player")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     @JsonIgnoreProperties({"player"})
     private List<Ship> ships;
 
     @ManyToOne
     @JoinColumn(name="room_id", nullable = true)
+    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     @JsonIgnoreProperties({"player"})
     private Room room;
 
     public Player(String name) {
+        this.id = id;
         this.name = name;
+        this.playerNumber = playerNumber;
+        this.playerType = playerType;
         this.level = level;
-        this.ships = new ArrayList<>();
+        this.roomNumber = roomNumber;
+        this.ships = ships;
+        this.room = room;
     }
 
     public Player() {
@@ -43,6 +60,22 @@ public class Player implements Comparable<Player>{
     }
     public void setShips(List<Ship> ships) {
         this.ships = ships;
+    }
+
+    public String getPlayerType() {
+        return playerType;
+    }
+
+    public void setPlayerType(String playerType) {
+        this.playerType = playerType;
+    }
+
+    public String getPlayerNumber() {
+        return playerNumber;
+    }
+
+    public void setPlayerNumber(String playerNumber) {
+        this.playerNumber = playerNumber;
     }
 
     public Room getRoom() {
@@ -73,10 +106,21 @@ public class Player implements Comparable<Player>{
         return level;
     }
 
+    public String getDetails() {
+        return name + " Lvl:(" + this.getLevel() + ")";
+    }
+
     public int levelUp(int value) {
         this.level += value;
         return this.level;
     }
+
+    public String generatePlayerNumber() {
+            Random random = new Random();
+            int randomNumber = random.nextInt(100000);
+            String formattedRandom = String.format("%05d", randomNumber);
+            return formattedRandom;
+        }
 
     public void setLevel(int level) {
         this.level = level;
@@ -89,4 +133,6 @@ public class Player implements Comparable<Player>{
     public void addShip(Ship ship) {
         this.ships.add(ship);
     }
+
+
 }

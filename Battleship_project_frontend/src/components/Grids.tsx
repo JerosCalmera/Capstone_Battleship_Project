@@ -13,16 +13,18 @@ interface Props {
     player1Data: string;
     player2Data: string;
     placedShip: string;
-    chat: string[];
     player2Name: string;
     miss: string;
     enemyMiss: string;
     turn: string;
     playerName: string;
+    gameInfo: string;
+    serverMessageLog: string;
+    turnNumber: number;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name, chat, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -56,7 +58,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
         if (placedShip.includes("Invalid"))
             setPlacedReadyShip("")
         setShipToPlace("")
-    }, [chat])
+    }, [placedShip])
 
     const populateGrid = () => {
         const letter: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
@@ -69,7 +71,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedCell(cellValue)}
-                        className={stylingCell(cellValue)}>**</button>);
+                        className={stylingCell(cellValue)}>X</button>);
             }
             end.push(
                 <div>
@@ -114,7 +116,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                 buttons.push(
                     <button key={cellValue}
                         onClick={() => clickedEnemyCell(cellValue)}
-                        className={stylingEnemyCell(cellValue)}>**</button>);
+                        className={stylingEnemyCell(cellValue)}>X</button>);
             }
             end.push(
                 <div>
@@ -145,9 +147,9 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                 stompClient.send("/app/placement", {}, JSON.stringify(value + shipSize + savedName));
                 setPlacedReadyShip(placedReadyShip + value)
             }
-            else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Invalid co-ordinate!")) }
+            else if (shipInfo.includes(value)) { stompClient.send("/app/chat", {}, JSON.stringify("Ship already present!")) }
             {
-                if (placedReadyShip.length === shipSize * 2) {
+                if (placedReadyShip.length === 2) {
                     setPlacedReadyShip("")
                     setShipToPlace("")
                 }
@@ -161,7 +163,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
             if (turn === savedName) {
                 if (enemyMiss.includes(value)) { null }
                 else
-                    stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + savedName));
+                    stompClient.send("/app/gameData", {}, JSON.stringify(value + player2Name.slice(0, 4) + playerName));
 
             }
         }
@@ -186,6 +188,10 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
         setShipToPlace("Destroyer")
     }
 
+    const randomPlacement = () => {
+        stompClient.send("/app/randomPlacement", {}, JSON.stringify(savedName));
+    }
+
     const matchBegin = () => {
         stompClient.send("/app/matchStart", {}, JSON.stringify("Match start"));
         setMatchStart("")
@@ -194,6 +200,15 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
 
     return (
         <>
+            {serverMessageLog === "Server: Rooms synced" ?
+                <div className="gameInfoOuter">
+                    <div className="gameInfo">
+                        <h3>Turn: ({turnNumber}) {turn.includes("Computer") ? "Computer" : turn}</h3>
+                        <h3>{gameInfo}</h3>
+                        {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
+                        {shipInfo.length < 1 && matchStart.length > 2 ? <button onClick={randomPlacement} className="button">Random Ship Placement</button> : null}
+                    </div>
+                </div> : null}
             <div className="gameBoardOuterGreater">
                 <div className="gameBoardOuter">
                     <div className="shipPlacementOuter">
@@ -233,7 +248,6 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                                 </ul>
                                 : null}
                         </div>
-                        {shipInfo.length === 60 && matchStart.length > 1 ? <button onClick={matchBegin} className="button">Confirm Ready</button> : null}
                     </div>
                     <div className="gameBoardRender">
                         <h2>{player1Data}</h2>
@@ -244,7 +258,7 @@ const Grids: React.FC<Props> = ({ playerName, turn, miss, enemyMiss, player2Name
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{player2Data}</h2>
+                        <h2>{player2Data.includes("Computer") ? "Computer " : player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>

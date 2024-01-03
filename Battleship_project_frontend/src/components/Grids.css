@@ -41,7 +41,7 @@
 .shipPlacementInner {
     height: 400px;
     width: 240px;
-    margin-left: -20px;
+    margin-right: -40px;
     line-height: 50%;
     margin-top: 60px;
 }
@@ -69,8 +69,8 @@
     height: 40px;
     width: 40px;
     border: 1px solid black;
-    background-color: grey;
-    color: grey;
+    background-color: rgb(53, 53, 53);
+    color: rgb(53, 53, 53);
     margin-right: -1px;
     margin-top: -1px;
 }
@@ -124,13 +124,14 @@
 }
 
 .gameBoardOuter {
+    width: 1460px;
     display: flex;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.708);
 }
 
 .gameBoardOuterGreater {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 20px;
-    background-color: rgba(0, 0, 0, 0.708);
 }

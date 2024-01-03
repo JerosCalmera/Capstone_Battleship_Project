@@ -15,4 +15,16 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findByRoomNumber(String roomNumber);
     @Query
     Room findRoomIdByPlayersName(String name);
+    @Query
+    Room findRoomIdByPlayersId(Long id);
+
+    @Query
+    Room findRoomByPlayersName(String name);
+
+    @Query("SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.players")
+    List<Room> findAllWithPlayers();
+
+    @Query
+    List<Room> findByPlayersName(String playerName);
+
 }

@@ -1,6 +1,6 @@
 import './App.css'
 
-import GameBoard from './containers/gameboard'
+import GameBoard from './containers/GameBoard'
 
 function App() {
 

@@ -29,9 +29,13 @@ h2 {
   transition: 0.2s;
 }
 
+.serverStatus {
+  position: fixed;
+}
+
 .startupOuter {
   background-color: rgba(0, 0, 0, 0.708);
-  height: 140px;
+  height: 150px;
   width: 550px;
   padding: 20px;
   padding-bottom: 30px;
@@ -42,7 +46,7 @@ h2 {
 }
 
 .chatBox {
-  height: 360px;
+  height: auto;
   width: 560px;
   line-height: 165%;
   background-color: rgba(0, 0, 0, 0.708);
@@ -53,6 +57,14 @@ h2 {
   flex-direction: column;
   list-style: none;
   padding-bottom: 20px;
+  overflow-wrap: break-word;
+}
+
+.chatBoxOuter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 
 .input {
@@ -74,6 +86,7 @@ h2 {
   text-align: center;
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
+  padding: 15px;
 }
 
 .leaderBoard {
@@ -83,7 +96,7 @@ h2 {
   background-color: rgba(0, 0, 0, 0.708);
   border-radius: 20px;
   padding: 15px;
-  margin-top: 5px;
+  margin-top: 36px;
   display: flex;
   flex-direction: column;
   list-style: none;
@@ -91,5 +104,48 @@ h2 {
 
 .leaderBoardOuter {
   margin-left: 600px;
-  margin-top: -596px;
+  margin-top: -636px;
+}
+
+.bugReportPageFade {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  margin-top: -2%;
+  margin-left: -2%;
+  padding-right: 2%;
+  padding-bottom: 2%;
+  background-color: rgba(59, 59, 59, 0.736);
+}
+
+.bugReportOuter {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.bugReport {
+  height: 100px;
+  width: 800px;
+  background-color: rgba(0, 0, 0, 0.888); 
+  border-radius: 20px;
+  padding: 40px;
+  padding-bottom: 60px;
+  text-align: center;
+  line-height: 165%;
+}
+
+.bugReportInputBox{
+  width: 800px;
+  background-color: rgba(116, 196, 194, 0.575);
+}
+
+.cancelBox {
+  display: flex;
+  align-items: right;
+  justify-content: right;
 }
