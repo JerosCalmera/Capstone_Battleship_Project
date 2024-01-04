@@ -124,7 +124,6 @@ public class PlayerAndRoom {
             addRoom.setRoomNumber(roomNumber.substring(1, 5));
             roomRepository.save(addRoom);
             Thread.sleep(50);
-            System.out.println(("Player" + playersNotInRoom.get(1).getName()));
             for (Player newPlayer : playersNotInRoom) {
                 Player playerToFind = playerRepository.findByName(newPlayer.getName());
                 if (playerToFind != null) {
@@ -157,7 +156,6 @@ public class PlayerAndRoom {
 
     public void handleNewPlayer(Player playerName) throws InterruptedException {
         Thread.sleep(100);
-        System.out.println(playerName.getName().substring(0, 4));
         List<String> players = playerRepository.findName();
         if (!players.contains(playerName.getName())) {
             if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 4)))) {

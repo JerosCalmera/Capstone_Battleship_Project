@@ -50,17 +50,13 @@ public class Placing {
     }
 
     public synchronized void placeShip(String target) throws InterruptedException {
-        System.out.println("Starting placeShip Function");
         Thread.sleep(50);
-        System.out.println("Target =" + target);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 9)));
-        System.out.println("Name =" + (target.substring(4, 9)));
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         if (shipsList.contains(target.substring(1, 3))) {
             invalidPlacement = true;
         }
         String shipList = String.join("", shipsList);
-        System.out.println("ships:" + shipList);
         if (!coOrds.contains(target.substring(1, 3))) {
             coOrds.add(target.substring(1, 3));
             damage += target.substring(1, 3);
@@ -68,11 +64,7 @@ public class Placing {
         if (shipList.contains(target.substring(1, 3))) {
             invalidPlacement = true;
         }
-        System.out.println("CoOrds list =" + coOrds);
-        System.out.println((target.substring(4)));
-        System.out.println("Selected player =" + selectedPlayer.getName());
         int max = Integer.parseInt(target.substring(3, 4));
-        System.out.println("Ship max size =" + max);
         Ship newShip = new Ship("", 0, "");
         if (max == 5) {
             newShip = new Ship("Carrier", 10, "");
@@ -86,7 +78,6 @@ public class Placing {
         if (coOrds.size() > 2) {
             coOrds.clear();
             damage = "";
-            System.out.println("CordsCleared");
         }
         if (coOrds.size() == 2) {
             for (int i = 0; i < coOrds.size() - 1; i++) {
@@ -94,9 +85,6 @@ public class Placing {
                 int inputTwo = 1 + i;
                 int letter = 0;
                 int number = 1;
-                System.out.println("inputOne letter: " + coOrds.get(inputOne).charAt(letter));
-                System.out.println("inputTwo letter: " + coOrds.get(inputTwo).charAt(letter));
-
                 if (!(Math.abs(coOrds.get(inputOne).charAt(letter) - coOrds.get(inputTwo).charAt(letter)) <= 1
                         && Math.abs(coOrds.get(inputOne).charAt(number) - coOrds.get(inputTwo).charAt(number)) <= 1)) {
                     invalidPlacement = true;
@@ -123,12 +111,10 @@ public class Placing {
                                 break;
                             }
                             String addCoOrd = addLetter + String.valueOf(numberToAdd);
-                            System.out.println(addCoOrd);
                             if (shipList.contains(addCoOrd)) {
                                 invalidPlacement = true;
                             } else {
                                 damage += addCoOrd;
-                                System.out.println(damage);
                             }
                         } else {
                             numberToAdd = numberToAdd + 1;
@@ -137,12 +123,10 @@ public class Placing {
                                 break;
                             }
                             String addCoOrd = addLetter + String.valueOf(numberToAdd);
-                            System.out.println(addCoOrd);
                             if (shipList.contains(addCoOrd)) {
                                 invalidPlacement = true;
                             } else {
                                 damage += addCoOrd;
-                                System.out.println(damage);
                             }
                         }
                         horizontalPlacement = true;
@@ -153,13 +137,10 @@ public class Placing {
                     int numberOfLoops = max - 2;
                     String letterToAdd = String.valueOf(coOrds.get(inputTwo).charAt(letter));
                     int addNumber = Character.getNumericValue(coOrds.get(inputTwo).charAt(number));
-                    System.out.println("Number: " + addNumber);
                     coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
                     int indexFirst = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputOne).charAt(letter)));
                     int indexSecond = coOrdLetters.indexOf(String.valueOf(coOrds.get(inputTwo).charAt(letter)));
                     for (int j = 0; j < numberOfLoops; j++) {
-                        System.out.println("indexFirst: " + indexFirst);
-                        System.out.println("indexSecond: " + indexSecond);
                         if (indexFirst > indexSecond) {
                             indexSecond = indexSecond - 1;
                             if (indexSecond > 9 || indexSecond < 0) {
@@ -168,13 +149,10 @@ public class Placing {
                             }
                             letterToAdd = coOrdLetters.get(indexSecond);
                             String addCoOrd = letterToAdd + addNumber;
-                            System.out.println("Letter to add: " + letterToAdd);
-                            System.out.println(addCoOrd);
                             if (shipList.contains(addCoOrd)) {
                                 invalidPlacement = true;
                             } else {
                                 damage += addCoOrd;
-                                System.out.println(damage);
                             }
                         } else {
                             indexSecond = indexSecond + 1;
@@ -184,13 +162,10 @@ public class Placing {
                             }
                             letterToAdd = coOrdLetters.get(indexSecond);
                             String addCoOrd = letterToAdd + addNumber;
-                            System.out.println("Letter to add: " + letterToAdd);
-                            System.out.println(addCoOrd);
                             if (shipList.contains(addCoOrd)) {
                                 invalidPlacement = true;
                             } else {
                                 damage += addCoOrd;
-                                System.out.println(damage);
                             }
                         }
                     }
@@ -249,8 +224,6 @@ public class Placing {
     }
 
     public String generateStartingRandomCoOrds(String firstCoOrds, Boolean computerGame) {
-        System.out.println("Starting generateStartingRandomCoOrds Function");
-        System.out.println("generateStartingRandomCoOrds input: " + firstCoOrds);
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
         coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         if (computerAllCoOrds.size() < 100) {
@@ -261,7 +234,6 @@ public class Placing {
         // Of random CoOrd letter = index 0, number index 1,
         String firstCoOrd = computerAllCoOrds.get(randomCoOrd);
         int rando = random.nextInt(3);
-        System.out.println("Random number: " + rando);
         int firstCoOrdIndexLetter = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(0)));
         int firstCoOrdIndexNumber = coOrdNumbers.indexOf(String.valueOf(firstCoOrd.charAt(1)));
         int secondCoOrdIndexLetter = 0;
@@ -279,7 +251,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexLetter == 9 && firstCoOrdIndexNumber == 9 ) {
@@ -290,7 +261,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexLetter == 0 && firstCoOrdIndexNumber == 9 ) {
@@ -301,7 +271,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexLetter == 9 && firstCoOrdIndexNumber == 0 ) {
@@ -312,7 +281,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexLetter == 0 && firstCoOrdIndexNumber != 0 && firstCoOrdIndexNumber != 9) {
@@ -323,7 +291,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexLetter == 9  && firstCoOrdIndexNumber != 0 && firstCoOrdIndexNumber != 9) {
@@ -334,7 +301,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexNumber == 0  && firstCoOrdIndexLetter != 0 && firstCoOrdIndexLetter != 9) {
@@ -345,7 +311,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
                 if (firstCoOrdIndexNumber == 9 && firstCoOrdIndexLetter != 0 && firstCoOrdIndexLetter != 9) {
@@ -356,7 +321,6 @@ public class Placing {
                         secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
                         secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
                     String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
-                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
                     return secondCoOrd;
                 }
             } else {
@@ -380,7 +344,6 @@ public class Placing {
         }
         String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
         if (computerGame) {
-            System.out.println("generateStartingRandomCoOrds for computer opponent game: " + secondCoOrd);
             return secondCoOrd;
         } else {
             return firstCoOrd + secondCoOrd;
@@ -388,7 +351,6 @@ public class Placing {
     }
 
     public void computerPlaceShips(Player player) throws InterruptedException {
-        System.out.println("Starting computerPlaceShips Function");
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(player.getName());
         String shipList = String.join("", shipsList);
         String placedShips = "";
