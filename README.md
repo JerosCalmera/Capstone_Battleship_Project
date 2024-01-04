@@ -1,6 +1,7 @@
 Capstone Project - Multiplayer Battleship
 
 Brief:
+
 To solo develop a multiplayer Battleship board game, playable in the browser between two people.
 Players can play a game of battleship via websocket, each player can see their board and the enemies, game plays in the same fashion as the board game, two boards will be visible to each player, their own with the ships they placed and the opponents.
 
