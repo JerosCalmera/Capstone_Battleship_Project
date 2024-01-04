@@ -286,24 +286,13 @@ function GameBoard() {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         location.reload()
     }
-    const resetPlacement = () => {
-        console.log(cellStorage)
-        console.log(shipInfo)
-        console.log(savedName)
-        console.log(playerName)
-        stompClient.send("/app/placement2", {}, JSON.stringify("Clear"));
-    }
-
+    
     const serverStatusStyle = () => {
         if (serverMessageLog != "Server: Rooms synced")
             return
         else {
             return "serverStatus"
         }
-    }
-
-    const autoShoot = () => {
-        stompClient.send("/app/autoShoot", {}, JSON.stringify("shoot"));
     }
 
     const playVsComputer = () => {
@@ -354,9 +343,7 @@ function GameBoard() {
                 }
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
-                <button className="button" onClick={resetPlacement}>Dev</button>
                 <button className="button" onClick={bugReporting}>Bug Report</button>
-                {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>}
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?
