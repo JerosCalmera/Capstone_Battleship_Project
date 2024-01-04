@@ -24,6 +24,7 @@ To do:
 - Ensure that more than one game can be played at once without bugs, currently only one game at a time can be played
 - Replace coloured squares representing ships with images
 - Improve computer player AI
+- General bugfixes
 - Host online
   
 ![Chat](https://github.com/JerosCalmera/Capstone_Battleship_Project/assets/136751073/ff71de8d-2bfd-4e93-8560-d649054c3b52)
