@@ -6,12 +6,13 @@ To solo develop a multiplayer Battleship board game, playable in the browser bet
 Players can play a game of battleship via websocket, each player can see their board and the enemies, game plays in the same fashion as the board game, two boards will be visible to each player, their own with the ships they placed and the opponents.
 
 Tech Stack:
+
 Frontend - TypeScript with React
 Backend - Java with Spring Boot
 Database: PostgreSQL database used to store game data (game board info, player names, games won etc
 WebSocket is used for frontend and backend communication
 
-Features: 
+Features:
 - The game can be played multiplayer between two players or single player against a computer controlled opponent
 - A chat feature allows players to communicate with each other, and also allows the "Admin" to send messages via the backend if needed
 - Players connect to a "room" designated by a manually typed or randomly generated token that both players must enter
