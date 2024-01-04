@@ -25,6 +25,7 @@ To do:
 - Replace coloured squares representing ships with images
 - Improve computer player AI
 - Host online
+  
 ![Chat](https://github.com/JerosCalmera/Capstone_Battleship_Project/assets/136751073/ff71de8d-2bfd-4e93-8560-d649054c3b52)
 ![AIBattle](https://github.com/JerosCalmera/Capstone_Battleship_Project/assets/136751073/250d41c4-18ed-430b-814f-0d89787ba2a4)
 ![multplayer](https://github.com/JerosCalmera/Capstone_Battleship_Project/assets/136751073/7dfb383a-846d-4d6e-9baf-5c3ba51fb943)
