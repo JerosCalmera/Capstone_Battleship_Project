@@ -105,7 +105,7 @@ function GameBoard() {
                         if (!newMessage.includes("Admin")){
                         newMessage = newMessage.replace(/\/global|\/Global/g, "[Global]")}
                 }
-                else if (newMessage.includes(passwordEntry) && passwordEntry.length > 0) {
+                if (newMessage.includes(passwordEntry) && passwordEntry.length > 0) {
                     newMessage = message.body.slice(16, -2);
                 }
                 setChat((prevChat) => {
@@ -276,7 +276,7 @@ function GameBoard() {
     }
     const chatSend = () => {
         if (passwordEntry.length < 4) {
-            stompClient.send("/app/chat", {}, JSON.stringify("Game[Lobby] Player: " + chatEntry));}
+            stompClient.send("/app/chat", {}, JSON.stringify("Game[Lobby] Guest: " + chatEntry));}
         else {
             stompClient.send("/app/chat", {}, JSON.stringify(passwordEntry + savedName + ": " + chatEntry));}
         setChatEntry("")
@@ -336,23 +336,26 @@ function GameBoard() {
         <>
             {bugReport === 1 ? bugReportingRender() : null}
             <div className={serverStatusStyle()}>
-                {serverStatus == true ? <h5>Connected to game server {passwordEntry}</h5> :
+                {serverStatus == true ? <h5>Connected to game server</h5> :
                     <>
                         <h5>Not connected to game server</h5>
                         <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
                 }
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
+                {/* <button className="button" onClick={resetPlacement}>Dev</button> */}
                 <button className="button" onClick={bugReporting}>Bug Report</button>
+                {/* {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>} */}
+
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
             {serverMessageLog === "Server: Room saved!" && savedName != "name" && passwordEntry.length > 0 ?
                 <div className="startupOuter">
                     <h3 >Room number: {passwordEntry}</h3 >
                     <h3>Waiting on other player.....</h3></div >
-                : passwordEntry.length > 2 ?
+                : serverMessageLog === "Server: Rooms synced"  && savedName != "name" && passwordEntry.length > 0 ?
                     <div>
-                        <Grids gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name}
+                        <Grids setChat={setChat} passwordEntry={passwordEntry} chat={chat} gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}

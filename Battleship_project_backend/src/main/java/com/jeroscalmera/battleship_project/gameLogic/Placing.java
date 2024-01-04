@@ -50,6 +50,7 @@ public class Placing {
     }
 
     public synchronized void placeShip(String target) throws InterruptedException {
+        System.out.println("Starting placeShip Function");
         Thread.sleep(50);
         System.out.println("Target =" + target);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 9)));
@@ -248,6 +249,8 @@ public class Placing {
     }
 
     public String generateStartingRandomCoOrds(String firstCoOrds, Boolean computerGame) {
+        System.out.println("Starting generateStartingRandomCoOrds Function");
+        System.out.println("generateStartingRandomCoOrds input: " + firstCoOrds);
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
         coOrdNumbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         if (computerAllCoOrds.size() < 100) {
@@ -258,14 +261,104 @@ public class Placing {
         // Of random CoOrd letter = index 0, number index 1,
         String firstCoOrd = computerAllCoOrds.get(randomCoOrd);
         int rando = random.nextInt(3);
+        System.out.println("Random number: " + rando);
         int firstCoOrdIndexLetter = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(0)));
-        int firstCoOrdIndexNumber = coOrdLetters.indexOf(String.valueOf(firstCoOrd.charAt(1)));
+        int firstCoOrdIndexNumber = coOrdNumbers.indexOf(String.valueOf(firstCoOrd.charAt(1)));
         int secondCoOrdIndexLetter = 0;
         int secondCoOrdIndexNumber = 0;
         do {
             randomCoOrd = random.nextInt(100);
             if (computerGame) {
                 firstCoOrd = firstCoOrds;
+                rando = random.nextInt(2);
+                if (firstCoOrdIndexLetter == 0 && firstCoOrdIndexNumber == 0 ) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexLetter == 9 && firstCoOrdIndexNumber == 9 ) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexLetter == 0 && firstCoOrdIndexNumber == 9 ) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexLetter == 9 && firstCoOrdIndexNumber == 0 ) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexLetter == 0 && firstCoOrdIndexNumber != 0 && firstCoOrdIndexNumber != 9) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexLetter == 9  && firstCoOrdIndexNumber != 0 && firstCoOrdIndexNumber != 9) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber + 1;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber - 1;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexNumber == 0  && firstCoOrdIndexLetter != 0 && firstCoOrdIndexLetter != 9) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
+                if (firstCoOrdIndexNumber == 9 && firstCoOrdIndexLetter != 0 && firstCoOrdIndexLetter != 9) {
+                    if (rando == 0){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter + 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    if (rando == 1){
+                        secondCoOrdIndexLetter = firstCoOrdIndexLetter - 1;
+                        secondCoOrdIndexNumber = firstCoOrdIndexNumber;}
+                    String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
+                    System.out.println("generateStartingRandomCoOrds for computer opponent game with existing edge co-ord: " + secondCoOrd);
+                    return secondCoOrd;
+                }
             } else {
                 firstCoOrd = computerAllCoOrds.get(randomCoOrd);
             }
@@ -287,14 +380,15 @@ public class Placing {
         }
         String secondCoOrd = coOrdLetters.get(secondCoOrdIndexLetter) + coOrdNumbers.get(secondCoOrdIndexNumber);
         if (computerGame) {
+            System.out.println("generateStartingRandomCoOrds for computer opponent game: " + secondCoOrd);
             return secondCoOrd;
         } else {
             return firstCoOrd + secondCoOrd;
         }
     }
 
-
     public void computerPlaceShips(Player player) throws InterruptedException {
+        System.out.println("Starting computerPlaceShips Function");
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(player.getName());
         String shipList = String.join("", shipsList);
         String placedShips = "";
@@ -327,4 +421,4 @@ public class Placing {
             placeShip("P" + secondCoOrd + 2 + player.getName());
         }
     }
-    }
+}
