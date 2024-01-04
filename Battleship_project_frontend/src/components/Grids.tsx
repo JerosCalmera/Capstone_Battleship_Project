@@ -20,11 +20,14 @@ interface Props {
     playerName: string;
     gameInfo: string;
     serverMessageLog: string;
+    passwordEntry: string;
+    chat: string[];
     turnNumber: number;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
+    setChat: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({ setChat, passwordEntry, chat, gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -189,6 +192,13 @@ const Grids: React.FC<Props> = ({ gameInfo, serverMessageLog, turnNumber, player
     }
 
     const randomPlacement = () => {
+        if (chat.includes("Admin: A Game against the Computer has been selected") && !chat.includes("Admin: Computer player ready")){
+            setChat((chat) => {
+                const updatedChat = [...chat, "Admin: The computer player is still placing its ships, please wait and try again"];
+                return updatedChat.slice(-10);
+            });
+        }
+        else
         stompClient.send("/app/randomPlacement", {}, JSON.stringify(savedName));
     }
 

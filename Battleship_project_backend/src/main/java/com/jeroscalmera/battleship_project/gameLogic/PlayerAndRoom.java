@@ -151,7 +151,7 @@ public class PlayerAndRoom {
             playerRepository.save(playerDetails1);
             playerRepository.save(playerDetails2);
             playersNotInRoom.clear();
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now,  to place your ships, click on the ship and click two cells on the board, or press the random placement button to randomly place your ships"));
         }
     }
 
@@ -196,9 +196,17 @@ public class PlayerAndRoom {
         Thread.sleep(50);
         handlePassword(roomNumber);
         Thread.sleep(50);;
-        placing.computerPlaceShips(computerPlayerCreated);
+        Thread placeShipsThread = new Thread(() -> {
+            try {
+                placing.computerPlaceShips(computerPlayerCreated);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        placeShipsThread.start();
+        placeShipsThread.join();
         matchStart();
+        webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Computer player ready"));
     }
-
 }
 
