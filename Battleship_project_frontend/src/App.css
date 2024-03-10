@@ -139,6 +139,21 @@ h2 {
   line-height: 165%;
 }
 
+.gameFlash {
+  height: auto;
+  width: auto;
+  background-color: rgba(0, 0, 0, 0.888); 
+  border-radius: 20px;
+  padding: 40px;
+  padding-bottom: 40px;
+  text-align: center;
+  line-height: 165%;
+}
+
+.gameFlashBody {
+  text-align: left;
+}
+
 .bugReportInputBox{
   width: 800px;
   background-color: rgba(116, 196, 194, 0.575);

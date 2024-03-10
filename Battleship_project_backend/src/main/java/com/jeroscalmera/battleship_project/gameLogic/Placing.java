@@ -40,12 +40,13 @@ public class Placing {
     public void restart() {
         List<Player> playerList = playerRepository.findAll();
         for (Player player : playerList) {
-            if (Objects.equals(player.getPlayerType(), "Human")) {
-                player.setRoom(null);
-                playerRepository.save(player);
-            } else if (Objects.equals(player.getPlayerType(), "Computer")) {
-                playerRepository.delete(player);
-            }
+//            if (Objects.equals(player.getPlayerType(), "Human")) {
+            player.setRoom(null);
+            player.setUnReady();
+            playerRepository.save(player);
+//            } else if (Objects.equals(player.getPlayerType(), "Computer")) {
+//                playerRepository.delete(player);
+//            }
         }
     }
 
@@ -349,8 +350,13 @@ public class Placing {
             return firstCoOrd + secondCoOrd;
         }
     }
-
+    public boolean shipPlacement = false;
     public void computerPlaceShips(Player player) throws InterruptedException {
+        if (shipPlacement == true) {
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: The computer is placing ships, please wait and try again"));
+            return;
+        }
+        shipPlacement = true;
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(player.getName());
         String shipList = String.join("", shipsList);
         String placedShips = "";
@@ -382,5 +388,6 @@ public class Placing {
             placeShip("P" + firstCoOrd + 2 + player.getName());
             placeShip("P" + secondCoOrd + 2 + player.getName());
         }
+        shipPlacement = false;
     }
 }

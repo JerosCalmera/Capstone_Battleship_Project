@@ -40,6 +40,10 @@ public class Player implements Comparable<Player>{
     @JsonIgnoreProperties({"player"})
     private Room room;
 
+    @Column(name = "ready")
+    private boolean ready;
+
+
     public Player(String name) {
         this.id = id;
         this.name = name;
@@ -49,6 +53,7 @@ public class Player implements Comparable<Player>{
         this.roomNumber = roomNumber;
         this.ships = ships;
         this.room = room;
+        this.ready = false;
     }
 
     public Player() {
@@ -134,5 +139,18 @@ public class Player implements Comparable<Player>{
         this.ships.add(ship);
     }
 
+    public void setReady() {this.ready = true;}
 
+    public void setUnReady() {this.ready = false;}
+
+    public String checkReady() {
+        String output = "No info";
+        if (!this.ready) {
+            output = this.name + " is not ready!";
+        }
+        else if (this.ready){
+            output = this.name + " is ready!";
+        }
+        return output;
+    }
 }

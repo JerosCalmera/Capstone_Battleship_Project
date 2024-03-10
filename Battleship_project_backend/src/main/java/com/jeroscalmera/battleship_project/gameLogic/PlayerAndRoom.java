@@ -54,13 +54,24 @@ public class PlayerAndRoom {
     String player2;
     public String roomNumberString;
 
-    int trigger = 0;
-
-
-    public void matchStart() throws InterruptedException {
-        trigger = (trigger + 1);
-        if (trigger == 2) {
-            trigger = 0;
+    public void matchStart(String playerName) throws InterruptedException {
+        if (!playerName.contains("Computer")) {
+            playerName = playerName.substring(1, playerName.length() -1);
+        }
+        System.out.println("input: " + playerName);
+        Player activePlayer = playerRepository.findByNameContaining(playerName);
+        System.out.println("found player:  " + activePlayer.getName());
+        activePlayer.setReady();
+        System.out.println(activePlayer.checkReady());
+        playerRepository.save(activePlayer);
+        Room activeRoom = roomRepository.findRoomIdByPlayersId(activePlayer.getId());
+        if (activeRoom.getPlayersReady() == 0) {
+            activeRoom.setPlayersReady(1);
+            roomRepository.save(activeRoom);
+        }
+        else if (activeRoom.getPlayersReady() == 1) {
+            activeRoom.setPlayersReady(2);
+            roomRepository.save(activeRoom);
             coinFlip();
         }
     }
@@ -71,7 +82,7 @@ public class PlayerAndRoom {
         Collections.sort(leaderboard);
         int total = 0;
         for (Player playerLeader : leaderboard) {
-            if (total < 10) {
+            if (total < 10 && !playerLeader.getName().contains("Computer")) {
                 webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
                 total++;
             } else {
@@ -203,7 +214,7 @@ public class PlayerAndRoom {
         });
         placeShipsThread.start();
         placeShipsThread.join();
-        matchStart();
+        matchStart(computerPlayerCreated.getName());
         webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Computer player ready"));
     }
 }

@@ -112,8 +112,8 @@ public class MessageController {
     }
 
     @MessageMapping("/matchStart")
-    public void matchStart(String string) throws InterruptedException {
-        playerAndRoom.matchStart();
+    public void matchStart(String playerName) throws InterruptedException {
+        playerAndRoom.matchStart(playerName);
     }
     @MessageMapping("/bugReport")
     public void bugReport(BugReport bugReport) throws InterruptedException {

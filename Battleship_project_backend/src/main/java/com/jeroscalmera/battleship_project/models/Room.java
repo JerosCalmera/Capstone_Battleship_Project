@@ -20,9 +20,14 @@ public class Room {
     @JsonIgnoreProperties({"room"})
     private List<Player> players;
 
+    @Column(name = "players_ready")
+    private int playersReady;
+
+
     public Room(String roomNumber) {
         this.roomNumber = roomNumber;
         this.players = new ArrayList<>();
+        this.playersReady = 0;
     }
 
     public Room() {
@@ -54,5 +59,13 @@ public class Room {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public void setPlayersReady(int playersReady) {
+        this.playersReady = playersReady;
+    }
+
+    public int getPlayersReady() {
+        return playersReady;
     }
 }

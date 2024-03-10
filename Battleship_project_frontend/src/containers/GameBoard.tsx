@@ -1,4 +1,4 @@
-import Stomp, { client } from "stompjs";
+import Stomp, {} from "stompjs";
 import SockJS from "sockjs-client";
 import { useEffect, useState } from "react";
 import Grids from "../components/Grids";
@@ -45,11 +45,13 @@ function GameBoard() {
     const [cellStorage, setCellStorage] = useState<string>("")
 
     const [gameInfo, setGameInfo] = useState<string>("")
-    const [turn, setTurn] = useState<string>("Waiting")
+    const [turn, setTurn] = useState<string>("Ship Placement Phase")
     const [turnNumber, setTurnNumber] = useState<number>(-1)
 
     const [bugReport, setBugReport] = useState<number>(0)
     const [bugReportInput, setBugReportInput] = useState<string>("")
+
+    const [gameFlash, setGameFlash] = useState<number>(1)
 
 
     useEffect(() => {
@@ -124,7 +126,7 @@ function GameBoard() {
                 setPlayer2Data(message.body.slice(16, -2))}
             });
 
-            client.subscribe("/topic/computer", (message: any) => {
+            client.subscribe("/topic/computer", () => {
             });
 
             client.subscribe("/topic/randomPlacement", () => {
@@ -139,7 +141,7 @@ function GameBoard() {
             }
             );
 
-            client.subscribe("/topic/autoShoot", (message: any) => {
+            client.subscribe("/topic/autoShoot", () => {
             });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
@@ -169,7 +171,7 @@ function GameBoard() {
                 setPlacedShip(message.body.slice(16, -2))}
             });
 
-            client.subscribe("/topic/bugReport", (message: any) => {
+            client.subscribe("/topic/bugReport", () => {
             });
 
             client.ws.onclose = () => {
@@ -310,6 +312,13 @@ function GameBoard() {
         setBugReport(0);
     }
 
+    const gameFlashScreen = () => {
+        if (gameFlash === 0){
+        setGameFlash(1)}
+        else
+        setGameFlash(0);
+    }
+
     const sendBugReport = () => {
         stompClient.send("/app/bugReport", {}, JSON.stringify("DATE: " + Date() + ", USER: " + savedName + ", REPORT: "  + bugReportInput));
         setBugReport(0)
@@ -323,9 +332,36 @@ function GameBoard() {
                     <div className="cancelBox">
                         <button className="button" onClick={bugReporting}>X</button>
                     </div>
-                    <h3>Please write your bug report in as much detail as possible</h3>
+                    <h3>Please write your bug report (or message) in as much detail as possible</h3>
                     <input className="bugReportInputBox" name="room" value={bugReportInput} onChange={(e) => setBugReportInput(e.target.value)}></input><br />
                         <button className="button" onClick={sendBugReport}>Send</button>
+                </div>
+            </div>
+        </div>
+        )
+    }
+
+    const gameFlashRender = () => {
+        return (
+        <div className="bugReportPageFade">
+            <div className="bugReportOuter">
+                <div className="gameFlash">
+                <h3>Welcome to Solar Fury! A multiplayer battleship game with a sci-fi theme! <br />
+                    <div className="gameFlashBody">
+                    <br />
+                    To get started, place your ships by clicking them from the left selection, and then click two spaces on your grid to place them,
+                    the ships will then autocomplete in the direction you clicked, alternatively click "Random Placement" to have the computer place your ships for you.
+                    Once all your ships are placed, click "Ready", once both players are ready the match will begin! <br />
+                    <br />
+                    The first player will be picked randomly, then click on your opponent's board on your turn to shoot at their ships. The first player to destroy all their
+                    opponents' ships will be the winner! And you will gain a level that will be shown on the leaderboard if you are in the top ten! <br />
+                    <br />
+                    You can chat to other players using the chat box at the bottom, if you wish to submit a bug report or leave a message for the developer, click the box on the top left. <br />
+                    <br />
+                    </div>
+                    Good luck! And have fun!
+                    </h3>
+                        <button className="button" onClick={gameFlashScreen}>Start</button>
                 </div>
             </div>
         </div>
@@ -344,7 +380,7 @@ function GameBoard() {
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
                 {/* <button className="button" onClick={resetPlacement}>Dev</button> */}
-                <button className="button" onClick={bugReporting}>Bug Report</button>
+                <button className="button" onClick={bugReporting}>Bug Report/Msg Dev</button>
                 {/* {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>} */}
 
             </div>
@@ -355,7 +391,8 @@ function GameBoard() {
                     <h3>Waiting on other player.....</h3></div >
                 : serverMessageLog === "Server: Rooms synced"  && savedName != "name" && passwordEntry.length > 0 ?
                     <div>
-                        <Grids setChat={setChat} passwordEntry={passwordEntry} chat={chat} gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name}
+                        {gameFlash === 1 ? gameFlashRender() : null}
+                        <Grids setChat={setChat} chat={chat} gameInfo={gameInfo} turnNumber={turnNumber} serverMessageLog={serverMessageLog} playerName={playerName} turn={turn} miss={miss} enemyMiss={enemyMiss} player2Name={player2Name}
                             placedShip={placedShip} player1Data={player1Data} setPlacedShip={setPlacedShip}
                             player2Data={player2Data} savedName={savedName} shipInfo={shipInfo}
                             shipDamage={shipDamage} enemyShipDamage={enemyShipDamage}
@@ -368,6 +405,5 @@ function GameBoard() {
                 leaderBoard={leaderBoard} />
         </>
     )
-}
-
-export default GameBoard
+    }
+    export default GameBoard
