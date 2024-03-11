@@ -82,8 +82,9 @@ public class PlayerAndRoom {
         int total = 0;
         for (Player playerLeader : leaderboard) {
             if (total < 10) {
-                if (!playerLeader.getPlayerType().contains("Computer")){
-                webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));}
+                if (playerLeader.getPlayerType().contains("Human")){
+                webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
+                }
                 total++;
             } else {
                 break;
