@@ -21,8 +21,8 @@ public class Player implements Comparable<Player>{
     @Column(name = "playerNumber")
     private String playerNumber;
 
-    @Column(name = "playerType")
-    private String playerType;
+    @Column(name = "player_is_computer")
+    private boolean isComputer;
 
     @Column(name = "level")
     private int level;
@@ -48,7 +48,7 @@ public class Player implements Comparable<Player>{
         this.id = id;
         this.name = name;
         this.playerNumber = playerNumber;
-        this.playerType = playerType;
+        this.isComputer = false;
         this.level = level;
         this.roomNumber = roomNumber;
         this.ships = ships;
@@ -67,12 +67,12 @@ public class Player implements Comparable<Player>{
         this.ships = ships;
     }
 
-    public String getPlayerType() {
-        return playerType;
+    public boolean isComputer() {
+        return isComputer;
     }
 
-    public void setPlayerType(String playerType) {
-        this.playerType = playerType;
+    public void setComputer(boolean computer) {
+        isComputer = computer;
     }
 
     public String getPlayerNumber() {

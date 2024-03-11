@@ -82,7 +82,7 @@ public class PlayerAndRoom {
         int total = 0;
         for (Player playerLeader : leaderboard) {
             if (total < 10) {
-                if (playerLeader.getPlayerType().contains("Human")){
+                if (!playerLeader.isComputer()){
                 webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
                 }
                 total++;
@@ -101,7 +101,7 @@ public class PlayerAndRoom {
         if (coin == 1) {
             Player player = playerRepository.findByNameContaining(player1);
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player.getRoom().getRoomNumber() + player.getName()));
-            if (Objects.equals(player.getPlayerType(), "Computer")) {
+            if (player.isComputer()) {
                 shooting.computerShoot(player1);
             }
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
@@ -109,7 +109,7 @@ public class PlayerAndRoom {
         if (coin == 2) {
         Player player = playerRepository.findByNameContaining(player2);
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player.getRoom().getRoomNumber() + player.getName()));
-            if (Objects.equals(player.getPlayerType(), "Computer")) {;
+            if (player.isComputer()) {;
                 shooting.computerShoot(player2);
             }
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
@@ -176,7 +176,6 @@ public class PlayerAndRoom {
             } else {
                 String name = playerName.getName();
                 Player player = new Player(name);
-                player.setPlayerType("Human");
                 playersNotInRoom.add(player);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
             }
@@ -187,7 +186,6 @@ public class PlayerAndRoom {
             {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: A Game against the Computer has been selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
-            player.setPlayerType("Human");
             playersNotInRoom.add(player);
         }
     }
@@ -198,7 +196,7 @@ public class PlayerAndRoom {
         String ident = randomNumber;
         Player computerPlayerCreated = new Player();
         computerPlayerCreated.setName(ident + "Computer");
-        computerPlayerCreated.setPlayerType("Computer");
+        computerPlayerCreated.setComputer(true);
         playerRepository.save(computerPlayerCreated);
         handleNewPlayer(computerPlayerCreated);
         Thread.sleep(50);

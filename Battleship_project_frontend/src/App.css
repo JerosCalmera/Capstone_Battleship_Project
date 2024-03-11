@@ -111,7 +111,7 @@ h2 {
   position: fixed;
   height: 100%;
   width: 100%;
-  margin-top: -2%;
+  margin-top: -4%;
   margin-left: -2%;
   padding-right: 2%;
   padding-bottom: 2%;
@@ -128,9 +128,26 @@ h2 {
   transform: translate(-50%, -50%);
 }
 
+
+.loadingOuter {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.loadingFlash {
+  height: 60px;
+  width: 350px;
+  padding-left: 40px;
+  background-color: rgba(0, 0, 0, 0.888); 
+  border-radius: 20px;
+}
+
 .bugReport {
-  height: 100px;
-  width: 800px;
   background-color: rgba(0, 0, 0, 0.888); 
   border-radius: 20px;
   padding: 40px;

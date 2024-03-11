@@ -3,6 +3,7 @@ import SockJS from "sockjs-client";
 import { useEffect, useState } from "react";
 import Grids from "../components/Grids";
 import StartUp from "../components/StartUp";
+import LoadingSplash from "../components/LoadingSplash";
 
 
 function GameBoard() {
@@ -374,7 +375,7 @@ function GameBoard() {
             <div className={serverStatusStyle()}>
                 {serverStatus == true ? <h5>Connected to game server</h5> :
                     <>
-                        <h5>Not connected to game server</h5>
+                        <h5>Not connected to game server</h5><LoadingSplash attemptReconnect={attemptReconnect} setAttemptReconnect={setAttemptReconnect}/>
                         <button className="button" onClick={() => setAttemptReconnect(attemptReconnect + 1)}>Reconnect</button></>
                 }
                 <h5>{serverMessageLog}</h5>

@@ -39,11 +39,13 @@ public class Shooting {
     }
 
     public void computerCheck(String string) throws InterruptedException {
+        System.out.println("Checking if: " + string + " is a human or computer player");
         Player playerToCheck;
         playerToCheck = playerRepository.findByNameContaining(string.substring(1, 5));
         System.out.println(playerToCheck.getName());
-        if (Objects.equals(playerToCheck.getPlayerType(), "Computer")) {
+        if (playerToCheck.isComputer()) {
             computerShoot(playerToCheck.getName());
+            System.out.println("Computer: " + playerToCheck.getName() + " is shooting");
         }
     }
 
@@ -51,12 +53,15 @@ public class Shooting {
         String target = input.trim();
         String aimPoint = target.substring(0, 2);
         aimPoint = aimPoint.trim();
+        System.out.println("Targeting data : " + target);
         Player selectedPlayer = playerRepository.findByNameContaining(target.substring(2, 6));
+        System.out.println("The target is : " + selectedPlayer.getName());
         Player selectedPlayer2 = playerRepository.findByNameContaining(target.substring(6, 10));
+        System.out.println("The shooter is : " + selectedPlayer2.getName());
         List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         String converted = String.join("", shipList);
         if (converted.contains(aimPoint)) {
-            if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")) {
+            if (!selectedPlayer2.isComputer()) {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Hit!"));
             } else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Hit!"));
@@ -75,7 +80,7 @@ public class Shooting {
             enumerateShips(selectedPlayer.getId());
             computerCheck(selectedPlayer.getName());
         } else {
-            if (Objects.equals(selectedPlayer2.getPlayerType(), "Human")) {
+            if (!selectedPlayer2.isComputer()) {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Miss!"));
             } else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Miss!"));
@@ -91,7 +96,7 @@ public class Shooting {
         boolean allShipsDestroyed = true;
         Player playerToCheck = playerRepository.findPlayerById(id);
         String playerName = playerToCheck.getName();
-        if (Objects.equals(playerToCheck.getPlayerType(), "Computer")) {
+        if (playerToCheck.isComputer()) {
             playerName = "Computer";
         }
         Ship ship = new Ship();
@@ -194,12 +199,16 @@ public class Shooting {
         }
         String humanPlayer;
         String computerPlayer;
-        if (Objects.equals(players.get(0).getPlayerType(), "Computer")) {
+        if (players.get(0).isComputer()) {
             humanPlayer = players.get(1).getName();
             computerPlayer = players.get(0).getName();
-        } else
+            System.out.println("Human is : " + players.get(1).getName());
+            System.out.println("Computer is : " + players.get(0).getName());
+        } else {
             humanPlayer = players.get(0).getName();
-        computerPlayer = players.get(1).getName();
+            computerPlayer = players.get(1).getName();
+        System.out.println("Human is : " + players.get(0).getName());
+        System.out.println("Computer is : " + players.get(1).getName());}
         String shoot = computerRandomCoOrd();
         if (computerHitCheck) {
             shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
