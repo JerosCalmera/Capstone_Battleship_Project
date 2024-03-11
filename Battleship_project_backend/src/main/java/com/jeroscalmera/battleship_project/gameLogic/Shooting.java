@@ -57,7 +57,11 @@ public class Shooting {
         Player selectedPlayer = playerRepository.findByNameContaining(target.substring(2, 6));
         System.out.println("The target is : " + selectedPlayer.getName());
         Player selectedPlayer2 = playerRepository.findByNameContaining(target.substring(6, 10));
+<<<<<<< HEAD
         System.out.println("The shooter is : " + selectedPlayer2.getName());
+=======
+        System.out.println(selectedPlayer2.getName() + " shooting at " + selectedPlayer.getName());
+>>>>>>> 1e1955e778fb72d7b7462079c70a30dfd47191a0
         List<String> shipList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         String converted = String.join("", shipList);
         if (converted.contains(aimPoint)) {
