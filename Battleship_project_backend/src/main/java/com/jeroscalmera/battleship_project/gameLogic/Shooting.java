@@ -41,6 +41,7 @@ public class Shooting {
     public void computerCheck(String string) throws InterruptedException {
         Player playerToCheck;
         playerToCheck = playerRepository.findByNameContaining(string.substring(1, 5));
+        System.out.println(playerToCheck.getName());
         if (Objects.equals(playerToCheck.getPlayerType(), "Computer")) {
             computerShoot(playerToCheck.getName());
         }

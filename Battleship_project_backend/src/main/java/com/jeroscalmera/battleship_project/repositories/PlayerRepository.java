@@ -26,7 +26,10 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
 
     @Query("SELECT p.name FROM Player p WHERE p.room.roomNumber = :roomNumber")
-    List<String> findPlayersByRoomNumber(@Param("roomNumber") String roomNumber);
+    List<Player> findPlayerNamesByRoomNumber(@Param("roomNumber") String roomNumber);
+
+    @Query("SELECT p FROM Player p WHERE p.room.roomNumber = :roomNumber")
+    List<Player> findPlayersByRoomNumber(@Param("roomNumber") String roomNumber);
 
 
     @Query("SELECT p FROM Player p WHERE p.name LIKE %:name%")

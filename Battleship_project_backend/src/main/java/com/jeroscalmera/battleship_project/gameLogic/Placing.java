@@ -1,6 +1,7 @@
 package com.jeroscalmera.battleship_project.gameLogic;
 
 import com.jeroscalmera.battleship_project.models.Player;
+import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.models.Ship;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
@@ -37,17 +38,22 @@ public class Placing {
     boolean verticalPlacement = false;
     boolean invalidPlacement = false;
 
-    public void restart() {
-        List<Player> playerList = playerRepository.findAll();
+    public void restart(String roomNumber) {
+        roomNumber = roomNumber.substring(1, roomNumber.length()-1);
+        List<Player> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
+        Room activeRoom = roomRepository.findByRoomNumber(roomNumber);
+        if (activeRoom != null) {
         for (Player player : playerList) {
-//            if (Objects.equals(player.getPlayerType(), "Human")) {
             player.setRoom(null);
             player.setUnReady();
+            player.setShips(null);
             playerRepository.save(player);
-//            } else if (Objects.equals(player.getPlayerType(), "Computer")) {
-//                playerRepository.delete(player);
-//            }
+            shipRepository.deleteAllCoOrdsByPlayerId(player.getId());
         }
+        activeRoom.setPlayers(null);
+        roomRepository.delete(activeRoom);
+        }
+        else System.out.println("Room not found");
     }
 
     public synchronized void placeShip(String target) throws InterruptedException {

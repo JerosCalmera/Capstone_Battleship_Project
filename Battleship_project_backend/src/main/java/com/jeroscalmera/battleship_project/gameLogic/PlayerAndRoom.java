@@ -78,12 +78,12 @@ public class PlayerAndRoom {
 
     public void leaderBoard(String trigger) throws InterruptedException {
         List<Player> leaderboard = playerRepository.findAll();
-        Player player = new Player();
         Collections.sort(leaderboard);
         int total = 0;
         for (Player playerLeader : leaderboard) {
-            if (total < 10 && !playerLeader.getName().contains("Computer")) {
-                webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));
+            if (total < 10) {
+                if (!playerLeader.getPlayerType().contains("Computer")){
+                webSocketMessageSender.sendMessage("/topic/leaderBoard", new Chat("Level (" + playerLeader.getLevel() + ") " + playerLeader.getName()));}
                 total++;
             } else {
                 break;
@@ -108,7 +108,7 @@ public class PlayerAndRoom {
         if (coin == 2) {
         Player player = playerRepository.findByNameContaining(player2);
             webSocketMessageSender.sendMessage("/topic/turn", new Chat(player.getRoom().getRoomNumber() + player.getName()));
-            if (Objects.equals(player.getPlayerNumber(), "Computer")) {;
+            if (Objects.equals(player.getPlayerType(), "Computer")) {;
                 shooting.computerShoot(player2);
             }
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoom().getRoomNumber() + "All ships placed! Match Start!"));
@@ -161,7 +161,7 @@ public class PlayerAndRoom {
             playerRepository.save(playerDetails1);
             playerRepository.save(playerDetails2);
             playersNotInRoom.clear();
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now,  to place your ships, click on the ship and click two cells on the board, or press the random placement button to randomly place your ships"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now."));
         }
     }
 
