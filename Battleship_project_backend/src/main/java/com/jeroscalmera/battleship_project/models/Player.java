@@ -43,6 +43,11 @@ public class Player implements Comparable<Player>{
     @Column(name = "ready")
     private boolean ready;
 
+    @Column(name = "aiShot")
+    private String aiShot;
+
+    @Column(name = "aiMissed")
+    private String aiMissed;
 
     public Player(String name) {
         this.id = id;
@@ -54,6 +59,8 @@ public class Player implements Comparable<Player>{
         this.ships = ships;
         this.room = room;
         this.ready = false;
+        this.aiShot = aiShot;
+        this.aiMissed = aiMissed;
     }
 
     public Player() {
@@ -152,5 +159,29 @@ public class Player implements Comparable<Player>{
             output = this.name + " is ready!";
         }
         return output;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public String getAiShot() {
+        return aiShot;
+    }
+
+    public void setAiShot(String aiShot) {
+        this.aiShot = aiShot;
+    }
+
+    public String getAiMissed() {
+        return aiMissed;
+    }
+
+    public void setAiMissed(String aiMissed) {
+        this.aiMissed = aiMissed;
     }
 }

@@ -1,8 +1,10 @@
 package com.jeroscalmera.battleship_project.gameLogic;
 
+import com.jeroscalmera.battleship_project.models.Lobby;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
 import com.jeroscalmera.battleship_project.models.Ship;
+import com.jeroscalmera.battleship_project.repositories.LobbyRepository;
 import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
 import com.jeroscalmera.battleship_project.repositories.RoomRepository;
 import com.jeroscalmera.battleship_project.repositories.ShipRepository;
@@ -18,16 +20,19 @@ public class Placing {
     private PlayerRepository playerRepository;
     private ShipRepository shipRepository;
     private RoomRepository roomRepository;
+
+    private LobbyRepository lobbyRepository;
     private WebSocketMessageSender webSocketMessageSender;
 
     public List<String> computerAllCoOrds = new ArrayList<>();
     public List<String> coOrdLetters = new ArrayList<>();
     public List<String> coOrdNumbers = new ArrayList<>();
 
-    public Placing(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, WebSocketMessageSender webSocketMessageSender) {
+    public Placing(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, LobbyRepository lobbyRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
         this.roomRepository = roomRepository;
+        this.lobbyRepository = lobbyRepository;
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
@@ -39,6 +44,7 @@ public class Placing {
     boolean invalidPlacement = false;
 
     public void restart(String roomNumber) {
+        if (roomNumber.length() > 3) {
         roomNumber = roomNumber.substring(1, roomNumber.length()-1);
         List<Player> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
         Room activeRoom = roomRepository.findByRoomNumber(roomNumber);
@@ -54,7 +60,9 @@ public class Placing {
         roomRepository.delete(activeRoom);
         }
         else System.out.println("Room not found");
-    }
+        Lobby lobbyRoomToDelete = lobbyRepository.findLobbySingleRoom(roomNumber);
+        lobbyRepository.delete(lobbyRoomToDelete);
+    }}
 
     public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);

@@ -53,8 +53,7 @@ public class MessageController {
         placing.computerPlaceShips(name);
     }
     @MessageMapping("/restart")
-    public void handleRestart(String roomNumber) {
-        placing.restart(roomNumber);
+    public void handleRestart(String roomNumber) {placing.restart(roomNumber);
     }
     @MessageMapping("/room")
     public void handlePassword(String newRoom) throws InterruptedException {

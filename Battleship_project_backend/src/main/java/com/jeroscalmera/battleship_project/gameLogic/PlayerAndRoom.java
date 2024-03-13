@@ -1,12 +1,10 @@
 package com.jeroscalmera.battleship_project.gameLogic;
 
 import com.jeroscalmera.battleship_project.models.BugReport;
+import com.jeroscalmera.battleship_project.models.Lobby;
 import com.jeroscalmera.battleship_project.models.Player;
 import com.jeroscalmera.battleship_project.models.Room;
-import com.jeroscalmera.battleship_project.repositories.BugreportRepository;
-import com.jeroscalmera.battleship_project.repositories.PlayerRepository;
-import com.jeroscalmera.battleship_project.repositories.RoomRepository;
-import com.jeroscalmera.battleship_project.repositories.ShipRepository;
+import com.jeroscalmera.battleship_project.repositories.*;
 import com.jeroscalmera.battleship_project.websocket.*;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +17,20 @@ public class PlayerAndRoom {
     private RoomRepository roomRepository;
     private ShipRepository shipRepository;
     private BugreportRepository bugreportRepository;
+
+    private LobbyRepository lobbyRepository;
     private WebSocketMessageSender webSocketMessageSender;
     private static final List<Player> playersNotInRoom = new ArrayList<>();
 
     private Placing placing;
     private Shooting shooting;
 
-    public PlayerAndRoom(PlayerRepository playerRepository, RoomRepository roomRepository, ShipRepository shipRepository, BugreportRepository bugreportRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
+    public PlayerAndRoom(LobbyRepository lobbyRepository, PlayerRepository playerRepository, RoomRepository roomRepository, ShipRepository shipRepository, BugreportRepository bugreportRepository, WebSocketMessageSender webSocketMessageSender, Placing placing, Shooting shooting) {
         this.playerRepository = playerRepository;
         this.roomRepository = roomRepository;
         this.shipRepository = shipRepository;
         this.bugreportRepository = bugreportRepository;
+        this.lobbyRepository = lobbyRepository;
         this.webSocketMessageSender = webSocketMessageSender;
         this.placing = placing;
         this.shooting = shooting;
@@ -52,7 +53,6 @@ public class PlayerAndRoom {
     String player1;
 
     String player2;
-    public String roomNumberString;
 
     public void matchStart(String playerName) throws InterruptedException {
         if (!playerName.contains("Computer")) {
@@ -72,6 +72,8 @@ public class PlayerAndRoom {
         else if (activeRoom.getPlayersReady() == 1) {
             activeRoom.setPlayersReady(2);
             roomRepository.save(activeRoom);
+            Lobby lobbyRoomToDelete = lobbyRepository.findLobbySingleRoom(activeRoom.getRoomNumber());
+            lobbyRepository.delete(lobbyRoomToDelete);
             coinFlip();
         }
     }
@@ -117,22 +119,23 @@ public class PlayerAndRoom {
     }
 
     public void handlePassword(String roomNumber) throws InterruptedException {
-        String roomNumberSave = roomNumber;
+        List<Lobby> lobbyRooms = lobbyRepository.findAll();
         if
-        (!Objects.equals(roomNumberString, roomNumber)) {
+        (!lobbyRooms.contains(roomNumber)) {
             if (!roomSaved) {
                 roomSaved = true;
-                roomNumberString = roomNumber;
+                Lobby roomToSave = new Lobby(roomNumber.substring(1, roomNumber.length()-1));
+                lobbyRepository.save(roomToSave);
                 webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
             } else {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Psst! Wrong room number!"));
+                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Game in progress please enter room number and press save"));
             }
         } else {
             roomValidated = true;
         }
         if (roomSaved && roomValidated) {
             webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
-            Room addRoom = new Room(roomNumberSave);
+            Room addRoom = new Room(roomNumber);
             addRoom.setRoomNumber(roomNumber.substring(1, 5));
             roomRepository.save(addRoom);
             Thread.sleep(50);
@@ -162,7 +165,6 @@ public class PlayerAndRoom {
             playerRepository.save(playerDetails1);
             playerRepository.save(playerDetails2);
             playersNotInRoom.clear();
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat(addRoom.getRoomNumber() + "Admin: Welcome to the private chatroom for game: " + addRoom.getRoomNumber() + ", type /global to talk to all players online now."));
         }
     }
 
