@@ -28,6 +28,12 @@ public class Placing {
     public List<String> coOrdLetters = new ArrayList<>();
     public List<String> coOrdNumbers = new ArrayList<>();
 
+    List<String> coOrds = new ArrayList<>();
+    boolean horizontalPlacement = false;
+    boolean verticalPlacement = false;
+    boolean invalidPlacement = false;
+    String damage = "";
+
     public Placing(PlayerRepository playerRepository, ShipRepository shipRepository, RoomRepository roomRepository, LobbyRepository lobbyRepository, WebSocketMessageSender webSocketMessageSender) {
         this.playerRepository = playerRepository;
         this.shipRepository = shipRepository;
@@ -36,33 +42,27 @@ public class Placing {
         this.webSocketMessageSender = webSocketMessageSender;
     }
 
-    private List<String> coOrds = new ArrayList<>();
-    private String existingCoOrds;
-    private String damage = "";
-    boolean horizontalPlacement = false;
-    boolean verticalPlacement = false;
-    boolean invalidPlacement = false;
-
     public void restart(String roomNumber) {
-        if (roomNumber.length() > 3) {
-        roomNumber = roomNumber.substring(1, roomNumber.length()-1);
-        List<Player> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
-        Room activeRoom = roomRepository.findByRoomNumber(roomNumber);
-        if (activeRoom != null) {
-        for (Player player : playerList) {
-            player.setRoom(null);
-            player.setUnReady();
-            player.setShips(null);
-            playerRepository.save(player);
-            shipRepository.deleteAllCoOrdsByPlayerId(player.getId());
-        }
-        activeRoom.setPlayers(null);
-        roomRepository.delete(activeRoom);
-        }
-        else System.out.println("Room not found");
-        Lobby lobbyRoomToDelete = lobbyRepository.findLobbySingleRoom(roomNumber);
-        lobbyRepository.delete(lobbyRoomToDelete);
-    }}
+        if (roomNumber.length() > 4) {
+            roomNumber = roomNumber.substring(1, roomNumber.length() - 1);
+            List<Player> playerList = playerRepository.findPlayersByRoomNumber(roomNumber);
+            Room activeRoom = roomRepository.findByRoomNumber(roomNumber);
+                for (Player player : playerList) {
+                    player.setUnReady();
+                    player.setShips(null);
+                    player.setRoom(null);
+                    activeRoom.setPlayers(null);
+                    playerRepository.save(player);
+                    shipRepository.deleteAllCoOrdsByPlayerId(player.getId());
+                    roomRepository.delete(activeRoom);
+                }
+                Lobby lobbyRoomToDelete = lobbyRepository.findLobbySingleRoom(roomNumber);
+                lobbyRepository.delete(lobbyRoomToDelete);
+            }
+    }
+
+
+
 
     public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);
@@ -201,7 +201,6 @@ public class Placing {
             } else {
                 coOrds.clear();
                 newShip.setDamage(damage);
-                existingCoOrds += damage;
                 selectedPlayer.addShip(newShip);
                 newShip.setPlayer(selectedPlayer);
                 shipRepository.save(newShip);
@@ -215,12 +214,12 @@ public class Placing {
         }
     }
 
-    public void resetPlacement(String trigger) {
-        if (trigger.length() > 1) {
-            coOrds.clear();
-            damage = "";
-        }
-    }
+//    public void resetPlacement(String trigger) {
+//        if (trigger.length() > 1) {
+//            coOrds.clear();
+//            damage = "";
+//        }
+//    }
 
     public void fillCoOrds() {
         coOrdLetters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
@@ -366,7 +365,7 @@ public class Placing {
     }
     public boolean shipPlacement = false;
     public void computerPlaceShips(Player player) throws InterruptedException {
-        if (shipPlacement == true) {
+        if (shipPlacement) {
             webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: The computer is placing ships, please wait and try again"));
             return;
         }

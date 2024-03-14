@@ -17,4 +17,7 @@ public interface LobbyRepository extends JpaRepository<Lobby, Long> {
     @Query("SELECT l FROM Lobby l WHERE l.lobbyRoom = :roomNumber")
     Lobby findLobbySingleRoom(@Param("roomNumber") String roomNumber);
 
+    @Query("SELECT COUNT(l) > 0 FROM Lobby l WHERE l.lobbyRoom = :roomNumber")
+    boolean findLobbyRoomExists(@Param("roomNumber") String roomNumber);
+
 }

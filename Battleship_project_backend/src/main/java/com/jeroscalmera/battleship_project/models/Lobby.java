@@ -20,8 +20,6 @@ public class Lobby {
 
     public Lobby(String lobbyRoom) {
         this.lobbyRoom = lobbyRoom;
-        this.isSaved = isSaved;
-        this.isValidated = isValidated;
     }
 
     public Lobby() {

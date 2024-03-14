@@ -70,7 +70,7 @@ public class MessageController {
     }
     @MessageMapping("/placement2")
     public void resetPlacement(String string) throws InterruptedException {
-        placing.resetPlacement(string);
+//        placing.resetPlacement(string);
     }
     @MessageMapping("/enemyDamage")
     public void enemyDamage(String string) {
@@ -99,11 +99,11 @@ public class MessageController {
 
     @MessageMapping("/autoShoot")
     public void autoShoot() throws InterruptedException {
-        shooting.autoShoot();
+//        shooting.autoShoot();
     }
     @MessageMapping("/turn")
     public void turn(String playerName) throws InterruptedException {
-        playerAndRoom.coinFlip();
+        playerAndRoom.coinFlip(playerName);
     }
 
     @MessageMapping("/turnCheck")

@@ -22,12 +22,6 @@ public class Shooting {
     private RoomRepository roomRepository;
     private List<String> coOrdLetters = new ArrayList<>();
     private List<String> coOrdNumbers = new ArrayList<>();
-    private List<String> used = new ArrayList<>();
-    private String computerHit;
-    public boolean allShipsDestroyedForAutoShoot = false;
-
-    private Boolean computerHitCheck;
-    private List<String> computerHitCheckStorage = new ArrayList<>();
     private Placing placing;
 
     public Shooting(PlayerRepository playerRepository, ShipRepository shipRepository, WebSocketMessageSender webSocketMessageSender, RoomRepository roomRepository, Placing placing) {
@@ -66,8 +60,9 @@ public class Shooting {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Hit!"));
             } else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Hit!"));
-                computerHit = aimPoint;
-                computerHitCheck = true;
+                selectedPlayer2.setAiConfirmedHit(aimPoint);
+                selectedPlayer2.setAiHitCheck(true);
+                playerRepository.save(selectedPlayer2);
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/enemyDamage", new Chat(selectedPlayer.getRoom().getRoomNumber() + aimPoint + selectedPlayer.getName()));
@@ -85,6 +80,9 @@ public class Shooting {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer2.getName() + " Miss!"));
             } else {
                 webSocketMessageSender.sendMessage("/topic/gameInfo", new Chat(selectedPlayer.getRoom().getRoomNumber() + "Computer Miss!"));
+                selectedPlayer2.setAiConfirmedHit("");
+                selectedPlayer2.setAiHitCheck(false);
+                playerRepository.save(selectedPlayer2);
             }
             webSocketMessageSender.sendMessage("/topic/turn", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName()));
             webSocketMessageSender.sendMessage("/topic/miss", new Hidden(selectedPlayer.getRoom().getRoomNumber() + selectedPlayer.getName() + aimPoint));
@@ -108,28 +106,32 @@ public class Shooting {
                 shipRepository.save(shipToCheck);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Carrier!"));
                 if (!playerName.contains("Computer")) {
-                    computerHitCheck = false;
+                    playerToCheck.setAiHitCheck(false);
+                    playerRepository.save(playerToCheck);
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Battleship!"));
                 if (!playerName.contains("Computer")) {
-                    computerHitCheck = false;
+                    playerToCheck.setAiHitCheck(false);
+                    playerRepository.save(playerToCheck);
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Cruiser!"));
                 if (!playerName.contains("Computer")) {
-                    computerHitCheck = false;
+                    playerToCheck.setAiHitCheck(false);
+                    playerRepository.save(playerToCheck);
                 }
             } else if (Objects.equals(shipToCheck.getShipDamage(), "XXXX")) {
                 shipToCheck.setShipDamage("Destroyed");
                 shipRepository.save(shipToCheck);
                 webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerName + ": You destroyed my Destroyer!"));
                 if (!playerName.contains("Computer")) {
-                    computerHitCheck = false;
+                    playerToCheck.setAiHitCheck(false);
+                    playerRepository.save(playerToCheck);
                 }
             }
         for (Ship shipToCheck : shipToModify)
@@ -138,8 +140,6 @@ public class Shooting {
             }
 
         if (allShipsDestroyed) {
-            allShipsDestroyedForAutoShoot = true;
-            used.clear();
             webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + playerToCheck.getName() + " has had all their starships destroyed! And is defeated!"));
             Room roomToCheck = new Room();
             Room roomId = roomRepository.findRoomIdByPlayersId(playerToCheck.getId());
@@ -147,6 +147,9 @@ public class Shooting {
             for (Player winner : players) {
                 if (!Objects.equals(winner.getName(), playerToCheck.getName())) {
                     winner.setLevel(winner.levelUp(1));
+                    winner.setAiConfirmedHit(null);
+                    winner.setAiShot(null);
+                    winner.setAiHitCheck(false);
                     playerRepository.save(winner);
                     webSocketMessageSender.sendMessage("/topic/chat", new Chat(playerToCheck.getRoom().getRoomNumber() + winner.getName() + " is the Winner!"));
                     Thread.sleep(50);
@@ -154,7 +157,6 @@ public class Shooting {
                 }
             }
         }
-        allShipsDestroyedForAutoShoot = false;
     }
 
     public String computerRandomCoOrd() {
@@ -168,61 +170,71 @@ public class Shooting {
         return startLetter + startNumber;
     }
 
-    public void autoShoot() throws InterruptedException { // for presentations
-        List<Room> playersInRoom = roomRepository.findAllWithPlayers();
-        List<Player> players = new ArrayList<>();
-        for (Room room : playersInRoom) {
-            players = room.getPlayers();
-        }
-        while (!allShipsDestroyedForAutoShoot) {
-            String shoot = computerRandomCoOrd();
-            while (used.contains(shoot)) {
-                shoot = computerRandomCoOrd();
-            }
-            used.add(shoot);
-            shootAtShip(shoot + players.get(1).getName().substring(0, 4) + players.get(0).getName().substring(0, 4));
-            Thread.sleep(50);
-            shootAtShip(shoot + players.get(0).getName().substring(0, 4) + players.get(1).getName().substring(0, 4));
+//    public void autoShoot() throws InterruptedException { // for presentations
+//        List<Room> playersInRoom = roomRepository.findAllWithPlayers();
+//        List<Player> players = new ArrayList<>();
+//        for (Room room : playersInRoom) {
+//            players = room.getPlayers();
+//        }
+//        while (!allShipsDestroyedForAutoShoot) {
+//            String shoot = computerRandomCoOrd();
+//            while (used.contains(shoot)) {
+//                shoot = computerRandomCoOrd();
+//            }
+//            used.add(shoot);
+//            shootAtShip(shoot + players.get(1).getName().substring(0, 4) + players.get(0).getName().substring(0, 4));
+//            Thread.sleep(50);
+//            shootAtShip(shoot + players.get(0).getName().substring(0, 4) + players.get(1).getName().substring(0, 4));
+//
+//        }
+//        allShipsDestroyedForAutoShoot = false;
+//    }
 
-        }
-        allShipsDestroyedForAutoShoot = false;
-    }
-
+    @Transactional
     public void computerShoot(String playerName) throws InterruptedException {
         Thread.sleep(1000);
-        if (computerHitCheck == null) {
-            computerHitCheck = false;
-        }
         List<Room> playersInRoom = roomRepository.findByPlayersName(playerName);
         List<Player> players = new ArrayList<>();
         for (Room room : playersInRoom) {
             players = room.getPlayers();
         }
-        String humanPlayer;
-        String computerPlayer;
+        Player humanPlayer;
+        Player computerPlayer;
         if (players.get(0).isComputer()) {
-            humanPlayer = players.get(1).getName();
-            computerPlayer = players.get(0).getName();
+            humanPlayer = players.get(1);
+            computerPlayer = players.get(0);
             System.out.println("Human is : " + players.get(1).getName());
             System.out.println("Computer is : " + players.get(0).getName());
         } else {
-            humanPlayer = players.get(0).getName();
-            computerPlayer = players.get(1).getName();
+            humanPlayer = players.get(0);
+            computerPlayer = players.get(1);
         System.out.println("Human is : " + players.get(0).getName());
         System.out.println("Computer is : " + players.get(1).getName());}
-        String shoot = computerRandomCoOrd();
-        if (computerHitCheck) {
-            shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
+
+        if (computerPlayer.getAiShot() == null) {
+            computerPlayer.setAiShot("");
         }
-        while (used.contains(shoot)) {
-            if (computerHitCheck && !computerHitCheckStorage.contains(shoot)) {
-                shoot = (placing.generateStartingRandomCoOrds(computerHit, true));
-                computerHitCheckStorage.add(shoot);
+
+        String shoot = computerRandomCoOrd();
+        if (computerPlayer.getAiHitCheck()) {
+            shoot = (placing.generateStartingRandomCoOrds(computerPlayer.getAiConfirmedHit(), true));
+            System.out.println("hit ship at: " + computerPlayer.getAiConfirmedHit() + " , now shooting: " + shoot);}
+
+        while (computerPlayer.getAiShot().contains(shoot)) {
+            if (computerPlayer.getAiHitCheck()) {
+                shoot = (placing.generateStartingRandomCoOrds(computerPlayer.getAiConfirmedHit(), true));
+                System.out.println("hit ship at: " + computerPlayer.getAiConfirmedHit() + " , now shooting: " + shoot);
             } else {
                 shoot = computerRandomCoOrd();
             }
+
+            if (!computerPlayer.getAiShot().contains(shoot)) {;
+                break;
+            }
         }
-        used.add(shoot);
-        shootAtShip(shoot + humanPlayer.substring(0, 4) + computerPlayer.substring(0, 4));
+        computerPlayer.setAiShot(computerPlayer.getAiShot() + shoot);
+        System.out.println("Shot: = " + computerPlayer.getAiShot());
+        playerRepository.save(computerPlayer);
+        shootAtShip(shoot + humanPlayer.getName().substring(0, 4) + computerPlayer.getName().substring(0, 4));
     }
 }

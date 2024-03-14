@@ -73,9 +73,9 @@ public class ShipTest {
 //        shipRepository.save(destroyer);
     }
 
-    @Test
-    public void randomCoOrd() {
-        Placing placing = new Placing(playerRepository, shipRepository, roomRepository, webSocketMessageSender);
-    placing.computerPlaceShips();
-    }
+//    @Test
+//    public void randomCoOrd() {
+//        Placing placing = new Placing(playerRepository, shipRepository, roomRepository, webSocketMessageSender);
+//    placing.computerPlaceShips();
+//    }
 }

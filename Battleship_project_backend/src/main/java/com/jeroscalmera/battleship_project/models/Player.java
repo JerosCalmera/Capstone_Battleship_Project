@@ -43,24 +43,23 @@ public class Player implements Comparable<Player>{
     @Column(name = "ready")
     private boolean ready;
 
-    @Column(name = "aiShot")
+    @Column(name = "aiShot", length = 1000)
     private String aiShot;
 
-    @Column(name = "aiMissed")
-    private String aiMissed;
+    @Column(name = "aiConfirmedHit")
+    private String aiConfirmedHit;
+
+    @Column(name = "aiHitCheck")
+    private boolean aiHitCheck;
+
 
     public Player(String name) {
-        this.id = id;
         this.name = name;
-        this.playerNumber = playerNumber;
         this.isComputer = false;
-        this.level = level;
-        this.roomNumber = roomNumber;
-        this.ships = ships;
-        this.room = room;
         this.ready = false;
-        this.aiShot = aiShot;
-        this.aiMissed = aiMissed;
+        this.aiHitCheck = false;
+        this.aiShot = "*";
+        this.aiConfirmedHit = "*";
     }
 
     public Player() {
@@ -177,11 +176,27 @@ public class Player implements Comparable<Player>{
         this.aiShot = aiShot;
     }
 
-    public String getAiMissed() {
-        return aiMissed;
+    public boolean getAiHitCheck() {
+        return aiHitCheck;
     }
 
-    public void setAiMissed(String aiMissed) {
-        this.aiMissed = aiMissed;
+    public void setAiHitCheck(boolean aiHitCheck) {
+        this.aiHitCheck = aiHitCheck;
+    }
+
+    public String getAiConfirmedHit() {
+        return aiConfirmedHit;
+    }
+
+    public void setAiConfirmedHit(String aiConfirmedHit) {
+        this.aiConfirmedHit = aiConfirmedHit;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 }
