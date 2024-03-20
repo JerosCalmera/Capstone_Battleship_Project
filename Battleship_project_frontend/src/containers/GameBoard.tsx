@@ -1,6 +1,6 @@
 import Stomp, {} from "stompjs";
 import SockJS from "sockjs-client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Grids from "../components/Grids";
 import StartUp from "../components/StartUp";
 import LoadingSplash from "../components/LoadingSplash";
@@ -52,6 +52,7 @@ function GameBoard() {
     const [bugReport, setBugReport] = useState<number>(0)
     const [bugReportInput, setBugReportInput] = useState<string>("")
 
+    const [startUpFlash, setStartUpFlash] = useState<number>(1)
     const [gameFlash, setGameFlash] = useState<number>(1)
 
 
@@ -101,21 +102,19 @@ function GameBoard() {
                 if (newMessage.includes(passwordEntry)) {
                 setMissCheck(message.body.slice(16, -2))}
             });
+                // if (newMessage.includes("/global" || "/Global") || newMessage.includes("Lobby") || !newMessage.includes("Admin:")) {
+                //         newMessage = message.body.slice(16, -2);
+                //         if (!newMessage.includes("Admin")){
+                //         newMessage = newMessage.replace(/\/global|\/Global/g, "[Global]")}
+                //         setChat((prevChat) => {
+                //             const updatedChat = [...prevChat, newMessage];
+                //             return updatedChat.slice(-10);}
+                // )}
+
             client.subscribe("/topic/chat", (message: any) => {
-                let newMessage: string = message.body.slice(12, -2)
-                if (newMessage.includes("/global" || "/Global") || newMessage.includes("Lobby") || !newMessage.includes("Admin:")) {
-                        newMessage = message.body.slice(16, -2);
-                        if (!newMessage.includes("Admin")){
-                        newMessage = newMessage.replace(/\/global|\/Global/g, "[Global]")}
-                }
-                if (newMessage.includes(passwordEntry) && passwordEntry.length > 0) {
-                    newMessage = message.body.slice(16, -2);
-                }
-                setChat((prevChat) => {
-                    const updatedChat = [...prevChat, newMessage];
-                    return updatedChat.slice(-10);
+                chatParse(message)
                 });
-            });
+
             client.subscribe("/topic/playerData1", (message: any) => {
                 const newMessage: string = message.body.slice(12, -2)
                 if (newMessage.includes(passwordEntry)) {
@@ -141,9 +140,6 @@ function GameBoard() {
                 })
             }
             );
-
-            client.subscribe("/topic/autoShoot", () => {
-            });
 
             client.send("/app/hello", {}, JSON.stringify(`Client Connected on ${port}`));
             setServerStatus(true);
@@ -199,6 +195,7 @@ function GameBoard() {
 
     useEffect(() => {
         setTurnNumber(turnNumber + 1)
+        console.log("Turn number use effect:", turnNumber);
     }, [turn])
 
     useEffect(() => {
@@ -247,6 +244,19 @@ function GameBoard() {
         }
     }, [hidden, chat, serverMessageLog]);
 
+    const gameFlashSave = useRef(gameFlash);
+
+    useEffect(() => {
+        gameFlashSave.current = gameFlash
+    }, [chat]);
+
+    const roomNumberSave = useRef(passwordEntry);
+
+    useEffect(() => {
+        roomNumberSave.current = passwordEntry
+    }, [turnNumber, chat]);
+
+
     const auth = () => {
         if (password.length < 4) {
             stompClient.send("/app/chat", {}, JSON.stringify("Admin: Sorry room codes must be minimum of 4 characters long!"));
@@ -285,6 +295,23 @@ function GameBoard() {
         setChatEntry("")
     }
 
+    const chatParse = (message: any) => {
+        console.log("gameflash " + gameFlashSave.current)
+    let newMessage: string = message.body.slice(12, -2);
+        if (gameFlashSave.current === 1) {
+            setChat((prevChat) => {
+            const updatedChat = [...prevChat, newMessage];
+            return updatedChat.slice(-10);
+        });
+        } else if (newMessage.includes(roomNumberSave.current) && roomNumberSave.current.length > 0) {
+                newMessage = message.body.slice(16, -2);
+                setChat((prevChat) => {
+                const updatedChat = [...prevChat, newMessage];
+                return updatedChat.slice(-10);
+            });
+        };
+    }
+
     const restart = () => {
         stompClient.send("/app/restart", {}, JSON.stringify(passwordEntry));
         location.reload()
@@ -320,6 +347,13 @@ function GameBoard() {
         setGameFlash(0);
     }
 
+    const startUpFlashScreen = () => {
+        if (startUpFlash === 0){
+        setStartUpFlash(1)}
+        else
+        setStartUpFlash(0);
+    }
+
     const sendBugReport = () => {
         stompClient.send("/app/bugReport", {}, JSON.stringify("DATE: " + Date() + ", USER: " + savedName + ", REPORT: "  + bugReportInput));
         setBugReport(0)
@@ -342,7 +376,8 @@ function GameBoard() {
         )
     }
 
-    const gameFlashRender = () => {
+    
+    const startUpFlashRender = () => {
         return (
         <div className="bugReportPageFade">
             <div className="bugReportOuter">
@@ -350,7 +385,31 @@ function GameBoard() {
                 <h3>Welcome to Solar Fury! A multiplayer battleship game with a sci-fi theme! <br />
                     <div className="gameFlashBody">
                     <br />
-                    To get started, place your ships by clicking them from the left selection, and then click two spaces on your grid to place them,
+                    To get started, enter a name in the prompt, and then you have the option of either entering a room code if a friend has started a room, creating a new room code or randomly generating one. <br />
+                    <br />
+                    When the code is entered for another persons room you will join them in that game room, alternatively if you are creating the room, simply share the code with the other player. <br />
+                    <br />
+                    If you wish, you can play against the computer by selecting that option, be forewarned however, the computer is no pushover!<br />
+                    <br />
+                    Your username is saved in the cloud, so you can return and continue playing and leveling up by re-entering that username.
+                    </div>
+                    </h3>
+                        <button className="button" onClick={startUpFlashScreen}>Ok</button>
+                </div>
+            </div>
+        </div>
+        )
+    }
+
+    const gameFlashRender = () => {
+        return (
+        <div className="bugReportPageFade">
+            <div className="bugReportOuter">
+                <div className="gameFlash">
+                <h3>Time to play! <br />
+                    <div className="gameFlashBody">
+                    <br />
+                    First of all, place your ships by clicking them from the left selection, and then click two spaces on your grid to place them,
                     the ships will then autocomplete in the direction you clicked, alternatively click "Random Placement" to have the computer place your ships for you.
                     Once all your ships are placed, click "Ready", once both players are ready the match will begin! <br />
                     <br />
@@ -372,6 +431,7 @@ function GameBoard() {
     return (
         <>
             {bugReport === 1 ? bugReportingRender() : null}
+            {serverStatus == true && startUpFlash === 1 ? startUpFlashRender() : null}
             <div className={serverStatusStyle()}>
                 {serverStatus == true ? <h5>Connected to game server</h5> :
                     <>
@@ -380,9 +440,7 @@ function GameBoard() {
                 }
                 <h5>{serverMessageLog}</h5>
                 <button className="button" onClick={restart}>Restart</button>
-                {/* <button className="button" onClick={resetPlacement}>Dev</button> */}
                 <button className="button" onClick={bugReporting}>Bug Report/Msg Dev</button>
-                {/* {turn === savedName ? <button className="button" onClick={autoShoot}>*</button> : <button className="button">-</button>} */}
 
             </div>
             {serverMessageLog === "Server: Room saved!" && passwordEntry.length < 1 ? serverSetMessageLog("Server: Another player has started a room") : null}
