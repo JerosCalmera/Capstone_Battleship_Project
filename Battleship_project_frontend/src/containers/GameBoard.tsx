@@ -254,7 +254,7 @@ function GameBoard() {
 
     useEffect(() => {
         roomNumberSave.current = passwordEntry
-    }, [turnNumber, chat]);
+    }, [turnNumber, chat, serverMessageLog]);
 
 
     const auth = () => {
@@ -325,6 +325,22 @@ function GameBoard() {
         }
     }
 
+    const privateWebSocketConnection = () => {
+        const port = 8081;
+        const socket = new SockJS(`${BASE_URL}:${port}/game`);
+        const client = Stomp.over(socket);
+    
+        client.connect({}, () => {
+                console.log("Connecting to private websocket");
+                client.subscribe(`/topic/private/${roomNumberSave.current}`, (message: any) => {
+                console.log(message.body.slice(12, -2))
+        });
+    });
+        client.ws.onclose = () => {
+            (console.log("Private connection terminated"))
+        };
+    }
+
     const playVsComputer = () => {
         const randomNumber = Math.floor(Math.random() * 9000) + 1000;
         const roomNumber = randomNumber.toString().padStart(4, "0");
@@ -342,9 +358,11 @@ function GameBoard() {
 
     const gameFlashScreen = () => {
         if (gameFlash === 0){
-        setGameFlash(1)}
+        setGameFlash(1)
+        privateWebSocketConnection();}
         else
         setGameFlash(0);
+        privateWebSocketConnection();
     }
 
     const startUpFlashScreen = () => {
