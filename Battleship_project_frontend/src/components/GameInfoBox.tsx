@@ -9,15 +9,16 @@ interface Props {
     matchBegin: () => void;
     randomPlacement: () => void;
     matchStart: string;
+    player1Data: string
 }
 
 
-const GameInfoBox: React.FC<Props> = ({serverMessageLog, turnNumber, turn, gameInfo, shipInfo, matchBegin, randomPlacement, matchStart}) => {
+const GameInfoBox: React.FC<Props> = ({player1Data, serverMessageLog, turnNumber, turn, gameInfo, shipInfo, matchBegin, randomPlacement, matchStart}) => {
 
 
     return (
         <>
-            {serverMessageLog === "Server: Rooms synced" ?
+            {player1Data.length > 1 ?
             <div className="gameInfoOuter">
                 <div className="gameInfo">
                     <h3>Turn: ({turnNumber}) {turn.includes("Computer") ? "Computer" : turn}</h3>

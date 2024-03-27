@@ -127,6 +127,7 @@ public class PlayerAndRoom {
                 lobbyRepository.save(roomToSave);
                 System.out.println("Lobby saved for first time");
                 webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Room saved!"));
+                webSocketMessageSender.sendMessage("/topic/hidden", new Hidden(roomNumber + "Server: Room saved!"));
             } else {
                 Lobby roomToValidate = lobbyRepository.findLobbySingleRoom(roomNumber);
                 roomToValidate.setValidated(true);
@@ -136,6 +137,7 @@ public class PlayerAndRoom {
             Lobby roomToCheck = lobbyRepository.findLobbySingleRoom(roomNumber);
             if (roomToCheck.isSaved() && roomToCheck.isValidated()) {
                 webSocketMessageSender.sendMessage("/topic/connect", new Greeting("Server: Rooms synced"));
+                webSocketMessageSender.sendMessage("/topic/hidden", new Hidden(roomNumber + "Server: Room synced!"));
                 Room addRoom = new Room(roomNumber);
                 addRoom.setRoomNumber(roomNumber.substring(0, 4));
                 roomRepository.save(addRoom);
@@ -169,19 +171,20 @@ public class PlayerAndRoom {
         List<String> players = playerRepository.findName();
         if (!players.contains(playerName.getName())) {
             if (players.stream().anyMatch(name -> name.startsWith(playerName.getName().substring(0, 4)))) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Sorry, " + playerName.getName() + " is too similar to an existing username!"));
-                webSocketMessageSender.sendMessage("/topic/hidden", new Chat(playerName.getName()));
+                webSocketMessageSender.sendMessage("/topic/globalChat", new Chat("Admin: Sorry, " + playerName.getName() + " is too similar to an existing username!"));
             } else {
                 String name = playerName.getName();
                 Player player = new Player(name);
                 playersNotInRoom.add(player);
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
+                webSocketMessageSender.sendMessage("/topic/globalChat", new Chat("Admin: Hello to our new player " + playerName.getName() + " your profile has been saved!"));
+                webSocketMessageSender.sendMessage("/topic/nameValidated", new Chat(playerName.getName()));
             }
         } else {
             if (!playerName.getName().contains("Computer")) {
-                webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+                webSocketMessageSender.sendMessage("/topic/globalChat", new Chat("Admin: Welcome back " + playerName.getName() + "!"));
+                webSocketMessageSender.sendMessage("/topic/nameValidated", new Chat(playerName.getName()));
             }else
-            {webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: A Game against the Computer has been selected"));}
+            {webSocketMessageSender.sendMessage("/topic/globalChat", new Chat("Admin: A Game against the Computer has been selected"));}
             String name = playerName.getName();
             Player player = new Player(name);
             playersNotInRoom.add(player);
@@ -213,7 +216,7 @@ public class PlayerAndRoom {
         placeShipsThread.start();
         placeShipsThread.join();
         matchStart(computerPlayerCreated.getName());
-        webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: Computer player ready"));
+        webSocketMessageSender.sendMessage("/topic/chat", new Chat(roomNumber.substring(1, roomNumber.length() - 1) + "Admin: Computer player ready"));
     }
 }
 

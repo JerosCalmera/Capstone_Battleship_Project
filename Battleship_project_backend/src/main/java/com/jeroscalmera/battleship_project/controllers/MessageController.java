@@ -45,8 +45,19 @@ public class MessageController {
         String chat = message.getContent();
         return new Chat(chat);
     }
+
+    @MessageMapping("/globalChat")
+    @SendTo("/topic/globalChat")
+    public Chat globalChat(Chat message) throws Exception {
+        String chat = message.getContent();
+        return new Chat(chat);
+    }
     @MessageMapping("/gameUpdate")
     public void gameUpdate(Player name) throws InterruptedException {
+    }
+
+    @MessageMapping("/nameValidated")
+    public void nameValidated() throws InterruptedException {
     }
     @MessageMapping("/startup")
     public void startup(Player name) throws InterruptedException {

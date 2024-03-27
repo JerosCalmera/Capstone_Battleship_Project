@@ -66,6 +66,7 @@ public class Placing {
 
     public synchronized void placeShip(String target) throws InterruptedException {
         Thread.sleep(50);
+        System.out.println("Target: " + target);
         Player selectedPlayer = playerRepository.findByNameContaining((target.substring(4, 9)));
         List<String> shipsList = playerRepository.findAllCoOrdsByPlayerName(selectedPlayer.getName());
         if (shipsList.contains(target.substring(1, 3))) {
@@ -366,7 +367,7 @@ public class Placing {
     public boolean shipPlacement = false;
     public void computerPlaceShips(Player player) throws InterruptedException {
         if (shipPlacement) {
-            webSocketMessageSender.sendMessage("/topic/chat", new Chat("Admin: The computer is placing ships, please wait and try again"));
+            webSocketMessageSender.sendMessage("/topic/chat", new Chat(player.getRoomNumber() + "Admin: The computer is placing ships, please wait and try again"));
             return;
         }
         shipPlacement = true;

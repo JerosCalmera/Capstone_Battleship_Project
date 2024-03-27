@@ -17,12 +17,15 @@ interface Props {
     chatSend: () => void;
     setChatEntry: React.Dispatch<React.SetStateAction<string>>;
     leaderBoard: string[];
+    nameValidated: boolean;
+    roomNumberSave: any;
+    player1Data: string;
 }
 
-const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
+const StartUp: React.FC<Props> = ({ player1Data, nameValidated, roomNumberSave, hidden, playVsComputer, chatEntry, setPlayerName, saveName, savedName, serverMessageLog, password, setPassword, auth, generate, playerName, chat, chatSend, setChatEntry, leaderBoard }) => {
 
     const chatBox = () => {
-        if (serverMessageLog === "Server: Rooms synced")
+        if (player1Data != "Player 1")
             return "chatBoxOuter"
         else {
             return
@@ -31,7 +34,7 @@ const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, sa
 
     return (
         <>
-            {savedName != "name" && serverMessageLog != "Server: Room saved!" ? serverMessageLog != "Server: Rooms synced" ? serverMessageLog != "Server: Another player has started a room" ?
+            {nameValidated === true && !hidden.includes("Server: Room saved!") && !hidden.includes(roomNumberSave.current) ?
                 <div className="startupOuter">
                     <h3>Please enter or generate a room code, or play against the computer</h3>
                     <input type="number" className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
@@ -40,14 +43,8 @@ const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, sa
                     <button className="button" onClick={playVsComputer}>Play against the computer</button>
                 </div>
                 :
-                <div className="startupOuter">
-                    <h3>Please enter the room code....</h3>
-                    <input type="number" className="input" name="room" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                    <button className="button" onClick={auth}>Start</button>
-                </div>
-                :
-                null : null}
-            {savedName === "name" ?
+                null}
+            {nameValidated === false ?
                 <div className="startupOuter">
                     <h3> Welcome to Solar Fury, Please enter your name</h3>
                     Player name: <input className="input" name="name" value={playerName} onChange={(e) => setPlayerName(e.target.value)}></input>
@@ -65,7 +62,7 @@ const StartUp: React.FC<Props> = ({ playVsComputer, chatEntry, setPlayerName, sa
                     <button className="button" onClick={chatSend}>Send</button>
                 </div>
             </div>
-            {serverMessageLog != "Server: Rooms synced" ?
+            {!hidden.includes("Server: Room synced") ?
                 <div className="leaderBoardOuter">
                     <div className="leaderBoard">
                         <h3>Top 10 Players:</h3>

@@ -21,13 +21,11 @@ interface Props {
     playerName: string;
     gameInfo: string;
     serverMessageLog: string;
-    chat: string[];
     turnNumber: number;
     setPlacedShip: React.Dispatch<React.SetStateAction<string>>;
-    setChat: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const Grids: React.FC<Props> = ({ setChat, chat, gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
+const Grids: React.FC<Props> = ({gameInfo, serverMessageLog, turnNumber, playerName, turn, miss, enemyMiss, player2Name, placedShip, setPlacedShip, player1Data, player2Data, savedName, shipInfo, shipDamage, enemyShipDamage, stompClient }) => {
 
     const [shipPlacement, setShipPlacement] = useState<boolean>(false)
     const [placedReadyShip, setPlacedReadyShip] = useState<string>("")
@@ -204,7 +202,7 @@ const Grids: React.FC<Props> = ({ setChat, chat, gameInfo, serverMessageLog, tur
 
     return (
         <>
-            <GameInfoBox shipInfo={shipInfo} shipDamage={shipDamage} turn={turn} gameInfo={gameInfo} serverMessageLog={serverMessageLog} turnNumber={turnNumber}
+            <GameInfoBox player1Data={player1Data} shipInfo={shipInfo} shipDamage={shipDamage} turn={turn} gameInfo={gameInfo} serverMessageLog={serverMessageLog} turnNumber={turnNumber}
             matchStart={matchStart} matchBegin={matchBegin} randomPlacement={randomPlacement}/>
             <div className="gameBoardOuterGreater">
                 <div className="gameBoardOuter">
@@ -247,7 +245,7 @@ const Grids: React.FC<Props> = ({ setChat, chat, gameInfo, serverMessageLog, tur
                         </div>
                     </div>
                     <div className="gameBoardRender">
-                        <h2>{player1Data}</h2>
+                        <h2>{player1Data.includes("Computer") ? player1Data.includes(savedName) ? "Error": "Setting up...." : player1Data }</h2>
                         <ul>
                             {populateGrid()}
                             <button name="end" className="endCellCorner">*</button>
@@ -255,7 +253,7 @@ const Grids: React.FC<Props> = ({ setChat, chat, gameInfo, serverMessageLog, tur
                         </ul>
                     </div >
                     <div className="gameBoardRender2">
-                        <h2>{player2Data.includes("Computer") ? "Computer " : player2Data}</h2>
+                        <h2>{player2Data.includes("Computer") ? player2Data.includes(savedName) ? !player2Data.includes(savedName) ? player2Data : "Computer " : "Computer" : player2Data}</h2>
                         <ul>
                             {populateEnemyGrid()}
                             <button name="end" className="endCellCorner">*</button>
